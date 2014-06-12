@@ -2,6 +2,11 @@
 #include "Moose.h"
 #include "AppFactory.h"
 #include "ModulesApp.h"
+#include "TwoDConvectionDiffusionDDC.h"
+#include "TwoDDarcyDDC.h"
+#include "PerturbationIC.h"
+// #include "VelocityAux.h"
+#include "VerticalRefine.h"
 
 template<>
 InputParameters validParams<QuollApp>()
@@ -37,6 +42,19 @@ QuollApp::registerApps()
 void
 QuollApp::registerObjects(Factory & factory)
 {
+
+   // Register the custom convection and Darcy kernels defined for this problem
+   registerKernel(TwoDConvectionDiffusionDDC);
+   registerKernel(TwoDDarcyDDC);
+
+   // Register the pertubation initial condition to seed the instability
+   registerInitialCondition(PerturbationIC);
+   
+   // Register the auxillary kernel to calculate the fluid velocities from the streamfunction
+// registerAux(VelocityAux);
+
+   // Register the mesh modifier to rescale the vertical component so that the mesh is refined at the top
+   registerMeshModifier(VerticalRefine);
 }
 
 void
