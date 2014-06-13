@@ -18,6 +18,7 @@ template<>
 InputParameters validParams<TwoDDarcyDDC>()
 {
   InputParameters params = validParams<Kernel>();
+  params.addParam<Real>("gamma", 1.0, "The anisotropy ratio");
   params.addRequiredCoupledVar("concentration_variable", "The gradient of the concentration is passed for the coupling.");
   return params;
 }
@@ -25,13 +26,14 @@ InputParameters validParams<TwoDDarcyDDC>()
 TwoDDarcyDDC::TwoDDarcyDDC(const std::string & name,
                        InputParameters parameters) :
     Kernel(name, parameters),
+    _gamma(getParam<Real>("gamma")),
     _grad_concentration(coupledGradient("concentration_variable"))
 {}
 
 Real TwoDDarcyDDC::computeQpResidual()
 {
 //  std::cout << _qp << "grad_concentration[1] = " << _grad_concentration[_qp] << "\n";
-  return  _test[_i][_qp] * _grad_concentration[_qp](0) - _grad_test[_i][_qp] * _grad_u[_qp];
+  return  _gamma * _test[_i][_qp] * _grad_concentration[_qp](0) - _grad_test[_i][_qp] * _grad_u[_qp];
 }
 
 Real TwoDDarcyDDC::computeQpJacobian()

@@ -37,6 +37,7 @@ protected:
 
 private:
 
+  Real _gamma;
   VariableGradient & _grad_concentration;
 };
 

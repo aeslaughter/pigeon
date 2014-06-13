@@ -35,7 +35,7 @@ Real TwoDConvectionDiffusionDDC::computeQpResidual()
 {
   Real convterm1 = - _test[_i][_qp] * (_grad_streamfunction[_qp](1) * _grad_u[_qp](0));
   Real convterm2 = _test[_i][_qp] * (_grad_streamfunction[_qp](0) * _grad_u[_qp](1));
-  Real diffterm = (_grad_u[_qp]) * _grad_test[_i][_qp];
+  Real diffterm = (_gamma * _grad_u[_qp]) * _grad_test[_i][_qp];
 
 
   return convterm1 + convterm2 + diffterm;

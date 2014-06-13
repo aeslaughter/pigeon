@@ -45,8 +45,8 @@ PerturbationIC::value(const Point & p)
    * case.
    */
   Real random_real = MooseRandom::rand();  
-  Real initial_diff = 1 + erf(p(1) / 2.0);
-  Real initial_perturbation = random_real * (_amplitude * std::sqrt(0.02) * std::abs(p(1)) * std::exp(0.5 - 0.01 * p(1) * p(1)));
+  Real initial_diff = 1.0 + erf(p(1) / 2.0);
+  Real initial_perturbation = random_real * (_amplitude * std::sqrt(0.002) * std::abs(p(1)) * std::exp(0.5 - 0.001 * p(1) * p(1)));
 
   return initial_diff + initial_perturbation;
 }
