@@ -1,13 +1,4 @@
-<<<<<<< HEAD
-Mamba
-=====
+MAMBA (Boiling and Chemistry in Porous Media)
 
-"Fork Mamba" to create a new MOOSE-based application.
+***NOTE: This repository has moved to our new organizational account. You can find and form our repo at the following link:
 
-For more information see: [http://mooseframework.com/create-an-app/](http://mooseframework.com/create-an-app/)
-=======
-MAMBA-Public
-============
-
-Public repository for CASL's MAMBA Mesoscale CRUD Code (Boiling and Chemistry in Porous Media)
->>>>>>> 05e2a4177ec3583f5260d296507223a17987311d
