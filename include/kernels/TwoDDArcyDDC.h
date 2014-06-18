@@ -35,10 +35,13 @@ protected:
 
   virtual Real computeQpJacobian();
 
+  virtual Real computeQpOffDiagJacobian(unsigned int jvar);
+
 private:
 
   Real _gamma;
   VariableGradient & _grad_concentration;
+  unsigned int _grad_concentration_var;
 };
 
 #endif //TWODDARCYDDC_H

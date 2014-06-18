@@ -35,11 +35,14 @@ protected:
 
   virtual Real computeQpJacobian();
 
+  virtual Real computeQpOffDiagJacobian(unsigned int jvar);
+
   RealTensorValue _gamma;
 
 private:
 
   VariableGradient & _grad_streamfunction;
+  unsigned int _grad_streamfunction_var;
 };
 
 #endif //TWODCONVECTIONDIFFUSIONDDC_H

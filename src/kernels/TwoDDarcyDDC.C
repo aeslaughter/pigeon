@@ -27,16 +27,23 @@ TwoDDarcyDDC::TwoDDarcyDDC(const std::string & name,
                        InputParameters parameters) :
     Kernel(name, parameters),
     _gamma(getParam<Real>("gamma")),
-    _grad_concentration(coupledGradient("concentration_variable"))
+    _grad_concentration(coupledGradient("concentration_variable")),
+    _grad_concentration_var(coupled("gamma"))
 {}
 
 Real TwoDDarcyDDC::computeQpResidual()
 {
-//  std::cout << _qp << "grad_concentration[1] = " << _grad_concentration[_qp] << "\n";
   return  _gamma * _test[_i][_qp] * _grad_concentration[_qp](0) - _grad_test[_i][_qp] * _grad_u[_qp];
 }
 
 Real TwoDDarcyDDC::computeQpJacobian()
 {
   return - _grad_test[_i][_qp] * _grad_phi[_j][_qp];
+}
+
+Real TwoDDarcyDDC::computeQpOffDiagJacobian(unsigned int jvar)
+{
+  if (jvar == _grad_concentration_var)
+    return _gamma * _test[_i][_qp] * _grad_phi[_j][_qp](0); 
+  return 0.0;
 }
