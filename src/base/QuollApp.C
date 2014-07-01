@@ -4,6 +4,9 @@
 #include "ModulesApp.h"
 #include "TwoDConvectionDiffusionDDC.h"
 #include "TwoDDarcyDDC.h"
+#include "ThreeDConvectionDiffusionDDC.h"
+#include "ThreeDDarcyDDCx.h"
+#include "ThreeDDarcyDDCy.h"
 #include "PerturbationIC.h"
 // #include "VelocityAux.h"
 #include "VerticalRefine.h"
@@ -46,6 +49,9 @@ QuollApp::registerObjects(Factory & factory)
    // Register the custom convection and Darcy kernels defined for this problem
    registerKernel(TwoDConvectionDiffusionDDC);
    registerKernel(TwoDDarcyDDC);
+   registerKernel(ThreeDConvectionDiffusionDDC);
+   registerKernel(ThreeDDarcyDDCx);
+   registerKernel(ThreeDDarcyDDCy);
 
    // Register the pertubation initial condition to seed the instability
    registerInitialCondition(PerturbationIC);
