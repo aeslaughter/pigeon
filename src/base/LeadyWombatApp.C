@@ -1,0 +1,45 @@
+#include "LeadyWombatApp.h"
+#include "Moose.h"
+#include "AppFactory.h"
+#include "ModulesApp.h"
+
+template<>
+InputParameters validParams<LeadyWombatApp>()
+{
+  InputParameters params = validParams<MooseApp>();
+  return params;
+}
+
+LeadyWombatApp::LeadyWombatApp(const std::string & name, InputParameters parameters) :
+    MooseApp(name, parameters)
+{
+  srand(processor_id());
+
+  Moose::registerObjects(_factory);
+  ModulesApp::registerObjects(_factory);
+  LeadyWombatApp::registerObjects(_factory);
+
+  Moose::associateSyntax(_syntax, _action_factory);
+  ModulesApp::associateSyntax(_syntax, _action_factory);
+  LeadyWombatApp::associateSyntax(_syntax, _action_factory);
+}
+
+LeadyWombatApp::~LeadyWombatApp()
+{
+}
+
+void
+LeadyWombatApp::registerApps()
+{
+  registerApp(LeadyWombatApp);
+}
+
+void
+LeadyWombatApp::registerObjects(Factory & factory)
+{
+}
+
+void
+LeadyWombatApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
+{
+}
