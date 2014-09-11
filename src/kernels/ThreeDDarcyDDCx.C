@@ -33,7 +33,7 @@ ThreeDDarcyDDCx::ThreeDDarcyDDCx(const std::string & name,
 
 Real ThreeDDarcyDDCx::computeQpResidual()
 {
-  return - _gamma * _test[_i][_qp] * _grad_concentration[_qp](1) - _grad_test[_i][_qp] * _grad_u[_qp];
+  return  _gamma * _test[_i][_qp] * _grad_concentration[_qp](1) - _grad_test[_i][_qp] * _grad_u[_qp];
 }
 
 Real ThreeDDarcyDDCx::computeQpJacobian()
@@ -44,6 +44,6 @@ Real ThreeDDarcyDDCx::computeQpJacobian()
 Real ThreeDDarcyDDCx::computeQpOffDiagJacobian(unsigned int jvar)
 {
   if (jvar == _grad_concentration_var)
-    return - _gamma * _test[_i][_qp] * _grad_phi[_j][_qp](1); 
+    return  _gamma * _test[_i][_qp] * _grad_phi[_j][_qp](1); 
   return 0.0;
 }
