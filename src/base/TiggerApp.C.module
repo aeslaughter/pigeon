@@ -1,0 +1,42 @@
+#include "TiggerApp.h"
+#include "Moose.h"
+#include "AppFactory.h"
+
+template<>
+InputParameters validParams<TiggerApp>()
+{
+  InputParameters params = validParams<MooseApp>();
+  return params;
+}
+
+TiggerApp::TiggerApp(const std::string & name, InputParameters parameters) :
+    MooseApp(name, parameters)
+{
+  srand(processor_id());
+
+  Moose::registerObjects(_factory);
+  TiggerApp::registerObjects(_factory);
+
+  Moose::associateSyntax(_syntax, _action_factory);
+  TiggerApp::associateSyntax(_syntax, _action_factory);
+}
+
+TiggerApp::~TiggerApp()
+{
+}
+
+void
+TiggerApp::registerApps()
+{
+  registerApp(TiggerApp);
+}
+
+void
+TiggerApp::registerObjects(Factory & factory)
+{
+}
+
+void
+TiggerApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
+{
+}
