@@ -1,0 +1,7 @@
+[Tests]
+  [./TMat]
+    type = 'Exodiff'
+    input = 'tempDependentMaterial.i'
+    exodiff = 'tempDependentMaterial_tempProfile.e'
+  [../]
+[]
