@@ -3,6 +3,8 @@
 #include "AppFactory.h"
 #include "ModulesApp.h"
 
+#include "CoupledHeatSource.h"
+
 template<>
 InputParameters validParams<TiggerApp>()
 {
@@ -37,6 +39,7 @@ TiggerApp::registerApps()
 void
 TiggerApp::registerObjects(Factory & factory)
 {
+  registerKernel(CoupledHeatSource);
 }
 
 void
