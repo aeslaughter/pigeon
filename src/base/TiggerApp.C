@@ -7,6 +7,8 @@
 
 #include "ExtendedHeatConductionMaterial.h"
 
+#include "ProjectVarAux.h"
+
 template<>
 InputParameters validParams<TiggerApp>()
 {
@@ -43,6 +45,7 @@ TiggerApp::registerObjects(Factory & factory)
 {
   registerKernel(CoupledHeatSource);
   registerMaterial(ExtendedHeatConductionMaterial);
+  registerAux(ProjectVarAux);
 }
 
 void
