@@ -1,0 +1,42 @@
+#include "LlamaApp.h"
+#include "Moose.h"
+#include "AppFactory.h"
+
+template<>
+InputParameters validParams<LlamaApp>()
+{
+  InputParameters params = validParams<MooseApp>();
+  return params;
+}
+
+LlamaApp::LlamaApp(const std::string & name, InputParameters parameters) :
+    MooseApp(name, parameters)
+{
+  srand(processor_id());
+
+  Moose::registerObjects(_factory);
+  LlamaApp::registerObjects(_factory);
+
+  Moose::associateSyntax(_syntax, _action_factory);
+  LlamaApp::associateSyntax(_syntax, _action_factory);
+}
+
+LlamaApp::~LlamaApp()
+{
+}
+
+void
+LlamaApp::registerApps()
+{
+  registerApp(LlamaApp);
+}
+
+void
+LlamaApp::registerObjects(Factory & factory)
+{
+}
+
+void
+LlamaApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
+{
+}
