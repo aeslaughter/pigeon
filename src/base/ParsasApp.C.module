@@ -1,0 +1,42 @@
+#include "ParsasApp.h"
+#include "Moose.h"
+#include "AppFactory.h"
+
+template<>
+InputParameters validParams<ParsasApp>()
+{
+  InputParameters params = validParams<MooseApp>();
+  return params;
+}
+
+ParsasApp::ParsasApp(const std::string & name, InputParameters parameters) :
+    MooseApp(name, parameters)
+{
+  srand(processor_id());
+
+  Moose::registerObjects(_factory);
+  ParsasApp::registerObjects(_factory);
+
+  Moose::associateSyntax(_syntax, _action_factory);
+  ParsasApp::associateSyntax(_syntax, _action_factory);
+}
+
+ParsasApp::~ParsasApp()
+{
+}
+
+void
+ParsasApp::registerApps()
+{
+  registerApp(ParsasApp);
+}
+
+void
+ParsasApp::registerObjects(Factory & factory)
+{
+}
+
+void
+ParsasApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
+{
+}
