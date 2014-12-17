@@ -30,7 +30,7 @@ private:
 
     MaterialProperty<Real> & _bulk_thermal_conductivity;
     MaterialProperty<Real> & _bulk_specific_heat;
-    MaterialProperty<Real> & _fluid_specific_heat;
+    MaterialProperty<Real> & _thermal_advection_coeff;
     MaterialProperty<Real> & _fluid_transient_coeff;
     MaterialProperty<Real> & _hydraulic_conductivity;
 };

@@ -2,7 +2,7 @@
 #define THERMALADVECTION
 
 #include "Kernel.h"
-#include "PorousMaterial.h"
+#include "Material.h"
 
 class ThermalAdvection;
 
@@ -19,7 +19,7 @@ protected:
 	virtual Real computeQpJacobian();
 
 private:
-	MaterialProperty<Real> & _fluid_specific_heat;
+	MaterialProperty<Real> & _thermal_advection_coeff;
 	VariableGradient & _grad_pressure;
 };
 #endif //THERMALADVECTION

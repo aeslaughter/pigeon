@@ -2,7 +2,7 @@
 #define THERMALCONDUCTION
 
 #include "Diffusion.h"
-#include "PorousMaterial.h"
+#include "Material.h"
 
 class ThermalConduction;
 

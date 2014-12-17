@@ -1,5 +1,5 @@
 #include "ThermalConduction.h"
-#include "PorousMaterial.h"
+#include "Material.h"
 
 template<>
 InputParameters validParams<ThermalConduction>()

@@ -15,8 +15,6 @@ InputParameters validParams<PorousMaterial>()
 	params.addRequiredParam<Real>("permeability", "The permeability");
 	params.addRequiredParam<Real>("fluid_viscosity", "The fluid viscosity");
 	
-
-
 	return params;
 }
 
@@ -37,10 +35,9 @@ PorousMaterial::PorousMaterial(const std::string & name, InputParameters paramet
     // Declare material properties that kernels can use
     _bulk_thermal_conductivity(declareProperty<Real>("bulk_thermal_conductivity")),
     _bulk_specific_heat(declareProperty<Real>("bulk_specific_heat")),
-    _fluid_specific_heat(declareProperty<Real>("fluid_specific_heat")),
+    _thermal_advection_coeff(declareProperty<Real>("thermal_advection_coeff")),
     _fluid_transient_coeff(declareProperty<Real>("fluid_transient_coeff")),
     _hydraulic_conductivity(declareProperty<Real>("hydraulic_conductivity"))
-	
 {}
 
 void
@@ -53,7 +50,7 @@ PorousMaterial::computeQpProperties()
 	_bulk_specific_heat[_qp] = _porosity * _fluid_density * _fluid_heat_capacity + (1-_porosity) * _solid_density * _solid_heat_capacity;
 
 	// Fluid specific heat
-	_fluid_specific_heat[_qp] = _fluid_density *_fluid_heat_capacity;
+	_thermal_advection_coeff[_qp] = - _fluid_density *_fluid_heat_capacity * _permeability / _fluid_viscosity;
 
 	// Fluid transient coeff
 	_fluid_transient_coeff[_qp] = _porosity *_fluid_density *_fluid_compressibility;
