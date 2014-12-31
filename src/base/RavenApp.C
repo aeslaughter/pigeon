@@ -3,6 +3,10 @@
 #include "AppFactory.h"
 #include "ModulesApp.h"
 
+#include "CHChemPotential.h" 
+#include "PFDiffusion.h"
+#include "TwoParticleDensityIC.h"
+
 template<>
 InputParameters validParams<RavenApp>()
 {
@@ -40,6 +44,9 @@ RavenApp::registerApps()
 void
 RavenApp::registerObjects(Factory & factory)
 {
+  registerKernel(CHChemPotential);
+  registerMaterial(PFDiffusion);
+  registerInitialCondition(TwoParticleDensityIC);
 }
 
 void
