@@ -157,3 +157,6 @@ peacock_*.e
 *.cpa-*
 *.cpr-*
 
+# make generated
+lib/*
+include/RavenRevision.h
