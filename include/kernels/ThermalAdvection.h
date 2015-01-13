@@ -20,6 +20,6 @@ protected:
 
 private:
 	MaterialProperty<Real> & _thermal_advection_coeff;
-	VariableGradient & _grad_pressure;
+	MaterialProperty<RealVectorValue> & _darcy_velocity;
 };
 #endif //THERMALADVECTION

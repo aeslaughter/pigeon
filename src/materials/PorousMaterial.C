@@ -14,6 +14,7 @@ InputParameters validParams<PorousMaterial>()
 	params.addRequiredParam<Real>("fluid_compressibility", "The fluid compressibility");
 	params.addRequiredParam<Real>("permeability", "The permeability");
 	params.addRequiredParam<Real>("fluid_viscosity", "The fluid viscosity");
+	params.addRequiredCoupledVar("pressure_for_Darcy", "The pressure gradient is used to calculate the velocity vector");
 	
 	return params;
 }
@@ -31,13 +32,15 @@ PorousMaterial::PorousMaterial(const std::string & name, InputParameters paramet
     _fluid_compressibility(getParam<Real>("fluid_compressibility")),
     _permeability(getParam<Real>("permeability")),
     _fluid_viscosity(getParam<Real>("fluid_viscosity")),
+    _grad_pressure(coupledGradient("pressure_for_Darcy")),
 
     // Declare material properties that kernels can use
     _bulk_thermal_conductivity(declareProperty<Real>("bulk_thermal_conductivity")),
     _bulk_specific_heat(declareProperty<Real>("bulk_specific_heat")),
     _thermal_advection_coeff(declareProperty<Real>("thermal_advection_coeff")),
     _fluid_transient_coeff(declareProperty<Real>("fluid_transient_coeff")),
-    _hydraulic_conductivity(declareProperty<Real>("hydraulic_conductivity"))
+    _hydraulic_conductivity(declareProperty<Real>("hydraulic_conductivity")),
+    _darcy_velocity(declareProperty<RealGradient>("darcy_velocity"))
 {}
 
 void
@@ -50,11 +53,14 @@ PorousMaterial::computeQpProperties()
 	_bulk_specific_heat[_qp] = _porosity * _fluid_density * _fluid_heat_capacity + (1-_porosity) * _solid_density * _solid_heat_capacity;
 
 	// Fluid specific heat
-	_thermal_advection_coeff[_qp] = - _fluid_density *_fluid_heat_capacity * _permeability / _fluid_viscosity;
+	_thermal_advection_coeff[_qp] = _fluid_density *_fluid_heat_capacity;
 
 	// Fluid transient coeff
 	_fluid_transient_coeff[_qp] = _porosity *_fluid_density *_fluid_compressibility;
 
 	// Hydraulic conductivity
 	_hydraulic_conductivity[_qp] = _permeability * _fluid_density / _fluid_viscosity;
+
+	// Darcy velocity
+	_darcy_velocity[_qp] = - _permeability / _fluid_viscosity * _grad_pressure[_qp];
 }
