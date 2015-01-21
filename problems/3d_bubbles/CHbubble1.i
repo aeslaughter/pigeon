@@ -184,15 +184,12 @@
   exodus = true
  # checkpoint = true
  # xda = true
-  [./console]
-    type = Console
-    perf_log = true
-    linear_residuals = true
-  [../]
+  print_perf_log = true
+  print_linear_residuals = true
   [./out]
     type = XDA
    output_final = true
-   output_intermediate = false 
+   output_timestep_end = false
   [../]
 []
 
@@ -203,4 +200,3 @@
     type = FunctionIC
   [../]
 []
-

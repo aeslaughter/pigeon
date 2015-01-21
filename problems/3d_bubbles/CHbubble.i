@@ -10,7 +10,7 @@
   nx = 25 # Number of elements in the x-direction
   ny = 5 # Number of elements in the y-direction
   nz = 0 # Number of elements in the z-direction
-  xmax = 100 # maximum x-coordinate of the mesh 
+  xmax = 100 # maximum x-coordinate of the mesh
   ymax = 20 # maximum y-coordinate of the mesh
   zmax = 0
   uniform_refine = 2
@@ -34,7 +34,7 @@
     order = FIRST # order for element shape function
     family = LAGRANGE # shape function type
     [./InitialCondition]
-      type = SmoothCirclesIC # Initial condition creates 2 circles  
+      type = SmoothCirclesIC # Initial condition creates 2 circles
       x1 = 17
       y1 = 0
       invalue = 1.1
@@ -190,16 +190,12 @@
   file_base = out1
   output_initial = true
   exodus = true
+  print_perf_log = true
+  print_linear_residuals = true
   #xda = true
-  [./console]
-    type = Console
-    perf_log = true
-    linear_residuals = true
-  [../]
   [./out]
     type = XDA
    output_final = true
-   output_intermediate = false 
+   output_timestep_end = false
   [../]
 []
-
