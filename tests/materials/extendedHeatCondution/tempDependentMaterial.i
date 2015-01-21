@@ -134,14 +134,10 @@
 
 
 [Outputs]
+  print_linear_residuals = true
+  print_perf_log = true
   [./tempProfile]
     output_material_properties = true
     type = Exodus
-  [../]
-
-  [./console]
-    type = Console
-    perf_log = true
-    linear_residuals = true
   [../]
 []
