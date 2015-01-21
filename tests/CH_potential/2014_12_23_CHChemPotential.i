@@ -85,9 +85,9 @@
   output_initial = true
   exodus = true
   output_final = true
+  print_perf_log = true
   [./console]
     type = Console
-    perf_log = true
     output_initial = true
     output_file = true
   [../]
