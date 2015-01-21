@@ -71,8 +71,8 @@
 []
 
 [Outputs]
-	file_base = out
-	exodus = true
+  file_base = out
+  exodus = true
 []
 
 
