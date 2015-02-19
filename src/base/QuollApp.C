@@ -36,6 +36,7 @@ QuollApp::~QuollApp()
 {
 }
 
+extern "C" void QuollApp__registerApps() { QuollApp::registerApps(); }
 void
 QuollApp::registerApps()
 {
