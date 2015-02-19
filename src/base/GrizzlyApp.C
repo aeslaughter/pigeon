@@ -28,6 +28,7 @@ GrizzlyApp::~GrizzlyApp()
 {
 }
 
+extern "C" void GrizzlyApp__registerApps() { GrizzlyApp::registerApps(); }
 void
 GrizzlyApp::registerApps()
 {
