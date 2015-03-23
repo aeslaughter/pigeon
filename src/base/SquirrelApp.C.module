@@ -1,0 +1,46 @@
+#include "SquirrelApp.h"
+#include "Moose.h"
+#include "AppFactory.h"
+
+template<>
+InputParameters validParams<SquirrelApp>()
+{
+  InputParameters params = validParams<MooseApp>();
+
+  params.set<bool>("use_legacy_uo_initialization") = false;
+  params.set<bool>("use_legacy_uo_aux_computation") = false;
+  return params;
+}
+
+SquirrelApp::SquirrelApp(const std::string & name, InputParameters parameters) :
+    MooseApp(name, parameters)
+{
+  srand(processor_id());
+
+  Moose::registerObjects(_factory);
+  SquirrelApp::registerObjects(_factory);
+
+  Moose::associateSyntax(_syntax, _action_factory);
+  SquirrelApp::associateSyntax(_syntax, _action_factory);
+}
+
+SquirrelApp::~SquirrelApp()
+{
+}
+
+extern "C" void SquirrelApp__registerApps() { SquirrelApp::registerApps(); }
+void
+SquirrelApp::registerApps()
+{
+  registerApp(SquirrelApp);
+}
+
+void
+SquirrelApp::registerObjects(Factory & factory)
+{
+}
+
+void
+SquirrelApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
+{
+}
