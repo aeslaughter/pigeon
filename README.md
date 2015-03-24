@@ -1,6 +1,6 @@
 Squirrel
-=====
+========
 
-"Fork Squirrel" to create a new MOOSE-based application.
+Squirrel is an app for MOOSE intended to support porous medium flow in a 
+particular reactor. 
 
-For more information see: [http://mooseframework.org/create-an-app/](http://mooseframework.org/create-an-app/)
