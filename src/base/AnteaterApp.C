@@ -1,10 +1,10 @@
-#include "StorkApp.h"
+#include "AnteaterApp.h"
 #include "Moose.h"
 #include "AppFactory.h"
 #include "ModulesApp.h"
 
 template<>
-InputParameters validParams<StorkApp>()
+InputParameters validParams<AnteaterApp>()
 {
   InputParameters params = validParams<MooseApp>();
 
@@ -13,37 +13,37 @@ InputParameters validParams<StorkApp>()
   return params;
 }
 
-StorkApp::StorkApp(const std::string & name, InputParameters parameters) :
+AnteaterApp::AnteaterApp(const std::string & name, InputParameters parameters) :
     MooseApp(name, parameters)
 {
   srand(processor_id());
 
   Moose::registerObjects(_factory);
   ModulesApp::registerObjects(_factory);
-  StorkApp::registerObjects(_factory);
+  AnteaterApp::registerObjects(_factory);
 
   Moose::associateSyntax(_syntax, _action_factory);
   ModulesApp::associateSyntax(_syntax, _action_factory);
-  StorkApp::associateSyntax(_syntax, _action_factory);
+  AnteaterApp::associateSyntax(_syntax, _action_factory);
 }
 
-StorkApp::~StorkApp()
+AnteaterApp::~AnteaterApp()
 {
 }
 
-extern "C" void StorkApp__registerApps() { StorkApp::registerApps(); }
+extern "C" void AnteaterApp__registerApps() { AnteaterApp::registerApps(); }
 void
-StorkApp::registerApps()
+AnteaterApp::registerApps()
 {
-  registerApp(StorkApp);
+  registerApp(AnteaterApp);
 }
 
 void
-StorkApp::registerObjects(Factory & factory)
+AnteaterApp::registerObjects(Factory & factory)
 {
 }
 
 void
-StorkApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
+AnteaterApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 {
 }
