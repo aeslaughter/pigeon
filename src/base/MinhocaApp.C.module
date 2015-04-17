@@ -1,0 +1,46 @@
+#include "MinhocaApp.h"
+#include "Moose.h"
+#include "AppFactory.h"
+
+template<>
+InputParameters validParams<MinhocaApp>()
+{
+  InputParameters params = validParams<MooseApp>();
+
+  params.set<bool>("use_legacy_uo_initialization") = false;
+  params.set<bool>("use_legacy_uo_aux_computation") = false;
+  return params;
+}
+
+MinhocaApp::MinhocaApp(const std::string & name, InputParameters parameters) :
+    MooseApp(name, parameters)
+{
+  srand(processor_id());
+
+  Moose::registerObjects(_factory);
+  MinhocaApp::registerObjects(_factory);
+
+  Moose::associateSyntax(_syntax, _action_factory);
+  MinhocaApp::associateSyntax(_syntax, _action_factory);
+}
+
+MinhocaApp::~MinhocaApp()
+{
+}
+
+extern "C" void MinhocaApp__registerApps() { MinhocaApp::registerApps(); }
+void
+MinhocaApp::registerApps()
+{
+  registerApp(MinhocaApp);
+}
+
+void
+MinhocaApp::registerObjects(Factory & factory)
+{
+}
+
+void
+MinhocaApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
+{
+}
