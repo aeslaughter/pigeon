@@ -1,6 +1,6 @@
 [GlobalParams]
-#  op_num = 10 # Number of grains
-#  var_name_base = gr # Base name of grains
+  op_num = 4 # Number of grains
+  var_name_base = gr # Base name of grains
 []
 
 [Mesh]
@@ -19,8 +19,8 @@
 #    scaling = 1e18
   [../]
 
-#  [./PolycrystalVariables]
-#  [../]
+  [./PolycrystalVariables]
+  [../]
 
 []
 
@@ -96,25 +96,25 @@
     block = 1
   [../]
  
-#  [./mass_decay]
-#    type = Decay
-#    variable = c
-#  [../]
+  [./mass_decay]
+    type = Decay
+    variable = c
+  [../]
 
-#  [./PolycrystalKernel]		
-#  [../]
+  [./PolycrystalKernel]		
+  [../]
 
 []
 
 [AuxKernels]
   # AuxKernel block, defining the equations used to calculate the auxvars
-#  [./bnds_aux]
-#    # AuxKernel that calculates the GB term
-#    type = BndsCalcAux
-#    variable = bnds
-#    execute_on = timestep_end
-#  [../]
-# 
+  [./bnds_aux]
+    # AuxKernel that calculates the GB term
+    type = BndsCalcAux
+    variable = bnds
+    execute_on = timestep_end
+  [../]
+ 
   [./grain_radius]
     type = GrainRadiusAux
     block = '1 2'
@@ -148,10 +148,10 @@
 #    outside = 5			#value of the variable outside the box	       
 #  [../]
 
-#  [./PolycrystalICs]
-#    [./PolycrystalRandomIC]
-#      random_type = discrete
-#    [../]
+  [./PolycrystalICs]
+    [./PolycrystalVoronoiIC]
+      grain_num = 15
+    [../]
   [../]
 []
 
@@ -166,19 +166,19 @@
     function = temp_bc
   [../]
 
-#  [./Periodic]
-#    [./top_bottom]
-#      primary = 'lefttop righttop'
-#      secondary = 'leftbottom rightbottom'
+  [./Periodic]
+    [./top_bottom]
+      primary = '5 6'
+      secondary = '2 3'
 #      translation = '0 1 0' 
-#    [../]
-# 
-#    [./left_right]
-#      primary = 1
-#      secondary = 4
+    [../]
+ 
+    [./left_right]
+      primary = 1
+      secondary = 4
 #      translation = '2 0 0'
-#    [../]
-#  [../]
+    [../]
+  [../]
 
 []
 
@@ -228,21 +228,22 @@
     prop_values = ' 1 1 0.1 11000.0'
   [../]
 
-#  [./radio_active_decay_constant]
-#    type = RadioActiveDecayConstant
-#    block = '1 2'
-#    lambda = 7.297e-10	 # units:(1/sec)  The constant for Cesium
-#  [../]
+  [./radio_active_decay_constant]
+    type = RadioActiveDecayConstant
+    block = '1 2'
+    lambda = 7.297e-10	 # units:(1/sec)  The constant for Cesium
+  [../]
 
-#  [./CuGrGr]
-#    type = GBEvolution # Quantitative material properties for copper grain growth.  Dimensions are nm and ns
-#    block = '1 2' # Block ID (only one block in this problem)
-#    GBmob0 = 2.5e-6 # Mobility prefactor for Cu from Schonfelder1997
-#    GBenergy = 0.708 # GB energy for Cu from Schonfelder1997
-#    Q = 0.23 # Activation energy for grain growth from Schonfelder 1997
-#    T = 450 # Constant temperature of the simulation (for mobility calculation)
-#    wGB = 14 # Width of the diffuse GB
-#  [../]
+  [./CuGrGr]
+    type = GBEvolution # Quantitative material properties for copper grain growth.	 Dimensions are nm and ns
+    block = '1 2' # Block ID 
+    GBmob0 = 2.5e-6 # Mobility prefactor for Cu from Schonfelder1997
+    GBenergy = 0.708 # GB energy for Cu from Schonfelder1997
+    Q = 0.23 # Activation energy for grain growth from Schonfelder 1997
+    T = 500 # Constant temperature of the simulation (for mobility calculation)
+    wGB = .014 # Width of the diffuse GB in nm
+    length_scale = 1e-6
+  [../]
 
 
 
@@ -255,6 +256,30 @@
 #   execute_on = timestep_begin
 #  [../]
 []
+
+
+#[Executioner]
+#  type = Transient
+#  scheme = bdf2
+# 
+#  solve_type ='PJFNK'
+#  petsc_options_iname = ' -pc_tyoe -pc_hypre_type -ksp_gmres_restart'
+#  petsc_options_value = 'hypre boomeramg 31'
+#  l_tol = 1.0e-4
+#  nl_max_its = 1e-11
+#  nl_rel_tol = 1.0e-4
+#  start_time = -300.0 
+#  end_time = 31.5e5
+#  #num_steps = 2
+#  dt = 5e3
+# 
+#  [./Adaptivity]
+#    initial_adaptivity = 2
+#    refine_fraction = 0.7
+#    coursen_fraction = 0.1
+#   max_h_level = 4 
+#  [../]
+#[]
 
 [Executioner]
   type = Transient
@@ -293,16 +318,16 @@
 #  nl_max_its = 40
 #  nl_abs_tol = 1e-9
 #  nl_rel_tol = 1e-9
-#  start_time = 0.0
-#  end_time = 31.5e7
+#  start_time = -300.0
+#  end_time = 31.5e5
 #  [./TimeStepper]
 #    type = IterationAdaptiveDT
-#    dt = 5
+#    dt = 500
 #    optimal_iterations = 8
-#    growth_factor = 1.25
+##    growth_factor = 1.25
 #  [../]
 #  [./Adaptivity]
-#    initial_adaptivity = 0
+#    initial_adaptivity = 2
 #    refine_fraction = 0.7
 #    coarsen_fraction = 0.1
 #    max_h_level = 4
@@ -353,170 +378,18 @@
     variable = grain_radius
   [../]
 
- # [./left_a]
- #   type = NodalVariableValue
- #   variable = c
- #   nodeid = 81 
- # [../]
- #
- # [./left_b]
- #   type = NodalVariableValue
- #   variable = c
- #   nodeid = 84
- # [../]
- #
- # [./left_c]
- #   type = NodalVariableValue
- #   variable = c
- #   nodeid = 78
- # [../]
- #
- # [./left_d]
- #   type = NodalVariableValue
- #   variable = c
- #   nodeid = 81
- # [../]
- #
- # [./left_e]
- #   type = NodalVariableValue
- #   variable = c
- #   nodeid = 75
- # [../]
- #
- # [./left_f]
- #   type = NodalVariableValue
- #   variable = c
- #   nodeid = 78
- # [../]
- #
- # [./left_]
- #   type = NodalVariableValue
- #   variable = c
- #   nodeid = 72
- # [../]
- #
- # [./left_h]
- #   type = NodalVariableValue
- #   variable = c
- #   nodeid = 75
- # [../]
- #
- # [./left_i]
- #   type = NodalVariableValue
- #   variable = c
- #   nodeid = 69
- # [../]
- #
- # [./left_j]
- #   type = NodalVariableValue
- #   variable = c
- #   nodeid = 61
- # [../]
- #
- # [./left_k]
- #   type = NodalVariableValue
- #   variable = c
- #   nodeid = 66
- # [../]
- #
- # [./left_l]
- #   type = NodalVariableValue
- #   variable = c
- #   nodeid = 62
- # [../]
- #
- #
- #
- #
- #
- #
- # [./right_a]
- #   type = NodalVariableValue
- #   variable = c
- #   nodeid = 253 
- # [../]
- #
-##  [./right_b]
-##    type = NodalVariableValue
-##    variable = c
-##    nodeid = 248
-##  [../]
-## 
- # [./right_c]
- #   type = NodalVariableValue
- #   variable = c
- #   nodeid = 253
- # [../]
- #
- # [./right_d]
- #   type = NodalVariableValue
- #   variable = c
- #   nodeid = 246
- # [../]
- #
- # [./right_e]
- #   type = NodalVariableValue
- #   variable = c
- #   nodeid = 249
- # [../]
- #
- # [./right_f]
- #   type = NodalVariableValue
- #   variable = c
- #   nodeid = 243
- # [../]
- #
- # [./right_g]
- #   type = NodalVariableValue
- #   variable = c
- #   nodeid = 246
- # [../]
- #
- # [./right_h]
- #   type = NodalVariableValue
- #   variable = c
- #   nodeid = 240
- # [../]
- #
- # [./right_i]
- #   type = NodalVariableValue
- #   variable = c
- #   nodeid = 237
- # [../]
- #
- # [./right_j]
- #   type = NodalVariableValue
- #   variable = c
- #   nodeid = 240
- # [../]
- #
- # [./right_k]
- #   type = NodalVariableValue
- #   variable = c
- #   nodeid = 232
- # [../]
- #
- # [./right_l]
- #   type = NodalVariableValue
- #   variable = c
- #   nodeid = 237
- # [../]
- #
- # [./right_m]
- #   type = NodalVariableValue
- #   variable = c
- #   nodeid = 233
- # [../]
+ 
+  [./num_grains]
+    type = NodalFloodCount
+    variable = bnds
+    threshold = 0.7
+  [../]
 
-#  [./num_nodes]
-#    type = NumNodes
-#  [../]
-# 
-#  [./num_grains]
-#    type = NodalFloodCount
-#    variable = bnds
-#    threshold = 0.1
-#  [../]
+  [./gr1area]
+    type = ElementIntegralVariablePostprocessor
+    variable = gr1
+    execute_on = 'initial timestep_end'
+  [../]
 
 []
 

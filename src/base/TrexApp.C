@@ -15,6 +15,7 @@
 
 // Materials
 #include "CalcDiffusionCoef.h"
+#include "GBChange.h"
 
    ///Marmot///
    #include "ConcEvolution.h"
@@ -101,6 +102,8 @@ TrexApp::registerObjects(Factory & factory)
   
   //Materials
   registerMaterial(CalcDiffusionCoef);
+  registerMaterial(GBChange);
+  
 
       //Marmot//
       registerMaterial(ConcEvolution);
