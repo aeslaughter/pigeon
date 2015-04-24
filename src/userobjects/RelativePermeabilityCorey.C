@@ -41,10 +41,8 @@ RelativePermeabilityCorey::relativePermLiq(Real sat_liq) const
 {
 
   // Check whether liquid saturation is [0,1] - if not, print error message.
-  if (sat_liq < 0.0)
-    mooseError("RelativePermeabilityCorey: Liquid saturation is negative\n");
-  if (sat_liq > 1.0)
-    mooseError("RelativePermeabilityCorey: Liquid saturation is greater than 1.0\n");
+  if (sat_liq < 0.0 || sat_liq > 1.0)
+    mooseError("RelativePermeabilityCorey: Liquid saturation is outside the range 0 <= Sl <= 1\n");
 
   Real sat_eff = (sat_liq - _sat_lr)/(1.0 - _sat_lr - _sat_gr);
   Real krel = std::pow(sat_eff, 4.0);
@@ -63,10 +61,8 @@ RelativePermeabilityCorey::relativePermGas(Real sat_liq) const
 {
 
   // Check whether liquid saturation is [0,1] - if not, print error message.
-  if (sat_liq < 0.0)
-    mooseError("RelativePermeabilityCorey: Liquid saturation is negative\n");
-  if (sat_liq > 1.0)
-    mooseError("RelativePermeabilityCorey: Liquid saturation is greater than 1.0\n");
+  if (sat_liq < 0.0 || sat_liq > 1.0)
+    mooseError("RelativePermeabilityCorey: Liquid saturation is outside the range 0 <= Sl <= 1\n");
     
   Real sat_eff = (sat_liq - _sat_lr)/(1.0 - _sat_lr - _sat_gr);
   Real krel = std::pow(1.0 - sat_eff, 2.0) * (1.0 - std::pow(sat_eff, 2.0));

@@ -50,10 +50,8 @@ RelativePermeabilityVanGenuchten::relativePermLiq(Real sat_liq) const
 {
   
   // Check whether liquid saturation is [0,1] - if not, print error message.
-  if (sat_liq < 0.0)
-    mooseError("RelativePermeabilityVanGenuchten: Liquid saturation is negative\n");
-  if (sat_liq > 1.0)
-    mooseError("RelativePermeabilityVanGenuchten: Liquid saturation is greater than 1.0\n");
+  if (sat_liq < 0.0 || sat_liq > 1.0)
+    mooseError("RelativePermeabilityVanGenuchten: Liquid saturation is outside the range 0 <= Sl <= 1\n");
 
 
   if (sat_liq >= _sat_ls) {
@@ -80,10 +78,8 @@ RelativePermeabilityVanGenuchten::relativePermGas(Real sat_liq) const
 {
 
   // Check whether liquid saturation is [0,1] - if not, print error message.
-  if (sat_liq < 0.0)
-    mooseError("RelativePermeabilityVanGenuchten: Liquid saturation is negative\n");
-  if (sat_liq > 1.0)
-    mooseError("RelativePermeabilityVanGenuchten: Liquid saturation is greater than 1.0\n");
+  if (sat_liq < 0.0 || sat_liq > 1.0)
+    mooseError("RelativePermeabilityVanGenuchten: Liquid saturation is outside the range 0 <= Sl <= 1\n");
 
   if (sat_liq >= _sat_ls) {
     return 0.0;

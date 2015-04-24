@@ -52,10 +52,8 @@ CapillaryPressureVanGenuchten::capillaryPressure(Real sat_liq) const
   Real cp;
 
   // Check whether liquid saturation is [0,1] - if not, print error message.
-  if (sat_liq < 0.0) 
-    mooseError("CapillaryPressureVanGenuchten: Liquid saturation is negative\n");
-  if (sat_liq > 1.0) 
-    mooseError("CapillaryPressureVanGenuchten: Liquid saturation is greater than 1.0\n");
+  if (sat_liq < 0.0 || sat_liq > 1.0)
+    mooseError("CapillaryPressureVanGenuchten: Liquid saturation is outside the range 0 <= Sl <= 1\n");
 
   if (sat_eff > 1.0) 
      { sat_eff = 1.0; } // Restrict sat_eff to be less than or equal to unity

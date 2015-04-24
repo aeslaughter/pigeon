@@ -8,12 +8,12 @@
   [./perfectly_mobile2]
     type = 'RunException'
     input = 'RelativePermeabilityPerfectlyMobile.i Functions/initial_saturation/value=x-0.1' 
-    expect_err = 'RelativePermeabilityPerfectlyMobile: Liquid saturation is negative'
+    expect_err = 'RelativePermeabilityPerfectlyMobile: Liquid saturation is outside the range 0 <= Sl <= 1'
   [../]
   [./perfectly_mobile3]
     type = 'RunException'
     input = 'RelativePermeabilityPerfectlyMobile.i Functions/initial_saturation/value=x+0.1' 
-    expect_err = 'RelativePermeabilityPerfectlyMobile: Liquid saturation is greater than 1.0'
+    expect_err = 'RelativePermeabilityPerfectlyMobile: Liquid saturation is outside the range 0 <= Sl <= 1'
   [../]
   [./van_genuchten1]
     type = 'CSVDiff'
@@ -42,12 +42,12 @@
   [./van_genuchten5]
     type = 'RunException'
     input = 'RelativePermeabilityVanGenuchten.i Functions/initial_saturation/value=x-0.1' 
-    expect_err = 'RelativePermeabilityVanGenuchten: Liquid saturation is negative'
+    expect_err = 'RelativePermeabilityVanGenuchten: Liquid saturation is outside the range 0 <= Sl <= 1'
   [../]
   [./van_genuchten6]
     type = 'RunException'
     input = 'RelativePermeabilityVanGenuchten.i Functions/initial_saturation/value=x+0.1' 
-    expect_err = 'RelativePermeabilityVanGenuchten: Liquid saturation is greater than 1.0'
+    expect_err = 'RelativePermeabilityVanGenuchten: Liquid saturation is outside the range 0 <= Sl <= 1'
   [../]
   [./corey1]
     type = 'CSVDiff'
@@ -64,11 +64,11 @@
   [./corey3]
     type = 'RunException'
     input = 'RelativePermeabilityCorey.i Functions/initial_saturation/value=x-0.1' 
-    expect_err = 'RelativePermeabilityCorey: Liquid saturation is negative'
+    expect_err = 'RelativePermeabilityCorey: Liquid saturation is outside the range 0 <= Sl <= 1'
   [../]
   [./corey4]
     type = 'RunException'
     input = 'RelativePermeabilityCorey.i Functions/initial_saturation/value=x+0.1' 
-    expect_err = 'RelativePermeabilityCorey: Liquid saturation is greater than 1.0'
+    expect_err = 'RelativePermeabilityCorey: Liquid saturation is outside the range 0 <= Sl <= 1'
   [../]
 []
