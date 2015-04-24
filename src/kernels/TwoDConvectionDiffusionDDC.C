@@ -27,7 +27,7 @@ InputParameters validParams<TwoDConvectionDiffusionDDC>()
 TwoDConvectionDiffusionDDC::TwoDConvectionDiffusionDDC(const std::string & name,
                        InputParameters parameters) :
     Kernel(name, parameters),
-    _gamma(getParam<RealTensorValue>("coeff_tensor")),
+    _gamma_tensor(getParam<RealTensorValue>("coeff_tensor")),
     _grad_streamfunction(coupledGradient("streamfunction_variable")),
     _grad_streamfunction_var(coupled("streamfunction_variable"))
 {}
@@ -36,7 +36,7 @@ Real TwoDConvectionDiffusionDDC::computeQpResidual()
 {
   Real convterm1 = - _test[_i][_qp] * (_grad_streamfunction[_qp](1) * _grad_u[_qp](0));
   Real convterm2 = _test[_i][_qp] * (_grad_streamfunction[_qp](0) * _grad_u[_qp](1));
-  Real diffterm = (_gamma * _grad_u[_qp]) * _grad_test[_i][_qp];
+  Real diffterm = (_gamma_tensor * _grad_u[_qp]) * _grad_test[_i][_qp];
 
   return convterm1 + convterm2 + diffterm;
 }
@@ -45,7 +45,7 @@ Real TwoDConvectionDiffusionDDC::computeQpJacobian()
 {
   Real dconvterm1 = - _test[_i][_qp] * (_grad_streamfunction[_qp](1) * _grad_phi[_j][_qp](0));
   Real dconvterm2 = _test[_i][_qp] * (_grad_streamfunction[_qp](0) * _grad_phi[_j][_qp](1));
-  Real ddiffterm = (_gamma * _grad_phi[_j][_qp]) * _grad_test[_i][_qp];
+  Real ddiffterm = (_gamma_tensor * _grad_phi[_j][_qp]) * _grad_test[_i][_qp];
 
   return dconvterm1 + dconvterm2 + ddiffterm;
 }

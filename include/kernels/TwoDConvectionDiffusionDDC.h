@@ -37,10 +37,10 @@ protected:
 
   virtual Real computeQpOffDiagJacobian(unsigned int jvar);
 
-  RealTensorValue _gamma;
 
 private:
 
+  RealTensorValue _gamma_tensor;
   VariableGradient & _grad_streamfunction;
   unsigned int _grad_streamfunction_var;
 };
