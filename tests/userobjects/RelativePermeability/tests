@@ -1,9 +1,19 @@
 [Tests]
-  [./relative_permeability_perfectly_mobile]
+  [./relative_permeability_perfectly_mobile1]
     type = 'CSVDiff'
     input = 'RelativePermeabilityPerfectlyMobile.i'
     csvdiff = 'RelativePermeabilityPerfectlyMobile_vpp_0001.csv'
     abs_zero = 1.0E-6
+  [../]
+  [./relative_permeability_perfectly_mobile2]
+    type = 'RunException'
+    input = 'RelativePermeabilityPerfectlyMobile.i Functions/initial_saturation/value=x-0.1' 
+    expect_err = 'RelativePermeabilityPerfectlyMobile: Liquid saturation is negative'
+  [../]
+  [./relative_permeability_perfectly_mobile3]
+    type = 'RunException'
+    input = 'RelativePermeabilityPerfectlyMobile.i Functions/initial_saturation/value=x+0.1' 
+    expect_err = 'RelativePermeabilityPerfectlyMobile: Liquid saturation is greater than 1.0'
   [../]
   [./relative_permeability_van_genuchten1]
     type = 'CSVDiff'
@@ -29,6 +39,16 @@
     csvdiff = 'RelativePermeabilityVanGenuchten4_vpp_0001.csv'
     abs_zero = 1.0E-6
   [../]
+  [./relative_permeability_van_genuchten5]
+    type = 'RunException'
+    input = 'RelativePermeabilityVanGenuchten.i Functions/initial_saturation/value=x-0.1' 
+    expect_err = 'RelativePermeabilityVanGenuchten: Liquid saturation is negative'
+  [../]
+  [./relative_permeability_van_genuchten6]
+    type = 'RunException'
+    input = 'RelativePermeabilityVanGenuchten.i Functions/initial_saturation/value=x+0.1' 
+    expect_err = 'RelativePermeabilityVanGenuchten: Liquid saturation is greater than 1.0'
+  [../]
   [./relative_permeability_corey1]
     type = 'CSVDiff'
     input = 'RelativePermeabilityCorey.i Outputs/file_base=RelativePermeabilityCorey1'
@@ -40,5 +60,15 @@
     input = 'RelativePermeabilityCorey.i UserObjects/RelativePermeability/sat_gr=0.2 UserObjects/RelativePermeability/sat_lr=0.1 Outputs/file_base=RelativePermeabilityCorey2'
     csvdiff = 'RelativePermeabilityCorey2_vpp_0001.csv'
     abs_zero = 1.0E-6
+  [../]
+  [./relative_permeability_corey3]
+    type = 'RunException'
+    input = 'RelativePermeabilityCorey.i Functions/initial_saturation/value=x-0.1' 
+    expect_err = 'RelativePermeabilityCorey: Liquid saturation is negative'
+  [../]
+  [./relative_permeability_corey4]
+    type = 'RunException'
+    input = 'RelativePermeabilityCorey.i Functions/initial_saturation/value=x+0.1' 
+    expect_err = 'RelativePermeabilityCorey: Liquid saturation is greater than 1.0'
   [../]
 []
