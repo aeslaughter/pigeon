@@ -1,0 +1,52 @@
+[Tests]
+  [./capillary_pressure_constant1]
+    type = 'CSVDiff'
+    input = 'CapillaryPressureConstant.i'
+    csvdiff = 'CapillaryPressureConstant_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./capillary_pressure_constant2]
+    type = 'RunException'
+    input = 'CapillaryPressureConstant.i Functions/initial_saturation/value=x-0.1' 
+    expect_err = 'CapillaryPressureConstant: Liquid saturation is negative'
+  [../]
+  [./capillary_pressure_constant3]
+    type = 'RunException'
+    input = 'CapillaryPressureConstant.i Functions/initial_saturation/value=x+0.1' 
+    expect_err = 'CapillaryPressureConstant: Liquid saturation is greater than 1.0'
+  [../]
+  [./capillary_pressure_van_genuchten1]
+    type = 'CSVDiff'
+    input = 'CapillaryPressureVanGenuchten.i'
+    csvdiff = 'CapillaryPressureVanGenuchten1_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./capillary_pressure_van_genuchten2]
+    type = 'CSVDiff'
+    input = 'CapillaryPressureVanGenuchten.i UserObjects/CapillaryPressure/sat_lr=0.2 Outputs/file_base=CapillaryPressureVanGenuchten2'
+    csvdiff = 'CapillaryPressureVanGenuchten2_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./capillary_pressure_van_genuchten3]
+    type = 'CSVDiff'
+    input = 'CapillaryPressureVanGenuchten.i UserObjects/CapillaryPressure/sat_lr=0.1 UserObjects/CapillaryPressure/p0=5e3 UserObjects/CapillaryPressure/m=0.95 UserObjects/CapillaryPressure/cp_max=1e4 Outputs/file_base=CapillaryPressureVanGenuchten3'
+    csvdiff = 'CapillaryPressureVanGenuchten3_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./capillary_pressure_van_genuchten4]
+    type = 'CSVDiff'
+    input = 'CapillaryPressureVanGenuchten.i UserObjects/CapillaryPressure/sat_lr=0.3 UserObjects/CapillaryPressure/sat_ls=0.8 Outputs/file_base=CapillaryPressureVanGenuchten4'
+    csvdiff = 'CapillaryPressureVanGenuchten4_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./capillary_pressure_van_genuchten5]
+    type = 'RunException'
+    input = 'CapillaryPressureVanGenuchten.i Functions/initial_saturation/value=x-0.1' 
+    expect_err = 'CapillaryPressureVanGenuchten: Liquid saturation is negative'
+  [../]
+  [./capillary_pressure_van_genuchten6]
+    type = 'RunException'
+    input = 'CapillaryPressureVanGenuchten.i Functions/initial_saturation/value=x+0.1' 
+    expect_err = 'CapillaryPressureVanGenuchten: Liquid saturation is greater than 1.0'
+  [../]
+[]

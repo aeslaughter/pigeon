@@ -1,0 +1,44 @@
+[Tests]
+  [./relative_permeability_perfectly_mobile]
+    type = 'CSVDiff'
+    input = 'RelativePermeabilityPerfectlyMobile.i'
+    csvdiff = 'RelativePermeabilityPerfectlyMobile_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./relative_permeability_van_genuchten1]
+    type = 'CSVDiff'
+    input = 'RelativePermeabilityVanGenuchten.i'
+    csvdiff = 'RelativePermeabilityVanGenuchten1_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./relative_permeability_van_genuchten2]
+    type = 'CSVDiff'
+    input = 'RelativePermeabilityVanGenuchten.i UserObjects/RelativePermeability/sat_gr=0.2 Outputs/file_base=RelativePermeabilityVanGenuchten2'
+    csvdiff = 'RelativePermeabilityVanGenuchten2_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./relative_permeability_van_genuchten3]
+    type = 'CSVDiff'
+    input = 'RelativePermeabilityVanGenuchten.i UserObjects/RelativePermeability/sat_gr=0.2 UserObjects/RelativePermeability/m=0.9 Outputs/file_base=RelativePermeabilityVanGenuchten3'
+    csvdiff = 'RelativePermeabilityVanGenuchten3_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./relative_permeability_van_genuchten4]
+    type = 'CSVDiff'
+    input = 'RelativePermeabilityVanGenuchten.i UserObjects/RelativePermeability/sat_gr=0.2 UserObjects/RelativePermeability/sat_lr=0.1 Outputs/file_base=RelativePermeabilityVanGenuchten4'
+    csvdiff = 'RelativePermeabilityVanGenuchten4_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./relative_permeability_corey1]
+    type = 'CSVDiff'
+    input = 'RelativePermeabilityCorey.i Outputs/file_base=RelativePermeabilityCorey1'
+    csvdiff = 'RelativePermeabilityCorey1_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./relative_permeability_corey2]
+    type = 'CSVDiff'
+    input = 'RelativePermeabilityCorey.i UserObjects/RelativePermeability/sat_gr=0.2 UserObjects/RelativePermeability/sat_lr=0.1 Outputs/file_base=RelativePermeabilityCorey2'
+    csvdiff = 'RelativePermeabilityCorey2_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+[]

@@ -35,7 +35,13 @@ Real
 RelativePermeabilityPerfectlyMobile::relativePermLiq(Real sat_liq) const
 {
   
-    return 1.0;
+  // Check whether liquid saturation is [0,1] - if not, print error message.
+  if (sat_liq < 0.0)
+    mooseError("RelativePermeabilityPerfectlyMobile: Liquid saturation is negative\n");
+  if (sat_liq > 1.0)
+    mooseError("RelativePermeabilityPerfectlyMobile: Liquid saturation is greater than 1.0\n");
+
+  return 1.0;
 
 }
 
@@ -43,7 +49,13 @@ RelativePermeabilityPerfectlyMobile::relativePermLiq(Real sat_liq) const
 Real
 RelativePermeabilityPerfectlyMobile::relativePermGas(Real sat_liq) const
 {
+
+  // Check whether liquid saturation is [0,1] - if not, print error message.
+  if (sat_liq < 0.0)
+    mooseError("RelativePermeabilityPerfectlyMobile: Liquid saturation is negative\n");
+  if (sat_liq > 1.0)
+    mooseError("RelativePermeabilityPerfectlyMobile: Liquid saturation is greater than 1.0\n");
   
-    return 1.0;
+  return 1.0;
 
 }
