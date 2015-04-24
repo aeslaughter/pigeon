@@ -88,11 +88,8 @@ QuollApp::~QuollApp()
 {
 }
 
-<<<<<<< HEAD
 extern "C" void QuollApp__registerApps() { QuollApp::registerApps(); }
-=======
-extern "C" void QuollApp_registerApps() { QuollApp::registerApps(); }
->>>>>>> Minor fixes to 2D convective mixing code
+
 void
 QuollApp::registerApps()
 {
