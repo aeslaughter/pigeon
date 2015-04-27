@@ -143,9 +143,9 @@ Real
     p = std::pow(2.0 * c/(-b + std::sqrt(b * b - 4.0 * a * c)), 4.0);
   }
   else
-    mooseError("FluidPropertiesWater::pSat: Temperature " << temperature << "C is outside range 0 <= t <= " << t_critical - t_c2k);
+    mooseError("FluidPropertiesWater::pSat: Temperature is outside range 0 <= t <= 400.964");
 
-  return p;
+  return p * 1.e6;
 }
 
 
@@ -180,7 +180,7 @@ Real
     t = (n[9] + d - std::sqrt((n[9] + d) * (n[9] + d) - 4.0 * (n[8] + n[9] * d))) / 2.0;
   }
   else
-    mooseError("FluidPropertiesWater::tSat: Pressure " << pressure << "Pa is outside range 611.213 Pa <= p <= 22.064 MPa");
+    mooseError("FluidPropertiesWater::tSat: Pressure is outside range 611.213 Pa <= p <= 22.064 MPa");
 
-  return t;
+  return t - 273.15;
 }

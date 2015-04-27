@@ -1,0 +1,46 @@
+[Tests]
+  [./water_tsat1]
+    type = 'CSVDiff'
+    input = 'WaterProperty.i'
+    csvdiff = 'WaterProperty_tSat_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./water_tsat2]
+    type = 'RunException'
+    input = 'WaterProperty.i Functions/initial_pressure/value=600.0' 
+    expect_err = 'FluidPropertiesWater::tSat: Pressure is outside range 611.213 Pa <= p <= 22.064 MPa'
+  [../]
+  [./water_tsat3]
+    type = 'RunException'
+    input = 'WaterProperty.i Functions/initial_pressure/value=22.1e6' 
+    expect_err = 'FluidPropertiesWater::tSat: Pressure is outside range 611.213 Pa <= p <= 22.064 MPa'
+  [../]
+  [./water_psat1]
+    type = 'CSVDiff'
+    input = 'WaterProperty.i Outputs/file_base=WaterProperty_pSat AuxKernels/FluidPropertyAux/fluid_property_enum=psat'
+    csvdiff = 'WaterProperty_pSat_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./water_psat2]
+    type = 'RunException'
+    input = 'WaterProperty.i Outputs/file_base=WaterProperty_pSat AuxKernels/FluidPropertyAux/fluid_property_enum=psat Functions/initial_temperature/value=-1'
+    expect_err = 'FluidPropertiesWater::pSat: Temperature is outside range 0 <= t <= 400.964'
+  [../]
+  [./water_psat3]
+    type = 'RunException'
+    input = 'WaterProperty.i Outputs/file_base=WaterProperty_pSat AuxKernels/FluidPropertyAux/fluid_property_enum=psat Functions/initial_temperature/value=401'
+    expect_err = 'FluidPropertiesWater::pSat: Temperature is outside range 0 <= t <= 400.964'
+  [../]
+  [./water_density1]
+    type = 'CSVDiff'
+    input = 'WaterProperty.i Outputs/file_base=WaterProperty_density AuxKernels/FluidPropertyAux/fluid_property_enum=density Functions/initial_pressure/value='(1+9.5*x)*1e6' Functions/initial_temperature/value=50'
+    csvdiff = 'WaterProperty_density_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./water_density2]
+    type = 'CSVDiff'
+    input = 'WaterProperty.i Outputs/file_base=WaterProperty_density2 AuxKernels/FluidPropertyAux/fluid_property_enum=density Functions/initial_pressure/value='(1+9.5*x)*1e6' Functions/initial_temperature/value=100'
+    csvdiff = 'WaterProperty_density2_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+[]

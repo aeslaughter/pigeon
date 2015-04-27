@@ -21,9 +21,9 @@ InputParameters validParams<FluidPropertyAux>()
 {
   InputParameters params = validParams<AuxKernel>();
   params.addRequiredParam<UserObjectName>("fluid_property_uo", "Name of the User Object defining the fluid properties");
-  params.addRequiredCoupledVar("pressure_variable", "The pressure variable corresponding to the fluid phase.");
-  params.addRequiredCoupledVar("temperature_variable", "The temperature variable.");
-  params.addRequiredCoupledVar("saturation_variable", "The saturation variable corresponding to the fluid phase.");
+  params.addCoupledVar("pressure_variable", 1.e6,  "The pressure variable corresponding to the fluid phase.");
+  params.addCoupledVar("temperature_variable", 50, "The temperature variable.");
+  params.addCoupledVar("saturation_variable", 1.0, "The saturation variable corresponding to the fluid phase.");
   MooseEnum fluid_property_enum("density viscosity psat tsat");
   params.addRequiredParam<MooseEnum>("fluid_property_enum", fluid_property_enum, "The fluid property that this auxillary kernel is to calculate");
   return params;
