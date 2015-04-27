@@ -30,6 +30,8 @@ class FluidPropertiesWater : public FluidProperties
    */
   Real fluidDensity(Real pressure, Real temperature) const;
   Real fluidViscosity(Real pressure, Real temperature) const;
+  Real pSat(Real temperature) const;
+  Real tSat(Real pressure) const;
 //  Real fluidHenryCoefficient(Real temperature) const;
 
  protected:

@@ -36,6 +36,7 @@
 #include "GasPressureAux.h"
 #include "FluidDensityAux.h"
 #include "FluidViscosityAux.h"
+#include "FluidPropertyAux.h"
 #include "RelativePermeabilityAux.h"
 
 // Mesh modifiers
@@ -135,6 +136,7 @@ QuollApp::registerObjects(Factory & factory)
    registerAux(FluidDensityAux);
    registerAux(FluidViscosityAux);
    registerAux(RelativePermeabilityAux);
+   registerAux(FluidPropertyAux);
 
    // Register the mesh modifier to rescale the vertical component so that the mesh is refined at the top
 // registerMeshModifier(VerticalRefine);

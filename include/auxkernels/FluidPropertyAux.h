@@ -1,5 +1,5 @@
 /****************************************************************/
-/* Auxillary kernel to calculate fluid density using the given  */
+/* Auxillary kernel to calculate fluid property using the given */
 /* Fluid Property UserObject for multiphase flow in porous      */
 /* media.                                                       */
 /*                                                              */
@@ -7,22 +7,22 @@
 /* chris.green@csiro.au                                         */
 /****************************************************************/
 
-#ifndef FLUIDDENSITYAUX_H
-#define FLUIDDENSITYAUX_H
+#ifndef FLUIDPROPERTYAUX_H
+#define FLUIDPROPERTYAUX_H
 
 #include "AuxKernel.h"
 #include "FluidProperties.h"
 
-class FluidDensityAux;
+class FluidPropertyAux;
 
 template<>
-InputParameters validParams<FluidDensityAux>();
+InputParameters validParams<FluidPropertyAux>();
 
-class FluidDensityAux : public AuxKernel
+class FluidPropertyAux : public AuxKernel
 {
 public:
 
-  FluidDensityAux(const std::string & name,
+  FluidPropertyAux(const std::string & name,
              InputParameters parameters);
 
 protected:
@@ -33,7 +33,7 @@ private:
 
   /**
    * This is the member reference that will hold the User Object
-   * value for fluid density.
+   * value for fluid property.
    * Note that User Object reference is const.
    */
   const FluidProperties & _fluid_property;
@@ -41,6 +41,7 @@ private:
   VariableValue & _pressure;
   VariableValue & _temperature;
   VariableValue & _saturation;
+  const MooseEnum & fluid_property_enum;
 };
 
-#endif //FLUIDDENSITYAUX_H
+#endif //FLUIDPROPERTYAUX_H
