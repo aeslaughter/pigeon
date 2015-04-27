@@ -28,7 +28,7 @@ ThreeDDarcyDDCx::ThreeDDarcyDDCx(const std::string & name,
     Kernel(name, parameters),
     _gamma(getParam<Real>("gamma")),
     _grad_concentration(coupledGradient("concentration_variable")),
-    _grad_concentration_var(coupled("gamma"))
+    _grad_concentration_var(coupled("concentration_variable"))
 {}
 
 Real ThreeDDarcyDDCx::computeQpResidual()
