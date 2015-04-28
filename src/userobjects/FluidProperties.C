@@ -38,13 +38,3 @@ FluidProperties::execute()
 void 
 FluidProperties::finalize()
 {}
-
-Real FluidProperties::pSat(Real t) const
-{
-  return 0;
-}
-
-Real FluidProperties::tSat(Real p) const
-{
-  return 0;
-}

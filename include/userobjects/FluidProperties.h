@@ -37,10 +37,6 @@ class FluidProperties : public GeneralUserObject
    */
   virtual Real fluidDensity(Real pressure, Real temperature) const = 0; 
   virtual Real fluidViscosity(Real pressure, Real temperature) const = 0;
-  virtual Real pSat(Real temperature) const;
-  virtual Real tSat(Real pressure) const;
-//  virtual Real fluidHenryCoefficient(Real temperature) const;
-
 
 };
 

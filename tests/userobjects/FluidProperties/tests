@@ -43,4 +43,40 @@
     csvdiff = 'WaterProperty_density2_vpp_0001.csv'
     abs_zero = 1.0E-6
   [../]
+  [./water_viscosity1]
+    type = 'CSVDiff'
+    input = 'WaterProperty.i Outputs/file_base=WaterProperty_viscosity AuxKernels/FluidPropertyAux/fluid_property_enum=viscosity Functions/initial_pressure/value='(1+9.5*x)*1e6' Functions/initial_temperature/value=50'
+    csvdiff = 'WaterProperty_viscosity_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./water_b23p]
+   type = 'CSVDiff'
+    input = 'WaterProperty.i Outputs/file_base=WaterProperty_b23p AuxKernels/FluidPropertyAux/fluid_property_enum=b23p Functions/initial_pressure/value=16.5291643e6 Functions/initial_temperature/value=350'
+    csvdiff = 'WaterProperty_b23p_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./water_b23t]
+   type = 'CSVDiff'
+    input = 'WaterProperty.i Outputs/file_base=WaterProperty_b23t AuxKernels/FluidPropertyAux/fluid_property_enum=b23t Functions/initial_pressure/value=16.5291643e6 Functions/initial_temperature/value=350'
+    csvdiff = 'WaterProperty_b23t_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./water_cowat1]
+   type = 'CSVDiff'
+    input = 'WaterProperty.i Outputs/file_base=WaterProperty_cowat1 AuxKernels/FluidPropertyAux/fluid_property_enum=cowat Functions/initial_pressure/value=3e6 Functions/initial_temperature/value=300-273.15'
+    csvdiff = 'WaterProperty_cowat1_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./water_cowat2]
+   type = 'CSVDiff'
+    input = 'WaterProperty.i Outputs/file_base=WaterProperty_cowat2 AuxKernels/FluidPropertyAux/fluid_property_enum=cowat Functions/initial_pressure/value=3e6 Functions/initial_temperature/value=500-273.15'
+    csvdiff = 'WaterProperty_cowat2_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./water_cowat3]
+   type = 'CSVDiff'
+    input = 'WaterProperty.i Outputs/file_base=WaterProperty_cowat3 AuxKernels/FluidPropertyAux/fluid_property_enum=cowat Functions/initial_pressure/value=80e6 Functions/initial_temperature/value=300-273.15'
+    csvdiff = 'WaterProperty_cowat3_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
 []

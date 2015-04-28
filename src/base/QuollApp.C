@@ -4,31 +4,31 @@
 #include "ModulesApp.h"
 
 // Kernels
-#include "TwoDConvectionDiffusionDDC.h"
-#include "TwoDDarcyDDC.h"
-#include "ThreeDConvectionDiffusionDDC.h"
-#include "ThreeDDarcyDDCx.h"
-#include "ThreeDDarcyDDCy.h"
-#include "MassTimeDerivative1.h"
-#include "MassTimeDerivative2.h"
-#include "Flux1.h"
-#include "Flux2.h"
-#include "SinglePhaseFlux1.h"
-#include "SinglePhaseFlux2.h"
-#include "SinglePhaseMassTimeDerivative1.h"
-#include "SinglePhaseMassTimeDerivative2.h"
-#include "MultiphaseFluxN.h"
-#include "MultiphaseFluxW.h"
-#include "MultiphaseMassTimeDerivativeN.h"
-#include "MultiphaseMassTimeDerivativeW.h"
-#include "ComponentMassTimeDerivative.h"
-#include "ComponentFlux.h"
+//#include "TwoDConvectionDiffusionDDC.h"
+//#include "TwoDDarcyDDC.h"
+//#include "ThreeDConvectionDiffusionDDC.h"
+//#include "ThreeDDarcyDDCx.h"
+//#include "ThreeDDarcyDDCy.h"
+//#include "MassTimeDerivative1.h"
+//#include "MassTimeDerivative2.h"
+//#include "Flux1.h"
+//#include "Flux2.h"
+//#include "SinglePhaseFlux1.h"
+//#include "SinglePhaseFlux2.h"
+//#include "SinglePhaseMassTimeDerivative1.h"
+//#include "SinglePhaseMassTimeDerivative2.h"
+//#include "MultiphaseFluxN.h"
+//#include "MultiphaseFluxW.h"
+//#include "MultiphaseMassTimeDerivativeN.h"
+//#include "MultiphaseMassTimeDerivativeW.h"
+//#include "ComponentMassTimeDerivative.h"
+//#include "ComponentFlux.h"
 
 // Initial conditions
 #include "PerturbationIC.h"
 
 // Boundary conditions
-#include "ConstantMassFluxBC.h"
+//#include "ConstantMassFluxBC.h"
 
 // Auxillary kernels
 #include "SaturationAux.h"
@@ -37,6 +37,7 @@
 #include "FluidDensityAux.h"
 #include "FluidViscosityAux.h"
 #include "FluidPropertyAux.h"
+#include "FluidPropertyWaterAux.h"
 #include "RelativePermeabilityAux.h"
 
 // Mesh modifiers
@@ -62,7 +63,7 @@
 #include "SideMassFluxIntegralPostprocessor.h"
 
 // Dirac kernels
-#include "TimeLimitedConstantPointSource.h"
+//#include "TimeLimitedConstantPointSource.h"
 
 template<>
 InputParameters validParams<QuollApp>()
@@ -107,26 +108,26 @@ QuollApp::registerObjects(Factory & factory)
 // registerKernel(ThreeDConvectionDiffusionDDC);
 // registerKernel(ThreeDDarcyDDCx);
 // registerKernel(ThreeDDarcyDDCy);
-   registerKernel(MassTimeDerivative1);
-   registerKernel(MassTimeDerivative2);
-   registerKernel(Flux1);
-   registerKernel(Flux2);
-   registerKernel(SinglePhaseFlux1);
-   registerKernel(SinglePhaseFlux2);
-   registerKernel(SinglePhaseMassTimeDerivative1);
-   registerKernel(SinglePhaseMassTimeDerivative2);
-   registerKernel(MultiphaseFluxN);
-   registerKernel(MultiphaseFluxW);
-   registerKernel(MultiphaseMassTimeDerivativeN);
-   registerKernel(MultiphaseMassTimeDerivativeW);
-   registerKernel(ComponentMassTimeDerivative);
-   registerKernel(ComponentFlux);
+// registerKernel(MassTimeDerivative1);
+// registerKernel(MassTimeDerivative2);
+// registerKernel(Flux1);
+// registerKernel(Flux2);
+// registerKernel(SinglePhaseFlux1);
+// registerKernel(SinglePhaseFlux2);
+// registerKernel(SinglePhaseMassTimeDerivative1);
+// registerKernel(SinglePhaseMassTimeDerivative2);
+// registerKernel(MultiphaseFluxN);
+// registerKernel(MultiphaseFluxW);
+// registerKernel(MultiphaseMassTimeDerivativeN);
+// registerKernel(MultiphaseMassTimeDerivativeW);
+// registerKernel(ComponentMassTimeDerivative);
+// registerKernel(ComponentFlux);
 
    // Register the pertubation initial condition to seed the instability
 // registerInitialCondition(PerturbationIC);
 
    // Register the boundary conditions
-   registerBoundaryCondition(ConstantMassFluxBC);
+// registerBoundaryCondition(ConstantMassFluxBC);
    
    // Register the auxillary kernel to calculate the fluid velocities from the streamfunction
    // registerAux(VelocityAux);
@@ -137,6 +138,7 @@ QuollApp::registerObjects(Factory & factory)
    registerAux(FluidViscosityAux);
    registerAux(RelativePermeabilityAux);
    registerAux(FluidPropertyAux);
+   registerAux(FluidPropertyWaterAux);
 
    // Register the mesh modifier to rescale the vertical component so that the mesh is refined at the top
 // registerMeshModifier(VerticalRefine);
@@ -160,7 +162,7 @@ QuollApp::registerObjects(Factory & factory)
    registerPostprocessor(SideMassFluxIntegralPostprocessor);
 
    // Register Dirac kernel
-   registerDiracKernel(TimeLimitedConstantPointSource);
+// registerDiracKernel(TimeLimitedConstantPointSource);
 
 }
 

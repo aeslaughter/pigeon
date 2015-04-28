@@ -48,7 +48,7 @@
 
 [AuxKernels]
   [./FluidPropertyAux]
-    type = FluidPropertyAux
+    type = FluidPropertyWaterAux
     variable = WaterPropertyAuxVariable
     fluid_property_enum = tsat
     fluid_property_uo = FluidPropertiesWater
