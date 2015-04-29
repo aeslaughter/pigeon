@@ -35,7 +35,6 @@ RelativePermeabilityCorey::RelativePermeabilityCorey(const std::string & name, I
 {
 }
 
-/// Define Corey relative permeability and override relativePermLiq.
 Real
 RelativePermeabilityCorey::relativePermLiq(Real sat_liq) const
 {
@@ -54,8 +53,6 @@ RelativePermeabilityCorey::relativePermLiq(Real sat_liq) const
   return krel;
 }
 
-
-/// Define Corey relative permeability and override relativePermGas.
 Real
 RelativePermeabilityCorey::relativePermGas(Real sat_liq) const
 {

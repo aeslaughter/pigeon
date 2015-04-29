@@ -22,6 +22,7 @@ InputParameters validParams<FluidViscosityAux>()
   InputParameters params = validParams<AuxKernel>();
   params.addRequiredParam<UserObjectName>("fluid_property_uo", "Name of the User Object defining the fluid properties");
   params.addRequiredCoupledVar("pressure_variable", "The pressure variable corresponding to the fluid phase.");
+  params.addRequiredCoupledVar("temperature_variable", "The temperature variable corresponding to the fluid phase.");
   return params;
 }
 
@@ -30,10 +31,13 @@ FluidViscosityAux::FluidViscosityAux(const std::string & name,
     AuxKernel(name, parameters),
 
     _fluid_property(getUserObject<FluidProperties>("fluid_property_uo")),
-    _pressure(coupledValue("pressure_variable"))
+    _pressure(coupledValue("pressure_variable")),
+    _temperature(coupledValue("temperature_variable"))
 {}
 
 Real FluidViscosityAux::computeValue()
 {
-  return _fluid_property.fluidViscosity(_pressure[_qp], 50.0); // Hard coded temperature
+  Real density = _fluid_property.fluidDensity(_pressure[_qp], _temperature[_qp]);
+
+  return _fluid_property.fluidViscosity(_temperature[_qp], density);
 }

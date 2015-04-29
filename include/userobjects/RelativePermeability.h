@@ -1,4 +1,11 @@
 /****************************************************************/
+/* MOOSE - Multiphysics Object Oriented Simulation Environment  */
+/*                                                              */
+/*          All contents are licensed under LGPL V2.1           */
+/*             See LICENSE for full restrictions                */
+/****************************************************************/
+
+/****************************************************************/
 /* Relative permeability base clase for multiphase flow in      */
 /* porous media                                                 */
 /*                                                              */
@@ -30,15 +37,22 @@ class RelativePermeability : public GeneralUserObject
   void finalize();
 
   /**
-   * Relative permeability is calculated as a function of saturation.
-   * These must be over-ridden in your derived class to provide actual
+   * Liquid relative permeability calculated as a function of saturation.
+   * This must be over-ridden in your derived class to provide actual
    * values of relative permeability.
-   * @param sat_liq is liquid phase saturation
+   * @param sat_liq liquid phase saturation
+   * @return liquid phase relative permeability
    */
   virtual Real relativePermLiq(Real sat_liq) const = 0;
+
+  /**
+   * Gas relative permeability calculated as a function of saturation.
+   * This must be over-ridden in your derived class to provide actual
+   * values of relative permeability.
+   * @param sat_liq liquid phase saturation
+   * @return gas phase relative permeability
+   */
   virtual Real relativePermGas(Real sat_liq) const = 0;
-
-
 };
 
 #endif // RELATIVEPERMEABILITY_H

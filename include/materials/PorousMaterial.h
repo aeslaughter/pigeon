@@ -43,17 +43,11 @@ private:
   Real _material_diffusivity;
 
   /**
-   * These are member references that will hold the User Object
-   * values for relative permeability and capillary pressure.
-   * Note that User Object references are const.
+   * Member references that will hold the User Object values for
+   * the porous material properties.
    */
   const RelativePermeability & _material_relative_permeability;
   const CapillaryPressure & _material_capillary_pressure;
-
-  /**
-   * These are the member references that will hold the values
-   * for the material properties in this class.
-   */
   MaterialProperty<Real> & _rock_density;
   MaterialProperty<Real> & _porosity;
   MaterialProperty<RealTensorValue> & _permeability;

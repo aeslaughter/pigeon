@@ -1,4 +1,11 @@
 /****************************************************************/
+/* MOOSE - Multiphysics Object Oriented Simulation Environment  */
+/*                                                              */
+/*          All contents are licensed under LGPL V2.1           */
+/*             See LICENSE for full restrictions                */
+/****************************************************************/
+
+/****************************************************************/
 /* Auxillary kernel to calculate fluid viscosity using the given*/
 /* Fluid Property UserObject for multiphase flow in porous      */
 /* media.                                                       */
@@ -33,12 +40,14 @@ private:
 
   /**
    * This is the member reference that will hold the User Object
-   * value for fluid viscosity.
-   * Note that User Object reference is const.
+   * value for fluid viscosity (Pa.s).
    */
   const FluidProperties & _fluid_property;
 
+  /// Fluid phase pressure
   VariableValue & _pressure;
+  /// Fluid phase temperature
+  VariableValue & _temperature;
 };
 
 #endif //FLUIDVISCOSITYAUX_H

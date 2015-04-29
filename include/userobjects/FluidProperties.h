@@ -1,4 +1,11 @@
 /****************************************************************/
+/* MOOSE - Multiphysics Object Oriented Simulation Environment  */
+/*                                                              */
+/*          All contents are licensed under LGPL V2.1           */
+/*             See LICENSE for full restrictions                */
+/****************************************************************/
+
+/****************************************************************/
 /* Fluid properties base clase for multiphase flow in porous    */
 /* media                                                        */
 /*                                                              */
@@ -30,14 +37,22 @@ class FluidProperties : public GeneralUserObject
   void finalize();
 
   /**
-   * Fluid properties that are over-written in the derived class
-   * to provide values for the calculations.
-   * @param pressure is gas phase pressure.
-   * @param temperature is the fluid temperature
+   * Fluid density must be over-written in all derived classes.
+   *  
+   * @param pressure fluid pressure (Pa)
+   * @param temperature fluid temperature (C)
+   * @return fluid density (kg/m^3)
    */
   virtual Real fluidDensity(Real pressure, Real temperature) const = 0;
-  virtual Real fluidViscosity(Real pressure, Real temperature) const = 0;
 
+  /**
+   * Fluid viscosity must be over-written in all derived classes.
+   *  
+   * @param pressure fluid pressure (Pa)
+   * @param temperature fluid temperature (C)
+   * @return fluid viscosity (Pa.s)
+   */
+  virtual Real fluidViscosity(Real pressure, Real temperature) const = 0;
 };
 
 #endif // FLUIDPROPERTIES_H

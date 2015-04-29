@@ -1,4 +1,11 @@
 /****************************************************************/
+/* MOOSE - Multiphysics Object Oriented Simulation Environment  */
+/*                                                              */
+/*          All contents are licensed under LGPL V2.1           */
+/*             See LICENSE for full restrictions                */
+/****************************************************************/
+
+/****************************************************************/
 /* Auxillary kernel to calculate relative permeability for      */
 /*  multiphase flow in porous media using the relative          */
 /* permeability relationship defined in the relative            */
@@ -32,11 +39,10 @@ protected:
 
 private:
 
- /**
-   * This is the member reference that will hold the User Object
-   * value for fluid density.
-   * Note that User Object reference is const.
-   */
+  /**
+    * This is the member reference that will hold the User Object
+    * value for relative permeability.
+    */
   const RelativePermeability & _relative_permeabilityUO;
   VariableValue & _liquid_saturation;
   const MooseEnum & fluid_phase_enum;

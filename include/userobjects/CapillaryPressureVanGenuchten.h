@@ -1,4 +1,11 @@
 /****************************************************************/
+/* MOOSE - Multiphysics Object Oriented Simulation Environment  */
+/*                                                              */
+/*          All contents are licensed under LGPL V2.1           */
+/*             See LICENSE for full restrictions                */
+/****************************************************************/
+
+/****************************************************************/
 /* van Genuchten capillary pressure for multiphase flow in      */
 /* porous media.                                                */
 /*                                                              */
@@ -28,8 +35,9 @@ class CapillaryPressureVanGenuchten : public CapillaryPressure
   CapillaryPressureVanGenuchten(const std::string & name, InputParameters parameters);
 
   /**
-   * Capillary pressure as a function of liquid saturation
-   * @param sat_liq is liquid phase saturation
+   * van Genuchten form of capillary pressure as a function of liquid saturation
+   * @param sat_liq liquid phase saturation
+   * @return capillary pressure (Pa)
    */
   Real capillaryPressure(Real sat_liq) const;
 
@@ -37,19 +45,14 @@ class CapillaryPressureVanGenuchten : public CapillaryPressure
 
   /// Liquid phase residual saturation
   Real _sat_lr;
-
   /// Liquid phase fully saturated saturation
   Real _sat_ls;
-
   /// van Genuchten exponent m
   Real _m;
-
   /// Maximum capillary pressure
   Real _cp_max;
-
   /// van Genuchten capillary pressure coefficient
   Real _p0;
-
 };
 
 #endif // CAPILLARYPRESSUREVANGENUCHTEN_H

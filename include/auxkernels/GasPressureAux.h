@@ -1,4 +1,11 @@
 /****************************************************************/
+/* MOOSE - Multiphysics Object Oriented Simulation Environment  */
+/*                                                              */
+/*          All contents are licensed under LGPL V2.1           */
+/*             See LICENSE for full restrictions                */
+/****************************************************************/
+
+/****************************************************************/
 /* Auxillary kernel to calculate pressure of the gas phase      */
 /* for multiphase flow in porous media using the capillary      */
 /* pressure defined in the Capillary Pressure UserObject.       */

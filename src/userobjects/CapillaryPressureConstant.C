@@ -30,7 +30,6 @@ CapillaryPressureConstant::CapillaryPressureConstant(const std::string & name, I
 {
 }
 
-/// Override capillary_pressure.
 Real
 CapillaryPressureConstant::capillaryPressure(Real sat_liq) const
 {

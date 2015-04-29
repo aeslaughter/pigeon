@@ -30,7 +30,6 @@ RelativePermeabilityPerfectlyMobile::RelativePermeabilityPerfectlyMobile(const s
 {
 }
 
-/// Define perfectly mobile (unity) relative permeability and override relativePermLiq.
 Real
 RelativePermeabilityPerfectlyMobile::relativePermLiq(Real sat_liq) const
 {
@@ -43,7 +42,6 @@ RelativePermeabilityPerfectlyMobile::relativePermLiq(Real sat_liq) const
 
 }
 
-/// Define perfectly mobile (unity) relative permeability and override relativePermGas.
 Real
 RelativePermeabilityPerfectlyMobile::relativePermGas(Real sat_liq) const
 {

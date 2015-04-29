@@ -1,4 +1,11 @@
 /****************************************************************/
+/* MOOSE - Multiphysics Object Oriented Simulation Environment  */
+/*                                                              */
+/*          All contents are licensed under LGPL V2.1           */
+/*             See LICENSE for full restrictions                */
+/****************************************************************/
+
+/****************************************************************/
 /* Auxillary kernel to calculate fluid property using the given */
 /* Fluid Property UserObject for multiphase flow in porous      */
 /* media.                                                       */
@@ -34,13 +41,16 @@ private:
   /**
    * This is the member reference that will hold the User Object
    * value for fluid property.
-   * Note that User Object reference is const.
    */
   const FluidPropertiesWater & _fluid_property;
 
+  /// Water phase pressure
   VariableValue & _pressure;
+  /// Water phase temperature
   VariableValue & _temperature;
+  /// Water phase saturation
   VariableValue & _saturation;
+  /// MooseEnum of fluid properties
   const MooseEnum & fluid_property_enum;
 };
 

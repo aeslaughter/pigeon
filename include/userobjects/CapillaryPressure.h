@@ -1,4 +1,11 @@
 /****************************************************************/
+/* MOOSE - Multiphysics Object Oriented Simulation Environment  */
+/*                                                              */
+/*          All contents are licensed under LGPL V2.1           */
+/*             See LICENSE for full restrictions                */
+/****************************************************************/
+
+/****************************************************************/
 /* Capillary pressure base clase for multiphase flow in porous  */
 /* media                                                        */
 /*                                                              */
@@ -33,7 +40,8 @@ class CapillaryPressure : public GeneralUserObject
    * Capillary pressure is calculated as a function of saturation.
    * Ths must be over-ridden in your derived class to provide actual
    * values of capillary pressure.
-   * @param sat_liq is liquid phase saturation
+   * @param sat_liq liquid phase saturation
+   * @return capillary pressure (Pa)
    */
   virtual Real capillaryPressure(Real sat_liq) const = 0;
 

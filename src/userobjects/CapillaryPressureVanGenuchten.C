@@ -43,7 +43,6 @@ CapillaryPressureVanGenuchten::CapillaryPressureVanGenuchten(const std::string &
 {
 }
 
-/// Define van Genuchten capillary pressure and override capillary_pressure.
 Real
 CapillaryPressureVanGenuchten::capillaryPressure(Real sat_liq) const
 {

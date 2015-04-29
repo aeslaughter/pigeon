@@ -44,7 +44,6 @@ RelativePermeabilityVanGenuchten::RelativePermeabilityVanGenuchten(const std::st
 {
 }
 
-/// Define van Genuchten relative permeability and override relativePermLiq.
 Real
 RelativePermeabilityVanGenuchten::relativePermLiq(Real sat_liq) const
 {
@@ -71,8 +70,6 @@ RelativePermeabilityVanGenuchten::relativePermLiq(Real sat_liq) const
   return krel;
 }
 
-
-/// Define van Genuchten relative permeability and override relativePermGas.
 Real
 RelativePermeabilityVanGenuchten::relativePermGas(Real sat_liq) const
 {

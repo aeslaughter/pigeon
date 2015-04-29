@@ -63,14 +63,13 @@ PorousMaterial::PorousMaterial(const std::string & name,
 void
 PorousMaterial::computeQpProperties()
 {
-
-  /// Set material properties at the quadrature points
-    _rock_density[_qp] = _material_density;
-    _porosity[_qp] = _material_porosity;
-    _permeability[_qp] = _material_permeability;
-    _gravity[_qp] = _material_gravity;
-    _diffusivity[_qp] = _material_diffusivity;
-    _gas_relative_permeability[_qp] = _material_relative_permeability.relativePermGas(_liquid_saturation[_qp]);
-    _liquid_relative_permeability[_qp] = _material_relative_permeability.relativePermLiq(_liquid_saturation[_qp]);
-//    _capillary_pressure[_qp] = _material_capillary_pressure.capillaryPressure(_liquid_saturation[_qp]);
+  // Set material properties at the quadrature points
+  _rock_density[_qp] = _material_density;
+  _porosity[_qp] = _material_porosity;
+  _permeability[_qp] = _material_permeability;
+  _gravity[_qp] = _material_gravity;
+  _diffusivity[_qp] = _material_diffusivity;
+  _gas_relative_permeability[_qp] = _material_relative_permeability.relativePermGas(_liquid_saturation[_qp]);
+  _liquid_relative_permeability[_qp] = _material_relative_permeability.relativePermLiq(_liquid_saturation[_qp]);
+//  _capillary_pressure[_qp] = _material_capillary_pressure.capillaryPressure(_liquid_saturation[_qp]);
   }
