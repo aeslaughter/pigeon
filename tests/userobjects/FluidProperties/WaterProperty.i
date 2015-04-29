@@ -4,17 +4,17 @@
 # * pSat - the saturated water pressure as a function of temperature.
 # * fluidDensity - the density of water as a function of pressure and temperature.
 #
-# For tSat, the fluid pressure is set to vary from 0.1 MPa at the left end of 
-# the 1D mesh to 10 MPa at the right end. Out of range exceptions are also 
+# For tSat, the fluid pressure is set to vary from 0.1 MPa at the left end of
+# the 1D mesh to 10 MPa at the right end. Out of range exceptions are also
 # tested.
 #
-# For pSat, the temperature is set to vary from 10 C at the left end of the 1D 
+# For pSat, the temperature is set to vary from 10 C at the left end of the 1D
 # mesh to 350 at the right end. Out of range exceptions are also tested.
 #
 # For fluidDensity, the pressure is set to vary linearly from 1MPa at the left
 # end of the mesh to 20MPa at the right end. Temperature is varied from 50 C
 # to 200 C for each test.
-# 
+#
 # #############################################################################
 
 [UserObjects]

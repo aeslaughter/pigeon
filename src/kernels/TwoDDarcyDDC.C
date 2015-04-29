@@ -44,6 +44,6 @@ Real TwoDDarcyDDC::computeQpJacobian()
 Real TwoDDarcyDDC::computeQpOffDiagJacobian(unsigned int jvar)
 {
   if (jvar == _grad_concentration_var)
-    return _gamma * _test[_i][_qp] * _grad_phi[_j][_qp](0); 
+    return _gamma * _test[_i][_qp] * _grad_phi[_j][_qp](0);
   return 0.0;
 }

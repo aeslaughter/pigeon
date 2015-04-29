@@ -42,10 +42,10 @@ Real RelativePermeabilityAux::computeValue()
   Real relperm;
 
   if (fluid_phase_enum == "liquid") {
-     relperm =  _relative_permeabilityUO.relativePermLiq(_liquid_saturation[_qp]); 
+     relperm =  _relative_permeabilityUO.relativePermLiq(_liquid_saturation[_qp]);
   }
   if (fluid_phase_enum == "gas") {
-     relperm =  _relative_permeabilityUO.relativePermGas(_liquid_saturation[_qp]); 
+     relperm =  _relative_permeabilityUO.relativePermGas(_liquid_saturation[_qp]);
   }
 
   return relperm;

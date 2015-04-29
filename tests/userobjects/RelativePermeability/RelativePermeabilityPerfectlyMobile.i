@@ -1,10 +1,10 @@
 # #############################################################################
-# Test the RelativePermeabilityPerfectlyMobile UserObject. This relative 
+# Test the RelativePermeabilityPerfectlyMobile UserObject. This relative
 # permeability UserObject returns 1.0 for all liquid saturations.
-# 
+#
 # The liquid saturation is initialised to vary linearly from zero at the left
 # end of the 1D mesh, to unity at the right end.
-# 
+#
 # #############################################################################
 
 [UserObjects]

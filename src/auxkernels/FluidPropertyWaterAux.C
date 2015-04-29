@@ -6,7 +6,7 @@
 /****************************************************************/
 
 /****************************************************************/
-/* Auxillary kernel to calculate fluid property using the given */ 
+/* Auxillary kernel to calculate fluid property using the given */
 /* Fluid Property UserObject for multiphase flow in porous      */
 /* media.                                                       */
 /*                                                              */
@@ -24,7 +24,7 @@ InputParameters validParams<FluidPropertyWaterAux>()
   params.addCoupledVar("pressure_variable", 1.e6,  "The pressure variable corresponding to the fluid phase.");
   params.addCoupledVar("temperature_variable", 50, "The temperature variable.");
   params.addCoupledVar("saturation_variable", 1.0, "The saturation variable corresponding to the fluid phase.");
-  MooseEnum fluid_property_enum("density viscosity tsat psat b23t b23p cowat");
+  MooseEnum fluid_property_enum("density viscosity tsat psat b23t b23p region1 region2");
   params.addRequiredParam<MooseEnum>("fluid_property_enum", fluid_property_enum, "The fluid property that this auxillary kernel is to calculate");
   return params;
 }
@@ -63,8 +63,11 @@ Real FluidPropertyWaterAux::computeValue()
   if (fluid_property_enum == "b23p") {
      property = _fluid_property.b23p(_temperature[_qp]);
   }
-  if (fluid_property_enum == "cowat") {
-     property = _fluid_property.cowat(_pressure[_qp], _temperature[_qp]);
+  if (fluid_property_enum == "region1") {
+     property = _fluid_property.region1(_pressure[_qp], _temperature[_qp]);
+  }
+  if (fluid_property_enum == "region2") {
+     property = _fluid_property.region2(_pressure[_qp], _temperature[_qp]);
   }
 
   return property;

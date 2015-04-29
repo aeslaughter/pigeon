@@ -55,7 +55,7 @@ CapillaryPressureVanGenuchten::capillaryPressure(Real sat_liq) const
   if (sat_liq < 0.0 || sat_liq > 1.0)
     mooseError("CapillaryPressureVanGenuchten: Liquid saturation is outside the range 0 <= Sl <= 1\n");
 
-  if (sat_eff > 1.0) 
+  if (sat_eff > 1.0)
      { sat_eff = 1.0; } // Restrict sat_eff to be less than or equal to unity
 
   if (sat_liq <= _sat_lr)
@@ -68,5 +68,5 @@ CapillaryPressureVanGenuchten::capillaryPressure(Real sat_liq) const
   if (cp < -_cp_max) { cp = -_cp_max;}
   if (cp > 0.0) { cp = 0.0;}
 
-  return cp; 
+  return cp;
 }

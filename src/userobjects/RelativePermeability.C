@@ -35,6 +35,6 @@ void
 RelativePermeability::execute()
 {}
 
-void 
+void
 RelativePermeability::finalize()
 {}

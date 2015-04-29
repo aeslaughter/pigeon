@@ -23,14 +23,14 @@ public:
 
 protected:
   virtual Real computeQpIntegral();
-  
+
   MaterialProperty<RealTensorValue> & _permeability;
   MaterialProperty<RealVectorValue> & _gravity;
 
   VariableValue & _fluid_density;
   VariableValue & _fluid_viscosity;
   VariableValue & _component;
-  
+
 };
 
 #endif // SIDEMASSFLUXINTEGRALPOSTPROCESSOR_H

@@ -44,7 +44,7 @@ VerticalRefine::modify()
    VerticalRefine::cosinescale(*_mesh_ptr, _mesh_top_value, _mesh_bottom_value);
 }
 
-void 
+void
 VerticalRefine::cosinescale(libMesh::MeshBase & mesh, const Real mt, const Real mb)
 {
    const Real pihalf = libMesh::pi / 2.0;
@@ -52,7 +52,7 @@ VerticalRefine::cosinescale(libMesh::MeshBase & mesh, const Real mt, const Real 
    const libMesh::MeshBase::node_iterator nd_end = mesh.nodes_end();
 
    // Cosine scale of the y coordinate in two dimensions
-   if (mesh.mesh_dimension() == 2) 
+   if (mesh.mesh_dimension() == 2)
      {
       for (libMesh::MeshBase::node_iterator nd = mesh.nodes_begin(); nd != nd_end; ++nd)
          {
@@ -61,7 +61,7 @@ VerticalRefine::cosinescale(libMesh::MeshBase & mesh, const Real mt, const Real 
      }
 
    // Cosine scale of the z coordinate in two dimensions
-   if (mesh.mesh_dimension() == 3) 
+   if (mesh.mesh_dimension() == 3)
      {
       for (libMesh::MeshBase::node_iterator nd = mesh.nodes_begin(); nd != nd_end; ++nd)
          {

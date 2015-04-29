@@ -35,6 +35,6 @@ void
 CapillaryPressure::execute()
 {}
 
-void 
+void
 CapillaryPressure::finalize()
 {}

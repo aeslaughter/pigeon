@@ -26,7 +26,7 @@ class VerticalRefine : public MeshModifier
 {
 public:
   VerticalRefine(const std::string & name, InputParameters parameters);
-  
+
 
   virtual ~VerticalRefine();
 

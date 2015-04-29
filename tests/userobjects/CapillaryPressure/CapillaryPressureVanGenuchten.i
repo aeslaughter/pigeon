@@ -1,10 +1,10 @@
 # #############################################################################
-# Test the CapillaryPressureConstant UserObject. This capillary pressure 
+# Test the CapillaryPressureConstant UserObject. This capillary pressure
 # UserObject returns the given capillary pressure for all liquid saturations.
-# 
+#
 # The liquid saturation is initialised to vary linearly from zero at the left
 # end of the 1D mesh, to unity at the right end.
-# 
+#
 # #############################################################################
 
 [UserObjects]

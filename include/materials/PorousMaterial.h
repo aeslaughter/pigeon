@@ -19,7 +19,7 @@ template<>
 InputParameters validParams<PorousMaterial>();
 
 /**
- * General material class for multiphase flow through porous media. 
+ * General material class for multiphase flow through porous media.
  */
 class PorousMaterial : public Material
 {
@@ -62,12 +62,12 @@ private:
   MaterialProperty<Real> & _gas_relative_permeability;
   MaterialProperty<Real> & _liquid_relative_permeability;
 //MaterialProperty<Real> & _capillary_pressure;
- 
+
   /**
    * The member reference of the liquid saturation variable
    */
   VariableValue & _liquid_saturation;
-   
+
 
 };
 

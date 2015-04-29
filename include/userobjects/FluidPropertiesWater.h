@@ -23,7 +23,7 @@ class FluidPropertiesWater : public FluidProperties
   FluidPropertiesWater(const std::string & name, InputParameters parameters);
 
   /**
-   * Water density and viscosoty as a function of 
+   * Water density and viscosoty as a function of
    * pressure and temperature.
    * @param pressure is fluid pore pressure (Pa)
    * @param temperature is the fluid temperature (C)
@@ -34,7 +34,9 @@ class FluidPropertiesWater : public FluidProperties
   Real tSat(Real pressure) const;
   Real b23p(Real temperature) const;
   Real b23t(Real pressure) const;
-  Real cowat(Real pressure, Real temperature) const;
+  Real region1(Real pressure, Real temperature) const;
+  Real region2(Real pressure, Real temperature) const;
+  Real region3(Real pressure, Real temperature) const;
 //  Real fluidHenryCoefficient(Real temperature) const;
 
  protected:

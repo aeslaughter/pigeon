@@ -21,16 +21,16 @@ InputParameters validParams<PorousMaterial>()
 
   params.addRequiredParam<Real>("density", "Density of the material (kg/m^3)");
   params.addRequiredParam<Real>("porosity", "Porosity of the material (must be between 0 and 1)");
-  params.addRequiredParam<RealTensorValue>("permeability", "The permeability tensor (m^2)"); 
+  params.addRequiredParam<RealTensorValue>("permeability", "The permeability tensor (m^2)");
   params.addRequiredParam<RealVectorValue>("gravity", "Gravitational acceleration vector downwards (m/s^2)");
   params.addRequiredParam<Real>("diffusivity", "Diffusivity (m^2/s");
-  
+
   /// MooseEnum for relative permeability choice. Default choice 'unity' (perfectly mobile, krg=krl=1).
 //  MooseEnum relperm_model ("unity, linear, Corey, vanGenuchten", "unity");
 //  params.addParam<MooseEnum>("relative_permeability", relperm_model, "The relative permeability model");
   params.addRequiredParam<UserObjectName>("rel_perm_uo", "Name of the User Object defining the relative permeability model");
   params.addRequiredParam<UserObjectName>("cap_pres_uo", "Name of the User Object defining the capillary pressure model");
-  
+
   params.addRequiredCoupledVar("liquid_saturation","The liquid saturation");
   return params;
 }

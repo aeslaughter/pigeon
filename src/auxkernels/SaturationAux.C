@@ -6,7 +6,7 @@
 /****************************************************************/
 
 /****************************************************************/
-/* Auxillary kernel to calculate saturation for multiphase flow */                          
+/* Auxillary kernel to calculate saturation for multiphase flow */
 /* in porous media.                                             */
 /*                                                              */
 /* Chris Green 2015                                             */

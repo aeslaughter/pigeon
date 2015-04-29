@@ -30,7 +30,7 @@ class EquationOfState : public GeneralUserObject
   void finalize();
 
   /**
-   * Each derived EOS class must overwrite the following fluid properties as 
+   * Each derived EOS class must overwrite the following fluid properties as
    * functions of pressure and temperature.
    * density (kg/m^3)
    * viscosity (Pa. s)

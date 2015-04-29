@@ -128,7 +128,7 @@ QuollApp::registerObjects(Factory & factory)
 
    // Register the boundary conditions
 // registerBoundaryCondition(ConstantMassFluxBC);
-   
+
    // Register the auxillary kernel to calculate the fluid velocities from the streamfunction
    // registerAux(VelocityAux);
    registerAux(SaturationAux);
@@ -142,7 +142,7 @@ QuollApp::registerObjects(Factory & factory)
 
    // Register the mesh modifier to rescale the vertical component so that the mesh is refined at the top
 // registerMeshModifier(VerticalRefine);
- 
+
    // Register the porous material
    registerMaterial(PorousMaterial);
 

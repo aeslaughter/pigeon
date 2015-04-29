@@ -58,7 +58,7 @@ Real ThreeDConvectionDiffusionDDC::computeQpJacobian()
 /*
 Real ThreeDConvectionDiffusionDDC::computeQpOffDiagJacobian(unsigned int jvar)
 {
-  if (jvar == _grad_streamfunction_var) 
+  if (jvar == _grad_streamfunction_var)
   {
     Real dconvterm1 = - _test[_i][_qp] * (_grad_phi[_j][_qp](1) * _grad_u[_qp](0));
     Real dconvterm2 = _test[_i][_qp] * (_grad_phi[_j][_qp](0) * _grad_u[_qp](1));

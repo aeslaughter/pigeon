@@ -6,7 +6,7 @@
 /****************************************************************/
 
 /****************************************************************/
-/* Auxillary kernel to calculate fluid density using the given  */ 
+/* Auxillary kernel to calculate fluid density using the given  */
 /* Fluid Property UserObject for multiphase flow in porous      */
 /* media.                                                       */
 /*                                                              */

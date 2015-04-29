@@ -35,7 +35,7 @@ class FluidProperties : public GeneralUserObject
    * @param pressure is gas phase pressure.
    * @param temperature is the fluid temperature
    */
-  virtual Real fluidDensity(Real pressure, Real temperature) const = 0; 
+  virtual Real fluidDensity(Real pressure, Real temperature) const = 0;
   virtual Real fluidViscosity(Real pressure, Real temperature) const = 0;
 
 };

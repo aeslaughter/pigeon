@@ -25,7 +25,7 @@ InputParameters validParams<FluidPropertiesWater>()
 FluidPropertiesWater::FluidPropertiesWater(const std::string & name, InputParameters parameters) :
   FluidProperties(name, parameters)
 {
-  // Reference critical constants used in to calculate thermophysical properties of water.
+  /// Reference critical constants used in to calculate thermophysical properties of water.
   _t_critical = 647.3;
   _p_critical = 22.064e6;
   _rho_critical = 322;
@@ -34,35 +34,50 @@ FluidPropertiesWater::FluidPropertiesWater(const std::string & name, InputParame
   _R = 0.461526;
 }
 
-/// Density of water
-/****************************************************************/
-/* From IAPWS IF97 Revised Release on the IAPWS Industrial      */
-/* Formulation 1997 for the Thermodynamic Properties of Water   */
-/* and Steam.                                                   */
-/*                                                              */
-/* Valid for 273.15 K <= T <= 1073.15 K, p <= 100 MPa           */
-/*          1073.15 K <= T <= 2273.15 K, p <= 50 Mpa            */
-/*                                                              */
-/* The calculation is split into five regions.                  */
-/****************************************************************/
+/**
+  * Density of water.
+  * From IAPWS IF97 Revised Release on the IAPWS Industrial
+  * Formulation 1997 for the Thermodynamic Properties of Water
+  * and Steam.
+  *
+  * Valid for 273.15 K <= T <= 1073.15 K, p <= 100 MPa
+  *          1073.15 K <= T <= 2273.15 K, p <= 50 Mpa
+  */
 Real
   FluidPropertiesWater::fluidDensity(Real pressure, Real temperature) const
 
 {
+  Real density;
+  // Determine which region the point is in. First calculate the saturated
+  // pressure from the input temperature
+  Real psat = pSat(temperature);
 
+  if (temperature >= 0. && temperature <= 350.)
+  {
+    if (pressure > psat && pressure <= 100.e6)
+    {
+      // Region 1: single phase liquid
+      density = region1(pressure, temperature);
+    }
+    
+    if (pressure <= psat)
+    {
+      // Region 2: vapour phase
+      density = region2(pressure, temperature);
+    }
+  }
 
-  return 0.;
+  return density;
 }
 
-/// Viscosity of water
-/****************************************************************/
-/* Eq. (10) from Release on the IAPWS Formulation 2008 for the  */
-/* Viscosity of Ordinary Water Substance.                       */
-/*                                                              */
-/* Function takes temperature (in C) and density (kg/m^3), and  */
-/* gives viscosity in Pa.s                                      */
-/*                                                              */
-/****************************************************************/
+/**
+  * Viscosity of water
+  * Eq. (10) from Release on the IAPWS Formulation 2008 for the
+  * Viscosity of Ordinary Water Substance.
+  *
+  * Function takes temperature (in C) and density (kg/m^3), and
+  * gives viscosity in Pa.s
+  */
 Real
   FluidPropertiesWater::fluidViscosity(Real temperature, Real density) const
 
@@ -96,15 +111,15 @@ Real
 
   d1[0] = 1.;
   d1[1] = rhobar - 1.;
-  d1[2] = d1[1] * d1[1]; 
-  d1[3] = d1[2] * d1[1]; 
-  d1[4] = d1[3] * d1[1]; 
-  d1[5] = d1[4] * d1[1]; 
-  d1[6] = d1[5] * d1[1]; 
+  d1[2] = d1[1] * d1[1];
+  d1[3] = d1[2] * d1[1];
+  d1[4] = d1[3] * d1[1];
+  d1[5] = d1[4] * d1[1];
+  d1[6] = d1[5] * d1[1];
 
   // Calculate mu0
   Real sum0 = 0.;
-  for (int i = 0; i<= 3; i++) 
+  for (int i = 0; i<= 3; i++)
      sum0 += h0v[i] * t0[i];
 
   Real mu0 = 100. * std::sqrt(tbar) / sum0;
@@ -117,33 +132,21 @@ Real
   Real mu1 = std::exp(rhobar * sum1);
 
   // The water viscosity (in Pa.s) is then given by
-  
+
   return mu_star * mu0 * mu1;
 }
 
-/// Henry coefficient of CO2 as a function of temperature.
-/*
-Real
-  FluidPropertiesWater::fluidHenryCoefficient(Real temperature) const
-
-{
-
-  Real co2henry = 200.0e+6; // Henry coefficient at T = 50C
-
-  return co2henry;
-}*/
-
-/// Saturation pressure as a function of temperature.
-/****************************************************************/
-/* Eq. (30) from Revised Release on the IAPWS Industrial        */
-/* Formulation 1997 for the Thermodynamic Properties of Water   */
-/* and Steam, IAPWS 2007.                                       */
-/*                                                              */
-/* Function takes temperature (in C) and gives saturation       */
-/* pressure in Pa.                                              */
-/*                                                              */
-/* Valid for 273.15 K <= t <= 647.096 K                         */
-/****************************************************************/
+/** Saturation pressure as a function of temperature.
+ *
+ * Eq. (30) from Revised Release on the IAPWS Industrial
+ * Formulation 1997 for the Thermodynamic Properties of Water
+ * and Steam, IAPWS 2007.
+ *
+ * Function takes temperature (in C) and gives saturation
+ * pressure in Pa.
+ *
+ * Valid for 273.15 K <= t <= 647.096 K
+ */
 Real
   FluidPropertiesWater::pSat(Real temperature) const
 {
@@ -170,17 +173,17 @@ Real
   return p * 1.e6;
 }
 
-/// Saturation temperature as a function of pressure.
-/****************************************************************/
-/* Eq. (31) from Revised Release on the IAPWS Industrial        */
-/* Formulation 1997 for the Thermodynamic Properties of Water   */
-/* and Steam, IAPWS 2007.                                       */
-/*                                                              */
-/* Function takes pressure (in Pa) and gives saturation         */
-/* temperature in C.                                            */
-/*                                                              */
-/* Valid for 611.213 Pa <= p <= 22.064 MPa                      */
-/****************************************************************/
+/** Saturation temperature as a function of pressure.
+ *
+ * Eq. (31) from Revised Release on the IAPWS Industrial
+ * Formulation 1997 for the Thermodynamic Properties of Water
+ * and Steam, IAPWS 2007.
+ *
+ * Function takes pressure (in Pa) and gives saturation
+ * temperature in C.
+ *
+ * Valid for 611.213 Pa <= p <= 22.064 MPa
+ */
 Real
   FluidPropertiesWater::tSat(Real pressure) const
 {
@@ -206,52 +209,52 @@ Real
   return t - _t_c2k;
 }
 
-/// Auxillary equation for the boundary between regions 2 and 3.
-/****************************************************************/
-/* Eq. (5) from Revised Release on the IAPWS Industrial         */
-/* Formulation 1997 for the Thermodynamic Properties of Water   */
-/* and Steam, IAPWS 2007.                                       */
-/*                                                              */
-/* Function takes temperature (in C) and gives pressure in Pa   */
-/****************************************************************/
+/** Auxillary equation for the boundary between regions 2 and 3.
+ *
+ * Eq. (5) from Revised Release on the IAPWS Industrial
+ * Formulation 1997 for the Thermodynamic Properties of Water
+ * and Steam, IAPWS 2007.
+ *
+ * Function takes temperature (in C) and gives pressure in Pa
+ */
 Real
   FluidPropertiesWater::b23p(Real temperature) const
 {
   Real n[5] = {0.34805185628969e3, -0.11671859879975e1, 0.10192970039326e-2, 0.57254459862746e3,
-               0.13918839778870e2};  
+               0.13918839778870e2};
 
   Real tk = temperature + _t_c2k;
 
   return (n[0] + n[1] * tk + n[2] * tk * tk) * 1.e6;
-} 
+}
 
-/// Auxillary equation for the boundary between regions 2 and 3.
-/****************************************************************/
-/* Eq. (6) from Revised Release on the IAPWS Industrial         */
-/* Formulation 1997 for the Thermodynamic Properties of Water   */
-/* and Steam, IAPWS 2007.                                       */
-/*                                                              */
-/* Function takes pressure (in Pa) and gives temperature in C   */
-/****************************************************************/
+/** Auxillary equation for the boundary between regions 2 and 3.
+ *
+ * Eq. (6) from Revised Release on the IAPWS Industrial
+ * Formulation 1997 for the Thermodynamic Properties of Water
+ * and Steam, IAPWS 2007.
+ *
+ * Function takes pressure (in Pa) and gives temperature in C
+ */
 Real
   FluidPropertiesWater::b23t(Real pressure) const
 {
   Real n[5] = {0.34805185628969e3, -0.11671859879975e1, 0.10192970039326e-2, 0.57254459862746e3,
-               0.13918839778870e2};  
+               0.13918839778870e2};
 
   return n[3] + std::sqrt((pressure / 1.e6 - n[4]) / n[2]) - _t_c2k;
-} 
+}
 
-/// Density function for Region 1 - single phase liquid region
-/****************************************************************/
-/* From Eq. (7) From Revised Release on the IAPWS Industrial    */
-/* Formulation 1997 for the Thermodynamic Properties of Water   */
-/* and Steam, IAPWS 2007.                                       */
-/*                                                              */
-/* Function takes pressure (in Pa) and temperature in C         */
-/****************************************************************/
+/** Density function for Region 1 - single phase liquid region
+ *
+ * From Eq. (7) From Revised Release on the IAPWS Industrial
+ * Formulation 1997 for the Thermodynamic Properties of Water
+ * and Steam, IAPWS 2007.
+ *
+ * Function takes pressure (in Pa) and temperature in C
+ */
 Real
-  FluidPropertiesWater::cowat(Real pressure, Real temperature) const
+  FluidPropertiesWater::region1(Real pressure, Real temperature) const
 {
   Real p_star1 = 16.53e6;
   Real t_star1 = 1386.;
@@ -274,16 +277,96 @@ Real
 
   // Now evaluate the sums
   Real sum1 = 0.;
+  Real tau1 = t_star1 / tk;
+  Real pi1 = pressure / p_star1;
 
-  for (int i = 0; i <= 33; i++) {
-    sum1 -= n1[i] * I1[i] * std::pow(7.1 - pressure / p_star1, I1[i]-1) * std::pow(t_star1 / tk - 1.222, J1[i]);
- }
+  for (int i = 0; i <= 33; i++)
+  {
+    sum1 -= n1[i] * I1[i] * std::pow(7.1 - pi1, I1[i]-1) * std::pow(tau1 - 1.222, J1[i]);
+  }
   // The density of water in this region is then given by
   return p_star1 / (sum1 * _R * tk) / 1000.0;
 }
 
+/** Density function for Region 2 - superheated steam
+ *
+ * From Eq. (15) From Revised Release on the IAPWS Industrial
+ * Formulation 1997 for the Thermodynamic Properties of Water
+ * and Steam, IAPWS 2007.
+ *
+ * Function takes pressure (in Pa) and temperature in C.
+ */
+Real
+  FluidPropertiesWater::region2(Real pressure, Real temperature) const
+{
+  Real p_star2 = 1.e6;
+  Real t_star2 = 540.;
+  Real tk = temperature + _t_c2k;
+
+  Real n02[9] = {-0.96927686500217e1,  0.10086655968018e2,-0.56087911283020e-2, 0.71452738081455e-1,
+                -0.40710498223928e0, 0.14240819171444e1, -0.43839511319450e1,  -0.28408632460772e0,
+                 0.21268463753307e-1};
+
+  Real n2[43] = {-0.17731742473213e-2, -0.17834862292358e-1,-0.45996013696365e-1, -0.57581259083432e-1,
+                 -0.50325278727930e-1, -0.33032641670203e-4,-0.18948987516315e-3, -0.39392777243355e-2,
+                 -0.43797295650573e-1, -0.26674547914087e-4, 0.20481737692309e-7, 0.43870667284435e-6,
+                 -0.32277677238570e-4, -0.15033924542148e-2, -0.40668253562649e-1, -0.78847309559367e-9,
+                  0.12790717852285e-7, 0.48225372718507e-6, 0.22922076337661e-5, -0.16714766451061e-10,
+                 -0.21171472321355e-2, -0.23895741934104e2, -0.59059564324270e-17,-0.12621808899101e-5,
+                 -0.38946842435739e-1, 0.11256211360459e-10, -0.82311340897998e1, 0.19809712802088e-7,
+                  0.10406965210174e-18,-0.10234747095929e-12, -0.10018179379511e-8, -0.80882908646985e-10,
+                  0.10693031879409e0, -0.33662250574171e0, 0.89185845355421e-24, 0.30629316876232e-12,
+                 -0.42002467698208e-5, -0.59056029685639e-25, 0.37826947613457e-5, -0.12768608934681e-14,
+                  0.73087610595061e-28, 0.55414715350778e-16, -0.94369707241210e-6};
+
+  int J02[9] = {0, 1, -5, -4, -3, -2, -1, 2, 3};
+  int I2[43] = {1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 5, 6, 6, 6, 7, 7, 7, 8, 8, 9, 10, 10,
+                10, 16, 16, 18, 20, 20, 20, 21, 22, 23, 24, 24, 24};
+  int J2[43] = {0, 1, 2, 3, 6, 1, 2, 4, 7, 36, 0, 1, 3, 6, 35, 1, 2, 3, 7, 3, 16, 35, 0, 11, 25, 8, 36, 13,
+                4, 10, 14, 29, 50, 57, 20, 35, 48, 21, 53, 39, 26, 40, 58};
+
+  // Ideal gas component of region 2 - Eq. (16)
+  Real sum02 = 0.;
+  Real tau2 = t_star2 / tk;
+  Real pi2 = pressure / p_star2;
+
+// not needed for density
+//  for (int i = 0; i <= 8; i++) {
+//  sum02 += n02[i] * std::pow(tau2, J02[i]);
+//}
+
+  // Residual component of Gibbs free energy - Eq. (17).
+  Real sumr2 = 0.;
+
+  for (int i = 0; i <= 43; i++)
+  {
+    sumr2 += n2[i] * I2[i] * std::pow(pi2, I2[i] - 1) * std::pow(tau2 - 0.5, J2[i]);
+  }
+
+  // The density in Region 2 is then given by
+  return p_star2 / (_R * tk * (1.0 / pi2 + sumr2)) / 1000.0;
+}
+
+/** Density function for Region 3 - supercritical water and steam
+ *
+ * To avoid iteration, use the backwards equations for region 3
+ * from Revised Supplementary Release on Backward Equations for 
+ * Specific Volume as a Function of Pressure and Temperature v(p,T)
+ * for Region 3 of the IAPWS Industrial Formulation 1997 for the 
+ * Thermodynamic Properties of Water and Steam.
+ *
+ * Function takes pressure (in Pa) and temperature in C
+ */
+Real
+  FluidPropertiesWater::region3(Real pressure, Real temperature) const
+{
+  // Region 3 is subdivided into 26 subregions, each with a given 
+  // backwards equation to directly calculate density from pressure 
+  // and temperature without the need for expensive iterations.
 
 
+  return 0.;
+}
 
 
 
@@ -309,7 +392,7 @@ Real
                  9.902381028e4,-1.093911774e5, 8.590841667e4, -4.511168742e4, 1.418138926e4,
                  -2.017271113e3, 7.982692717, -2.616571843e-2, 1.522411790e-3, 2.284279054e-2,
                  2.421647003e2, 1.269716088e-10, 2.074838328e-7, 2.174020350e-8, 1.105710498e-9,
-                 1.293441934e1, 1.308119072e-5, 6.047626338e-14}; 
+                 1.293441934e1, 1.308119072e-5, 6.047626338e-14};
   Real sa[12] = {8.438375405e-1, 5.362162162e-4, 1.72, 7.342278489e-2, 4.975858870e-2,
                  6.537154300e-1, 1.15e-6, 1.5108e-5, 1.4188e-1, 7.002753165,
                  2.995284926e-4, 2.04e-1};
@@ -331,11 +414,11 @@ Real
   Real y = 1.0 - sa[0] * tkr2 - sa[1] / (std::pow(tkr, 6.));
   Real x = sa[2] * y * y - 2.0 * (sa[3] * tkr - sa[4] * pnmr);
 
-  // Note: z may become negative in the vicinity of the critical point. 
-  if (x < 0.0 ) 
+  // Note: z may become negative in the vicinity of the critical point.
+  if (x < 0.0 )
     mooseError("FluidPropertiesWater::fluidDensity: negative density\n");
-  else 
-    x = std::sqrt(x); 
+  else
+    x = std::sqrt(x);
 
   Real z = y + x;
   Real u1 = aa[11] * sa[4] * std::pow(z, -5./17.);

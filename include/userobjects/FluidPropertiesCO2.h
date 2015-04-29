@@ -34,7 +34,7 @@ class FluidPropertiesCO2 : public FluidProperties
   FluidPropertiesCO2(const std::string & name, InputParameters parameters);
 
   /**
-   * CO2 density, viscosoty and Henry coefficient as a function of 
+   * CO2 density, viscosoty and Henry coefficient as a function of
    * pressure and temperature.
    * @param pressure is fluid pore pressure (Pa)
    * @param temperature is the fluid temperature (C)

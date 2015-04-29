@@ -1,10 +1,10 @@
 # #############################################################################
-# Test the RelativePermeabilityCorey UserObject. This relative 
-# permeability UserObject 
-# 
+# Test the RelativePermeabilityCorey UserObject. This relative
+# permeability UserObject
+#
 # The liquid saturation is initialised to vary linearly from zero at the left
 # end of the 1D mesh, to unity at the right end.
-# 
+#
 # #############################################################################
 
 [UserObjects]

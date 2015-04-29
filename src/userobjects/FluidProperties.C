@@ -35,6 +35,6 @@ void
 FluidProperties::execute()
 {}
 
-void 
+void
 FluidProperties::finalize()
 {}

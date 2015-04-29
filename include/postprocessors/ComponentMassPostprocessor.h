@@ -24,12 +24,12 @@ public:
 
 protected:
   virtual Real computeQpIntegral();
-  
+
   MaterialProperty<Real> & _porosity;
 
   VariableValue & _fluid_density;
   VariableValue & _component;
-  
+
 };
 
 #endif // COMPONENTMASSPOSTPROCESSOR_H
