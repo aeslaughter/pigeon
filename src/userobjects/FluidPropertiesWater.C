@@ -35,7 +35,7 @@ FluidPropertiesWater::FluidPropertiesWater(const std::string & name, InputParame
 }
 
 Real
-  FluidPropertiesWater::fluidDensity(Real pressure, Real temperature) const
+  FluidPropertiesWater::density(Real pressure, Real temperature) const
 
 {
   // Valid for 273.15 K <= T <= 1073.15 K, p <= 100 MPa
@@ -66,7 +66,7 @@ Real
 }
 
 Real
-  FluidPropertiesWater::fluidViscosity(Real temperature, Real density) const
+  FluidPropertiesWater::viscosity(Real temperature, Real density) const
 
 {
   int ivs[21] = {0,1,2,3,0,1,2,3,5,0,1,2,3,4,0,1,0,3,4,3,5};

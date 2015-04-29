@@ -41,7 +41,7 @@ FluidPropertiesCO2::FluidPropertiesCO2(const std::string & name, InputParameters
 
 /// Density of supercritical CO2
 Real
-  FluidPropertiesCO2::fluidDensity(Real pressure, Real temperature) const
+  FluidPropertiesCO2::density(Real pressure, Real temperature) const
 
 {
 // Hard code constant bulk modulus pressure dependence.
@@ -52,7 +52,7 @@ Real
 
 /// Viscosity of supercritical CO2
 Real
-  FluidPropertiesCO2::fluidViscosity(Real pressure, Real temperature) const
+  FluidPropertiesCO2::viscosity(Real pressure, Real temperature) const
 
 {
 
@@ -63,7 +63,7 @@ Real
 /*
 /// Henry coefficient of CO2 as a function of temperature.
 Real
-  FluidPropertiesCO2::fluidHenryCoefficient(Real temperature) const
+  FluidPropertiesCO2::henry(Real temperature) const
 
 {
 

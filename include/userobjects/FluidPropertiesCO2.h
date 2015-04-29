@@ -46,9 +46,9 @@ class FluidPropertiesCO2 : public FluidProperties
    * @param pressure is fluid pore pressure (Pa)
    * @param temperature is the fluid temperature (C)
    */
-  Real fluidDensity(Real pressure, Real temperature) const;
-  Real fluidViscosity(Real pressure, Real temperature) const;
-//  Real fluidHenryCoefficient(Real temperature) const;
+  Real density(Real pressure, Real temperature) const;
+  Real viscosity(Real pressure, Real temperature) const;
+//  Real henry(Real temperature) const;
 
  protected:
 

@@ -37,7 +37,7 @@ FluidViscosityAux::FluidViscosityAux(const std::string & name,
 
 Real FluidViscosityAux::computeValue()
 {
-  Real density = _fluid_property.fluidDensity(_pressure[_qp], _temperature[_qp]);
+  Real density = _fluid_property.density(_pressure[_qp], _temperature[_qp]);
 
-  return _fluid_property.fluidViscosity(_temperature[_qp], density);
+  return _fluid_property.viscosity(_temperature[_qp], density);
 }

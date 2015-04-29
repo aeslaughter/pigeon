@@ -39,5 +39,5 @@ FluidDensityAux::FluidDensityAux(const std::string & name,
 
 Real FluidDensityAux::computeValue()
 {
-  return _fluid_property.fluidDensity(_pressure[_qp], _temperature[_qp]);
+  return _fluid_property.density(_pressure[_qp], _temperature[_qp]);
 }

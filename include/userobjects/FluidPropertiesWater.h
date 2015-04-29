@@ -42,7 +42,7 @@ class FluidPropertiesWater : public FluidProperties
    * @param temperature water temperature (C)
    * @return water density (kg/m^3)
    */
-  Real fluidDensity(Real pressure, Real temperature) const;
+  Real density(Real pressure, Real temperature) const;
 
   /**
    * Viscosity of water. 
@@ -53,7 +53,7 @@ class FluidPropertiesWater : public FluidProperties
    * @param density water density (kg/m^3)
    * @return viscosity (Pa.s)
    */
-  Real fluidViscosity(Real temperature, Real density) const;
+  Real viscosity(Real temperature, Real density) const;
 
   /** Saturation pressure as a function of temperature.
    *

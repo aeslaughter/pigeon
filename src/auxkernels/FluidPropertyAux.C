@@ -45,11 +45,11 @@ Real FluidPropertyAux::computeValue()
   Real property;
 
   if (fluid_property_enum == "density") {
-     property = _fluid_property.fluidDensity(_pressure[_qp], _temperature[_qp]);
+     property = _fluid_property.density(_pressure[_qp], _temperature[_qp]);
   }
   if (fluid_property_enum == "viscosity") {
-     Real density = _fluid_property.fluidDensity(_pressure[_qp], _temperature[_qp]);
-     property = _fluid_property.fluidViscosity(_temperature[_qp], density);
+     Real density = _fluid_property.density(_pressure[_qp], _temperature[_qp]);
+     property = _fluid_property.viscosity(_temperature[_qp], density);
   }
 
   return property;
