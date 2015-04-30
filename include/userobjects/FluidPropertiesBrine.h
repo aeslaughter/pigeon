@@ -17,6 +17,7 @@
 #define FLUIDPROPERTIESBRINE_H
 
 #include "FluidProperties.h"
+#include "FluidPropertiesWater.h"
 
 class FluidPropertiesBrine;
 
@@ -31,13 +32,16 @@ class FluidPropertiesBrine : public FluidProperties
 
   /**
    * Density of brine.
+   * From Driesner, The system H2o-NaCl. Part II: Correlations for molar volume,
+   * enthalpy, and isobaric heat capacity from 0 to 1000 C, 1 to 500 bar, and 0 
+   * to 1 Xnacl, Geochimica et Cosmochimica Acta 71, 4902-4919 (2007).
    *
    * @param pressure water pressure (Pa)
    * @param temperature water temperature (C)
    * @param xnacl salt mass fraction (-)
    * @return water density (kg/m^3)
    */
-  Real fluidDensity(Real pressure, Real temperature Real xnacl) const;
+  Real density(Real pressure, Real temperature, Real xnacl) const;
 
   /**
    * Viscosity of brine. 
@@ -47,21 +51,16 @@ class FluidPropertiesBrine : public FluidProperties
    * @param xnacl salt mass fraction (-)
    * @return viscosity (Pa.s)
    */
-  Real fluidViscosity(Real temperature, Real density, Real xnacl) const;
+  Real viscosity(Real temperature, Real density, Real xnacl) const;
 
  protected:
-  /// Temperature of water at the critical point
-  Real _t_critical;
-  /// Pressure of water at the critical point
-  Real _p_critical;
-  /// Density of water at the critical point
-  Real _rho_critical;
-  /// Specific volume of water at the critical point
-  Real _v_critical;
-  /// Conversion of temperature from Celcius to Kelvin
-  Real _t_c2k;
-  /// Universal gas constant
-  Real _R;
+
+  /**
+   * This is the member reference that will hold the User Object
+   * value for fluid property.
+   */
+  const FluidPropertiesWater & _water_property;
+
 };
 
 #endif // FLUIDPROPERTIESBRINE_H

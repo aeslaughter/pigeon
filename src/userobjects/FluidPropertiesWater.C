@@ -32,6 +32,7 @@ FluidPropertiesWater::FluidPropertiesWater(const std::string & name, InputParame
   _v_critical = 1.0 / _rho_critical;
   _t_c2k = 273.15;
   _R = 0.461526;
+
 }
 
 Real
@@ -69,8 +70,9 @@ Real
   FluidPropertiesWater::viscosity(Real temperature, Real density) const
 
 {
-  int ivs[21] = {0,1,2,3,0,1,2,3,5,0,1,2,3,4,0,1,0,3,4,3,5};
-  int jvs[21] = {0,0,0,0,1,1,1,1,1,2,2,2,2,2,3,3,4,4,5,6,6};
+
+  int iv[21] = {0,1,2,3,0,1,2,3,5,0,1,2,3,4,0,1,0,3,4,3,5};
+  int jv[21] = {0,0,0,0,1,1,1,1,1,2,2,2,2,2,3,3,4,4,5,6,6};
 
   Real h0v[4] = {1.67752, 2.20462, 0.6366564, -0.241605};
   Real h1v[21] = {5.20094e-1, 8.50895e-2, -1.08374, -2.89555e-1, 2.22531e-1, 9.99115e-1,
@@ -114,7 +116,7 @@ Real
   // Now calculate mu1
   Real sum1 = 0.;
   for (int i = 0; i <= 20; i++)
-     sum1 += t1[ivs[i]] * h1v[i] * d1[jvs[i]];
+     sum1 += t1[iv[i]] * h1v[i] * d1[jv[i]];
 
   Real mu1 = std::exp(rhobar * sum1);
 

@@ -43,7 +43,7 @@ class FluidProperties : public GeneralUserObject
    * @param temperature fluid temperature (C)
    * @return fluid density (kg/m^3)
    */
-  virtual Real density(Real pressure, Real temperature) const = 0;
+//virtual Real density(Real pressure, Real temperature, Real xmass = 1) const = 0;
 
   /**
    * Fluid viscosity must be over-written in all derived classes.
@@ -52,7 +52,7 @@ class FluidProperties : public GeneralUserObject
    * @param temperature fluid temperature (C)
    * @return fluid viscosity (Pa.s)
    */
-  virtual Real viscosity(Real pressure, Real temperature) const = 0;
+//virtual Real viscosity(Real pressure, Real temperature) const = 0;
 };
 
 #endif // FLUIDPROPERTIES_H
