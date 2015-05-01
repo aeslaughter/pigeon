@@ -45,8 +45,10 @@ Real
   Real pbar2 = pbar * pbar;
   Real pbar3 = pbar2 * pbar;
 
-  // The mole fraction of NaCl can be calculated from the given mass fraction
-  Real Xnacl = xnacl * (xnacl * _Mnacl + (1.0 - xnacl) * _Mh2o) / _Mnacl;
+  // The correlation requires mole fraction. First calculate the average molar mass
+  // from the mass fraction, then compute the mole fraction
+  Real Mbrine = 1.0 / (xnacl / _Mnacl + (1.0 - xnacl) / _Mh2o);
+  Real Xnacl = xnacl / _Mnacl * Mbrine;
 
   n11 = -54.2958 - 45.7623 * std::exp(-9.44785e-4 * pbar);
   n21 = -2.6142 - 2.39092e-4 * pbar;
@@ -67,7 +69,7 @@ Real
   // The brine density is then given by the molar density of water
   water_density = _water_property.density(pressure, Tv);
 
-  density = water_density * (Xnacl * _Mnacl + (1.0 - Xnacl) * _Mh2o) / _Mh2o;
+  density = water_density * Mbrine / _Mh2o;
 
   return density;
 }
@@ -75,8 +77,16 @@ Real
 Real
   FluidPropertiesBrine::brineViscosity(Real temperature, Real density, Real xnacl) const
 {
-  // Return viscosity of pure water
-  return _water_property.viscosity(temperature, density);
+  // Correlation requires molar concentration (mol/kg)
+  Real mol = xnacl / ((1.0 - xnacl) * _Mnacl);
+  Real mol2 = mol * mol;
+  Real mol3 = mol2 * mol;
+
+  Real a = 1.0 + 0.0816 * mol + 0.0122 * mol2 + 0.128e-3 * mol3 + 0.629e-3 * temperature 
+           * (1.0 - std::exp(-0.7 * mol));
+
+  // The brine viscosity is then a multiplied by the viscosity of pure water
+  return a * _water_property.viscosity(temperature, density);
 }
 
 Real
