@@ -45,29 +45,29 @@ Real FluidPropertyWaterAux::computeValue()
   Real property;
 
   if (fluid_property_enum == "density") {
-     property = _fluid_property.density(_pressure[_qp], _temperature[_qp]);
+    property = _fluid_property.density(_pressure[_qp], _temperature[_qp]);
   }
   if (fluid_property_enum == "viscosity") {
-     Real density = _fluid_property.density(_pressure[_qp], _temperature[_qp]);
-     property = _fluid_property.viscosity(_temperature[_qp], density);
+    Real density = _fluid_property.density(_pressure[_qp], _temperature[_qp]);
+    property = _fluid_property.viscosity(_temperature[_qp], density);
   }
   if (fluid_property_enum == "tsat") {
-     property = _fluid_property.tSat(_pressure[_qp]);
+    property = _fluid_property.tSat(_pressure[_qp]);
   }
   if (fluid_property_enum == "psat") {
-     property = _fluid_property.pSat(_temperature[_qp]);
+    property = _fluid_property.pSat(_temperature[_qp]);
   }
   if (fluid_property_enum == "b23t") {
-     property = _fluid_property.b23t(_pressure[_qp]);
+    property = _fluid_property.b23t(_pressure[_qp]);
   }
   if (fluid_property_enum == "b23p") {
-     property = _fluid_property.b23p(_temperature[_qp]);
+    property = _fluid_property.b23p(_temperature[_qp]);
   }
   if (fluid_property_enum == "region1") {
-     property = _fluid_property.region1(_pressure[_qp], _temperature[_qp]);
+    property = _fluid_property.region1(_pressure[_qp], _temperature[_qp]);
   }
   if (fluid_property_enum == "region2") {
-     property = _fluid_property.region2(_pressure[_qp], _temperature[_qp]);
+    property = _fluid_property.region2(_pressure[_qp], _temperature[_qp]);
   }
 
   return property;
