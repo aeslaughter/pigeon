@@ -85,7 +85,7 @@ Real
   Real a = 1.0 + 0.0816 * mol + 0.0122 * mol2 + 0.128e-3 * mol3 + 0.629e-3 * temperature 
            * (1.0 - std::exp(-0.7 * mol));
 
-  // The brine viscosity is then a multiplied by the viscosity of pure water
+  // The brine viscosity is then multiplied by the viscosity of pure water
   return a * _water_property.viscosity(temperature, density);
 }
 

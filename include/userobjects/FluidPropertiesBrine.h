@@ -45,7 +45,7 @@ class FluidPropertiesBrine : public FluidProperties
 
   /**
    * Viscosity of brine. 
-   * From Phillips et a;, A technical databook for geothermal energy utilization,
+   * From Phillips et al, A technical databook for geothermal energy utilization,
    * LbL-12810 (1981).
    *
    * @param temperature brine temperature (C)

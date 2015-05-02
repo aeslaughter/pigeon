@@ -26,7 +26,7 @@ FluidPropertiesWater::FluidPropertiesWater(const std::string & name, InputParame
   FluidProperties(name, parameters)
 {
   /// Reference critical constants used in to calculate thermophysical properties of water.
-  _t_critical = 647.3;
+  _t_critical = 647.096;
   _p_critical = 22.064e6;
   _rho_critical = 322;
   _v_critical = 1.0 / _rho_critical;
@@ -70,7 +70,6 @@ Real
   FluidPropertiesWater::viscosity(Real temperature, Real density) const
 
 {
-
   int iv[21] = {0,1,2,3,0,1,2,3,5,0,1,2,3,4,0,1,0,3,4,3,5};
   int jv[21] = {0,0,0,0,1,1,1,1,1,2,2,2,2,2,3,3,4,4,5,6,6};
 
@@ -115,7 +114,7 @@ Real
 
   // Now calculate mu1
   Real sum1 = 0.;
-  for (int i = 0; i <= 20; i++)
+  for (int i = 0; i <= 21; i++)
      sum1 += t1[iv[i]] * h1v[i] * d1[jv[i]];
 
   Real mu1 = std::exp(rhobar * sum1);
