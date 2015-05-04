@@ -40,9 +40,15 @@ private:
 
   /**
    * This is the member reference that will hold the User Object
-   * value for fluid property.
+   * value for the brine property User Object.
    */
-  const FluidPropertiesBrine & _fluid_property;
+  const FluidPropertiesBrine & _brine_property;
+
+  /**
+   * This is the member reference that will hold the User Object
+   * value for the water property User Object.
+   */
+  const FluidPropertiesWater & _water_property;
 
   /// Brine phase pressure
   VariableValue & _pressure;
@@ -53,7 +59,7 @@ private:
   /// Salt mass fraction in the brine 
   VariableValue & _salt_mass_fraction;
   /// MooseEnum of fluid properties
-  const MooseEnum & fluid_property_enum;
+  const MooseEnum & brine_property_enum;
 };
 
 #endif //FLUIDPROPERTYBRINEAUX_H

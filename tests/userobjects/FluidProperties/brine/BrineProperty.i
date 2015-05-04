@@ -54,6 +54,7 @@
     brine_property_enum = density
     salt_mass_fraction_variable = xnacl
     brine_property_uo = FluidPropertiesBrine
+    water_property_uo = FluidPropertiesWater
     temperature_variable = temperature
     execute_on = initial
     pressure_variable = pressure

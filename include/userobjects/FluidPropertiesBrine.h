@@ -49,7 +49,7 @@ class FluidPropertiesBrine : public FluidProperties
    * LbL-12810 (1981).
    *
    * @param temperature brine temperature (C)
-   * @param density brine density (kg/m^3)
+   * @param density water density (kg/m^3)
    * @param xnacl salt mass fraction (-)
    * @return viscosity (Pa.s)
    */

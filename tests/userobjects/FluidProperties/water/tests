@@ -45,8 +45,14 @@
   [../]
   [./water_viscosity1]
     type = 'CSVDiff'
-    input = 'WaterProperty.i Outputs/file_base=WaterProperty_viscosity AuxKernels/FluidPropertyAux/fluid_property_enum=viscosity Functions/initial_pressure/value='(1+9.5*x)*1e6' Functions/initial_temperature/value=50'
-    csvdiff = 'WaterProperty_viscosity_vpp_0001.csv'
+    input = 'WaterProperty.i Outputs/file_base=WaterProperty_viscosity1 AuxKernels/FluidPropertyAux/fluid_property_enum=viscosity Functions/initial_pressure/value='2.2e6' Functions/initial_temperature/value=25'
+    csvdiff = 'WaterProperty_viscosity1_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./water_viscosity2]
+    type = 'CSVDiff'
+    input = 'WaterProperty.i Outputs/file_base=WaterProperty_viscosity2 AuxKernels/FluidPropertyAux/fluid_property_enum=viscosity Functions/initial_pressure/value='(1+9.5*x)*1e6' Functions/initial_temperature/value=50'
+    csvdiff = 'WaterProperty_viscosity2_vpp_0001.csv'
     abs_zero = 1.0E-6
   [../]
   [./water_b23p]
