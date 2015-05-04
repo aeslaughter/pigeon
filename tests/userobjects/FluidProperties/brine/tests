@@ -1,0 +1,26 @@
+[Tests]
+  [./brine_density1]
+    type = 'CSVDiff'
+    input = 'BrineProperty.i Outputs/file_base=BrineProperty_density1 AuxKernels/BrinePropertyAux/fluid_property_enum=density'
+    csvdiff = 'BrineProperty_density1_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./brine_density2]
+    type = 'CSVDiff'
+    input = 'BrineProperty.i Outputs/file_base=BrineProperty_density2 Functions/initial_pressure/value=40.e6 Functions/initial_temperature/value=100. AuxKernels/BrinePropertyAux/fluid_property_enum=density'
+    csvdiff = 'BrineProperty_density2_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./brine_viscosity1]
+    type = 'CSVDiff'
+    input = 'BrineProperty.i Outputs/file_base=BrineProperty_viscosity1 Functions/initial_pressure/value=10.e6 AuxKernels/BrinePropertyAux/brine_property_enum=viscosity'
+    csvdiff = 'BrineProperty_viscosity1_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./brine_viscosity2]
+    type = 'CSVDiff'
+    input = 'BrineProperty.i Outputs/file_base=BrineProperty_viscosity2 AuxKernels/BrinePropertyAux/brine_property_enum=viscosity Functions/initial_temperature/value=100.'
+    csvdiff = 'BrineProperty_viscosity2_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+[]
