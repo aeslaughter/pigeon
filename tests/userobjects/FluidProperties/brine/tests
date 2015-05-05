@@ -25,8 +25,20 @@
   [../]
   [./brine_psat]
     type = 'CSVDiff'
-    input = 'BrineProperty.i Outputs/file_base=BrineProperty_psat AuxKernels/BrinePropertyAux/brine_property_enum=psat Functions/initial_temperature/value=100.'
-    csvdiff = 'BrineProperty_viscosity2_vpp_0001.csv'
+    input = 'BrineProperty.i Outputs/file_base=BrineProperty_psat AuxKernels/BrinePropertyAux/brine_property_enum=psat Functions/initial_temperature/value=200 Functions/initial_xnacl/value=0.16*x'
+    csvdiff = 'BrineProperty_psat_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./halite_density]
+    type = 'CSVDiff'
+    input = 'BrineProperty.i Outputs/file_base=BrineProperty_halite_density AuxKernels/BrinePropertyAux/brine_property_enum=halite_density Functions/initial_temperature/value=126.85 Functions/initial_pressure/value='(6+9*x)*1.e9''
+    csvdiff = 'BrineProperty_halite_density_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./halite_solubility]
+    type = 'CSVDiff'
+    input = 'BrineProperty.i Outputs/file_base=BrineProperty_solubility AuxKernels/BrinePropertyAux/brine_property_enum=halite_solubility Functions/initial_temperature/value=400*x'
+    csvdiff = 'BrineProperty_solubility_vpp_0001.csv'
     abs_zero = 1.0E-6
   [../]
 []
