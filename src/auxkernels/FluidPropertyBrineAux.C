@@ -49,11 +49,11 @@ Real FluidPropertyBrineAux::computeValue()
   Real property;
 
   if (brine_property_enum == "density") {
-    property = _brine_property.brineDensity(_pressure[_qp], _temperature[_qp], _salt_mass_fraction[_qp]);
+    property = _brine_property.density(_pressure[_qp], _temperature[_qp], _salt_mass_fraction[_qp]);
   }
   if (brine_property_enum == "viscosity") {
     Real density = _water_property.density(_pressure[_qp], _temperature[_qp]);
-    property = _brine_property.brineViscosity(_temperature[_qp], density,  _salt_mass_fraction[_qp]);
+    property = _brine_property.viscosity(_temperature[_qp], density,  _salt_mass_fraction[_qp]);
   }
   if (brine_property_enum == "halite_density") {
     property = _brine_property.haliteDensity(_pressure[_qp], _temperature[_qp]);
@@ -62,7 +62,7 @@ Real FluidPropertyBrineAux::computeValue()
     property = _brine_property.haliteSolubility(_temperature[_qp]);
   }
   if (brine_property_enum == "pSat") {
-    property = _brine_property.brinePSat(_temperature[_qp], _salt_mass_fraction[_qp]);
+    property = _brine_property.pSat(_temperature[_qp], _salt_mass_fraction[_qp]);
   }
 
   return property;
