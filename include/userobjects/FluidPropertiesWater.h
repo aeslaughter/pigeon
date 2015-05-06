@@ -141,8 +141,6 @@ class FluidPropertiesWater : public FluidProperties
    */
   Real region3(Real pressure, Real temperature) const;
 
-//  Real fluidHenryCoefficient(Real temperature) const;
-
  protected:
   /// Temperature of water at the critical point
   Real _t_critical;
@@ -156,6 +154,7 @@ class FluidPropertiesWater : public FluidProperties
   Real _t_c2k;
   /// Universal gas constant
   Real _R;
+
 };
 
 #endif // FLUIDPROPERTIESWATER_H

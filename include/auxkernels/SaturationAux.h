@@ -20,6 +20,12 @@
 
 class SaturationAux;
 
+/**
+ * SaturationAux takes in one phases saturation, and returns th
+ * saturation of the other phase using the simple relationship
+ * S_1 = 1 - S_2.
+ */
+
 template<>
 InputParameters validParams<SaturationAux>();
 
