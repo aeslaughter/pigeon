@@ -53,7 +53,18 @@ class FluidPropertiesBrine : public FluidProperties
    * @param xnacl salt mass fraction (-)
    * @return viscosity (Pa.s)
    */
-  Real viscosity(Real temperature, Real density, Real xnacl) const;
+  Real viscosityDens(Real temperature, Real density, Real xnacl) const;
+
+  /**
+   * Viscosity of brine using pressure instead of density.
+   * Calls viscosityDens.
+   *
+   * @param pressure pressure (Pa)
+   * @param temperature brine temperature (C)
+   * @param xnacl salt mass fraction (-)
+   * @return viscosity (Pa.s)
+   */
+  Real viscosity(Real pressure, Real density, Real xnacl) const;
 
   /**
    * Density of halite (solid NaCl)

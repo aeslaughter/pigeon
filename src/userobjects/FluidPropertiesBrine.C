@@ -27,6 +27,7 @@ FluidPropertiesBrine::FluidPropertiesBrine(const std::string & name, InputParame
   FluidProperties(name, parameters),
 
   _water_property(getUserObject<FluidPropertiesWater>("water_property_uo"))
+//_water_property(getUserObjectByName<FluidPropertiesWater>("FluidPropertiesWater")) // Hard code fluid properties name
 {
   /// Reference constants used in to calculate thermophysical properties of water.
   _Mh2o = 18.015e-3;
@@ -77,7 +78,7 @@ Real
 }
 
 Real
-  FluidPropertiesBrine::viscosity(Real temperature, Real density, Real xnacl) const
+  FluidPropertiesBrine::viscosityDens(Real temperature, Real density, Real xnacl) const
 {
   // Correlation requires molar concentration (mol/kg)
   Real mol = xnacl / ((1.0 - xnacl) * _Mnacl);
@@ -92,6 +93,15 @@ Real
   // TODO: In EOS code, add water viscosity as an input parameter so that it is not calculated
   // more than once per qp per iteration.
   return a * _water_property.viscosity(temperature, density);
+}
+
+Real
+  FluidPropertiesBrine::viscosity(Real pressure, Real temperature, Real xnacl) const
+{
+  // Calculate the water density
+  Real water_density = _water_property.density(pressure, temperature);
+
+  return viscosityDens(temperature, water_density, xnacl);
 }
 
 Real

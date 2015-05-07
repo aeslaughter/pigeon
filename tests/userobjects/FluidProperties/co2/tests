@@ -1,0 +1,14 @@
+[Tests]
+  [./co2_density]
+    type = 'CSVDiff'
+    input = 'CO2Property.i Outputs/file_base=CO2Property_density AuxKernels/CO2PropertyAux/co2_property_enum=density'
+    csvdiff = 'CO2Property_density_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./co2_viscosity]
+    type = 'CSVDiff'
+    input = 'CO2Property.i Outputs/file_base=CO2Property_viscosity AuxKernels/CO2PropertyAux/co2_property_enum=viscosity'
+    csvdiff = 'CO2Property_viscosity_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+[]

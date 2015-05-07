@@ -6,19 +6,7 @@
 /****************************************************************/
 
 /****************************************************************/
-/* Fluid properties of supercritical CO2.                       */
-/* porous media.                                                */
-/*                                                              */
-/* Density and viscosity correlation from Liang-Biao Ouyang,    */
-/* New correlations for predicting the density and viscosity of */
-/* supercritical carbon dioxide under conditions expected in    */
-/* carbon capture and sequestration operations. The Open Pet.   */
-/* Eng. J., 4, 13-21, 2011.                                     */
-/*                                                              */
-/* Henry coefficient from Battistelli et al, A fluid property   */
-/* module for the TOUGH2 simulator for saline brines with       */
-/* non-condensible gas, Proc. 18th Workshop Geothermal Res. Eng.*/
-/* 1993.                                                        */
+/* Fluid properties of gas phase CO2.                           */
 /*                                                              */
 /* Chris Green 2015                                             */
 /* chris.green@csiro.au                                         */
@@ -37,28 +25,44 @@ InputParameters validParams<FluidPropertiesCO2>()
 FluidPropertiesCO2::FluidPropertiesCO2(const std::string & name, InputParameters parameters) :
   FluidProperties(name, parameters)
 {
+  _t_c2k = 273.15;
 }
 
-/// Density of supercritical CO2
 Real
   FluidPropertiesCO2::density(Real pressure, Real temperature) const
 
 {
-// Hard code constant bulk modulus pressure dependence.
-  Real co2density = 784.29 * std::exp(pressure /(2.0e9)); // Density at P = 20MPa, T = 50C
+  Real tk = temperature + _t_c2k;
+  Real tc = std::pow((tk * 1.e-2), 10./3.);
+  Real pc = pressure * 1.e-6;
 
-  return co2density;
+  Real vc1 = 1.8882e-4 * tk;
+  Real vc2 = - pc * (8.24e-2 + 1.249e-2 * pc) / tc; 
+  
+  return pc / (vc1 + vc2);
 }
 
-/// Viscosity of supercritical CO2
 Real
   FluidPropertiesCO2::viscosity(Real pressure, Real temperature) const
 
 {
+  Real A[5] = {1357.8, 4.9227, -2.9661e-3, 2.8529e-6, -2.1829e-9};
+  Real B[5] = {3918.9, -35.984, 2.5825e-1, -7.1178e-4, 6.9578e-7};
+  Real C[5];
 
-  Real co2viscosity = 68.674e-6; // Viscosity at P = 20MPa, T = 50C
+  Real pbar = pressure * 1.e-5;
+  Real xx = pbar * 0.01;
 
-  return co2viscosity;
+  if (xx > 1.0) xx = 1.0;
+
+  for (int i = 0; i<=4; i++)
+    C[i] = A[i] + xx * (B[i] - A[i]);
+
+  Real t2 = temperature * temperature;
+  Real t3 = t2 * temperature;
+  Real t4 = t3 * temperature;
+
+  return (C[0] + C[1] * temperature + C[2] * t2 + C[3] * t3 + C[4] * t4) * 1.e-8;
 }
 /*
 /// Henry coefficient of CO2 as a function of temperature.

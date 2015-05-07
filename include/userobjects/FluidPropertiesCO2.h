@@ -6,19 +6,7 @@
 /****************************************************************/
 
 /****************************************************************/
-/* Fluid properties of supercritical CO2.                       */
-/* porous media.                                                */
-/*                                                              */
-/* Density and viscosity correlation from Liang-Biao Ouyang,    */
-/* New correlations for predicting the density and viscosity of */
-/* supercritical carbon dioxide under conditions expected in    */
-/* carbon capture and sequestration operations. The Open Pet.   */
-/* Eng. J., 4, 13-21, 2011.                                     */
-/*                                                              */
-/* Henry coefficient from Battistelli et al, A fluid property   */
-/* module for the TOUGH2 simulator for saline brines with       */
-/* non-condensible gas, Proc. 18th Workshop Geothermal Res. Eng.*/
-/* 1993.                                                        */
+/* Fluid properties of gaseous CO2.                             */
 /*                                                              */
 /* Chris Green 2015                                             */
 /* chris.green@csiro.au                                         */
@@ -41,16 +29,25 @@ class FluidPropertiesCO2 : public FluidProperties
   FluidPropertiesCO2(const std::string & name, InputParameters parameters);
 
   /**
-   * CO2 density, viscosoty and Henry coefficient as a function of
-   * pressure and temperature.
-   * @param pressure is fluid pore pressure (Pa)
-   * @param temperature is the fluid temperature (C)
+   * CO2 gas density as a function of  pressure and temperature.
+   * @param pressure gas pressure (Pa)
+   * @param temperature fluid temperature (C)
+   * @return density (kg/m^3)
    */
   Real density(Real pressure, Real temperature) const;
+
+  /**
+   * CO2 gas viscosity as a function of  pressure and temperature.
+   * @param pressure gas pressure (Pa)
+   * @param temperature fluid temperature (C)
+   * @return viscosity (Pa.s)
+   */
   Real viscosity(Real pressure, Real temperature) const;
 //  Real henry(Real temperature) const;
 
  protected:
+  /// Conversion of temperature from Celcius to Kelvin
+  Real _t_c2k;
 
 };
 
