@@ -24,6 +24,9 @@ class SaturationAux;
  * SaturationAux takes in one phases saturation, and returns th
  * saturation of the other phase using the simple relationship
  * S_1 = 1 - S_2.
+ *
+ * As saturation is only required at the nodes, use a nodal 
+ * auxvariable.
  */
 
 template<>

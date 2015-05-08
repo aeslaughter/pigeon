@@ -6,34 +6,36 @@
 /****************************************************************/
 
 /****************************************************************/
-/* Auxillary kernel to calculate pressure of the gas phase      */
-/* for multiphase flow in porous media using the capillary      */
+/* Auxillary kernel to calculate nodal pressure of one phase    */
+/* given the pressure of the other phase and the capillary      */
 /* pressure defined in the Capillary Pressure UserObject.       */
 /*                                                              */
 /* Chris Green 2015                                             */
 /* chris.green@csiro.au                                         */
 /****************************************************************/
 
-#include "GasPressureAux.h"
+#include "FluidPressureAux.h"
 
 template<>
-InputParameters validParams<GasPressureAux>()
+InputParameters validParams<FluidPressureAux>()
 {
   InputParameters params = validParams<AuxKernel>();
-  params.addRequiredCoupledVar("liquid_pressure_variable", "The pressure variable corresponding to the liquid phase.");
-  params.addRequiredCoupledVar("capillary_pressure_variable", "The capillary pressure auxillary variable.");
+  params.addRequiredCoupledVar("primary_pressure_variable", "The primary nonlinear pressure variable."); 
+  params.addRequiredCoupledVar("liquid_saturation_variable", "The liquid saturation variable.");
+  params.addRequiredParam<UserObjectName>("capillary_pressure_uo", "The capillary pressure UserObject");
   return params;
 }
 
-GasPressureAux::GasPressureAux(const std::string & name,
+FluidPressureAux::FluidPressureAux(const std::string & name,
                        InputParameters parameters) :
     AuxKernel(name, parameters),
 
-    _liquid_pressure(coupledValue("liquid_pressure_variable")),
-    _capillary_pressure(coupledValue("capillary_pressure_variable"))
+    _capillary_pressure(getUserObject<CapillaryPressure>("capillary_pressure_uo")),
+    _primary_pressure(coupledValue("primary_pressure_variable")),
+    _liquid_saturation(coupledValue("liquid_saturation_variable"))
 {}
 
-Real GasPressureAux::computeValue()
+Real FluidPressureAux::computeValue()
 {
-    return _liquid_pressure[_qp] + _capillary_pressure[_qp]; // The gas pressure
+    return _primary_pressure[_qp] + _capillary_pressure.capillaryPressure(_liquid_saturation[_qp]); 
 }

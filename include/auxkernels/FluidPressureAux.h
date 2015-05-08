@@ -6,29 +6,30 @@
 /****************************************************************/
 
 /****************************************************************/
-/* Auxillary kernel to calculate pressure of the gas phase      */
-/* for multiphase flow in porous media using the capillary      */
+/* Auxillary kernel to calculate nodal pressure of one phase    */
+/* given the pressure of the other phase and the capillary      */
 /* pressure defined in the Capillary Pressure UserObject.       */
 /*                                                              */
 /* Chris Green 2015                                             */
 /* chris.green@csiro.au                                         */
 /****************************************************************/
 
-#ifndef GASPRESSUREAUX_H
-#define GASPRESSUREAUX_H
+#ifndef FLUIDPRESSUREAUX_H
+#define FLUIDPRESSUREAUX_H
 
 #include "AuxKernel.h"
+#include "CapillaryPressure.h"
 
-class GasPressureAux;
+class FluidPressureAux;
 
 template<>
-InputParameters validParams<GasPressureAux>();
+InputParameters validParams<FluidPressureAux>();
 
-class GasPressureAux : public AuxKernel
+class FluidPressureAux : public AuxKernel
 {
 public:
 
-  GasPressureAux(const std::string & name,
+  FluidPressureAux(const std::string & name,
              InputParameters parameters);
 
 protected:
@@ -37,8 +38,16 @@ protected:
 
 private:
 
-  VariableValue & _liquid_pressure;
-  VariableValue & _capillary_pressure;
+  /**
+   * This is the member reference that will hold the User Object
+   * value for capillary pressure (Pa).
+   */
+  const CapillaryPressure & _capillary_pressure;
+
+  /// Primary pressure variable at the nodes
+  VariableValue & _primary_pressure;
+  /// Liquid phase saturation at the nodes
+  VariableValue & _liquid_saturation; 
 };
 
-#endif //GASPRESSUREAUX_H
+#endif //FLUIDPRESSUREAUX_H

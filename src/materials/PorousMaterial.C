@@ -25,7 +25,7 @@ InputParameters validParams<PorousMaterial>()
   params.addRequiredParam<RealVectorValue>("gravity", "Gravitational acceleration vector downwards (m/s^2)");
   params.addRequiredParam<Real>("diffusivity", "Diffusivity (m^2/s");
 
-  /// MooseEnum for relative permeability choice. Default choice 'unity' (perfectly mobile, krg=krl=1).
+/// MooseEnum for relative permeability choice. Default choice 'unity' (perfectly mobile, krg=krl=1).
 //  MooseEnum relperm_model ("unity, linear, Corey, vanGenuchten", "unity");
 //  params.addParam<MooseEnum>("relative_permeability", relperm_model, "The relative permeability model");
   params.addRequiredParam<UserObjectName>("rel_perm_uo", "Name of the User Object defining the relative permeability model");
@@ -55,7 +55,7 @@ PorousMaterial::PorousMaterial(const std::string & name,
     _diffusivity(declareProperty<Real>("diffusivity")),
     _gas_relative_permeability(declareProperty<Real>("gas_relative_permeability")),
     _liquid_relative_permeability(declareProperty<Real>("liquid_relative_permeability")),
-//  _capillary_pressure(declareProperty<Real>("capillary_pressure")),
+    _capillary_pressure(declareProperty<Real>("capillary_pressure")),
     _liquid_saturation(coupledValue("liquid_saturation"))
 
 {}
@@ -71,5 +71,5 @@ PorousMaterial::computeQpProperties()
   _diffusivity[_qp] = _material_diffusivity;
   _gas_relative_permeability[_qp] = _material_relative_permeability.relativePermGas(_liquid_saturation[_qp]);
   _liquid_relative_permeability[_qp] = _material_relative_permeability.relativePermLiq(_liquid_saturation[_qp]);
-//  _capillary_pressure[_qp] = _material_capillary_pressure.capillaryPressure(_liquid_saturation[_qp]);
+  _capillary_pressure[_qp] = _material_capillary_pressure.capillaryPressure(_liquid_saturation[_qp]);
   }

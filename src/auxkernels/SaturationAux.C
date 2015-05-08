@@ -34,7 +34,7 @@ Real SaturationAux::computeValue()
 {
   Real sat = 1.0 - _saturation[_qp];
 
-// Bound the saturation so that it is 0 <= sat <= 1
+  // Bound the saturation so that it is 0 <= sat <= 1 just in case
   if (sat < 0.0) sat = 0.0;
   if (sat > 1.0) sat = 1.0;
 

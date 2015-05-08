@@ -21,8 +21,8 @@
 //#include "MultiphaseFluxW.h"
 //#include "MultiphaseMassTimeDerivativeN.h"
 //#include "MultiphaseMassTimeDerivativeW.h"
-//#include "ComponentMassTimeDerivative.h"
-//#include "ComponentFlux.h"
+#include "ComponentMassTimeDerivative.h"
+#include "ComponentFlux.h"
 
 // Initial conditions
 #include "PerturbationIC.h"
@@ -33,7 +33,7 @@
 // Auxillary kernels
 #include "SaturationAux.h"
 #include "CapillaryPressureAux.h"
-#include "GasPressureAux.h"
+#include "FluidPressureAux.h"
 #include "FluidPropertyWaterAux.h"
 #include "FluidPropertyBrineAux.h"
 #include "FluidPropertyCO2Aux.h"
@@ -123,8 +123,8 @@ QuollApp::registerObjects(Factory & factory)
 // registerKernel(MultiphaseFluxW);
 // registerKernel(MultiphaseMassTimeDerivativeN);
 // registerKernel(MultiphaseMassTimeDerivativeW);
-// registerKernel(ComponentMassTimeDerivative);
-// registerKernel(ComponentFlux);
+   registerKernel(ComponentMassTimeDerivative);
+   registerKernel(ComponentFlux);
 
    // Register the pertubation initial condition to seed the instability
 // registerInitialCondition(PerturbationIC);
@@ -136,7 +136,7 @@ QuollApp::registerObjects(Factory & factory)
    // registerAux(VelocityAux);
    registerAux(SaturationAux);
    registerAux(CapillaryPressureAux);
-   registerAux(GasPressureAux);
+   registerAux(FluidPressureAux);
    registerAux(RelativePermeabilityAux);
    registerAux(FluidPropertyWaterAux);
    registerAux(FluidPropertyBrineAux);

@@ -55,7 +55,7 @@ private:
   MaterialProperty<Real> & _diffusivity;
   MaterialProperty<Real> & _gas_relative_permeability;
   MaterialProperty<Real> & _liquid_relative_permeability;
-//MaterialProperty<Real> & _capillary_pressure;
+  MaterialProperty<Real> & _capillary_pressure;
 
   /**
    * The member reference of the liquid saturation variable
