@@ -46,9 +46,13 @@ CapillaryPressureVanGenuchten::CapillaryPressureVanGenuchten(const std::string &
 Real
 CapillaryPressureVanGenuchten::capillaryPressure(Real sat_liq) const
 {
-
   Real sat_eff = (sat_liq - _sat_lr)/(_sat_ls - _sat_lr);
   Real cp;
+
+ if (sat_liq < 0.0 )
+    sat_liq = 0.0;
+  if (sat_liq > 1.0)
+    sat_liq = 1.0;
 
   // Check whether liquid saturation is [0,1] - if not, print error message.
   if (sat_liq < 0.0 || sat_liq > 1.0)
@@ -68,4 +72,18 @@ CapillaryPressureVanGenuchten::capillaryPressure(Real sat_liq) const
   if (cp > 0.0) { cp = 0.0;}
 
   return cp;
+}
+
+Real
+CapillaryPressureVanGenuchten::dCapillaryPressure(Real sat_liq) const
+{
+  Real sat_eff = (sat_liq - _sat_lr)/(_sat_ls - _sat_lr);
+  Real dcp;
+
+  if (sat_liq <= _sat_lr)
+    dcp = 0.0;
+  else
+    dcp = _p0 * (1.0 - _m) * std::pow(std::pow(sat_eff, -1.0/_m) - 1.0, -_m) * std::pow(sat_eff, -1.0-1.0/_m) / (_sat_ls - _sat_lr);
+
+  return dcp;
 }

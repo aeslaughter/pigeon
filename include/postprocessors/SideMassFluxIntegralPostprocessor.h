@@ -29,7 +29,8 @@ protected:
 
   VariableValue & _fluid_density;
   VariableValue & _fluid_viscosity;
-  VariableValue & _component;
+  VariableValue & _mass_fraction;
+  VariableValue & _relative_permeability;
 
 };
 

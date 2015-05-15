@@ -45,6 +45,20 @@ class RelativePermeabilityPerfectlyMobile : public RelativePermeability
    */
   Real relativePermGas(Real sat_liq) const;
 
+  /**
+   * Derivative of liquid relative permeability with respect to liquid saturation.
+   * @param sat_liq liquid phase saturation
+   * @return derivative of liquid relative permeability with respect to liquid saturation
+   */
+  Real dRelativePermLiquid(Real sat_liq) const;
+
+  /**
+   * Derivative of gas relative permeability with respect to liquid saturation.
+   * @param sat_liq liquid phase saturation
+   * @return derivative of gas relative permeability with respect to liquid saturation
+   */
+  Real dRelativePermGas(Real sat_liq) const;
+
  protected:
 };
 

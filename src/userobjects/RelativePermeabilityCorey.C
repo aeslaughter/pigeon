@@ -1,4 +1,3 @@
-/****************************************************************/
 /* MOOSE - Multiphysics Object Oriented Simulation Environment  */
 /*                                                              */
 /*          All contents are licensed under LGPL V2.1           */
@@ -38,7 +37,6 @@ RelativePermeabilityCorey::RelativePermeabilityCorey(const std::string & name, I
 Real
 RelativePermeabilityCorey::relativePermLiq(Real sat_liq) const
 {
-
   // Check whether liquid saturation is [0,1] - if not, print error message.
   if (sat_liq < 0.0 || sat_liq > 1.0)
     mooseError("RelativePermeabilityCorey: Liquid saturation is outside the range 0 <= Sl <= 1\n");
@@ -56,7 +54,6 @@ RelativePermeabilityCorey::relativePermLiq(Real sat_liq) const
 Real
 RelativePermeabilityCorey::relativePermGas(Real sat_liq) const
 {
-
   // Check whether liquid saturation is [0,1] - if not, print error message.
   if (sat_liq < 0.0 || sat_liq > 1.0)
     mooseError("RelativePermeabilityCorey: Liquid saturation is outside the range 0 <= Sl <= 1\n");
@@ -69,4 +66,22 @@ RelativePermeabilityCorey::relativePermGas(Real sat_liq) const
   if (krel > 1) { krel = 1;}
 
   return krel;
+}
+
+Real
+RelativePermeabilityCorey::dRelativePermLiquid(Real sat_liq) const
+{
+  Real sat_eff = (sat_liq - _sat_lr)/(1.0 - _sat_lr - _sat_gr);
+  Real dkrel = 4.0 * std::pow(sat_eff, 3.0) / (1.0 - _sat_lr - _sat_gr);
+
+  return dkrel;
+}
+
+Real
+RelativePermeabilityCorey::dRelativePermGas(Real sat_liq) const
+{
+  Real sat_eff = (sat_liq - _sat_lr)/(1.0 - _sat_lr - _sat_gr);
+  Real dkrel = (-2.0 * (1.0 + 2.0 * sat_eff) * std::pow(1.0 - sat_eff, 2.0)) / (1.0 - _sat_lr - _sat_gr);
+
+  return dkrel;
 }

@@ -62,7 +62,6 @@ private:
    */
   VariableValue & _liquid_saturation;
 
-
 };
 
 #endif //POROUSMATERAIL_H

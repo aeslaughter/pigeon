@@ -47,6 +47,10 @@ RelativePermeabilityVanGenuchten::RelativePermeabilityVanGenuchten(const std::st
 Real
 RelativePermeabilityVanGenuchten::relativePermLiq(Real sat_liq) const
 {
+  if (sat_liq < 0.0 )
+    sat_liq = 0.0;
+  if (sat_liq > 1.0)
+    sat_liq = 1.0;
 
   // Check whether liquid saturation is [0,1] - if not, print error message.
   if (sat_liq < 0.0 || sat_liq > 1.0)
@@ -73,6 +77,12 @@ RelativePermeabilityVanGenuchten::relativePermLiq(Real sat_liq) const
 Real
 RelativePermeabilityVanGenuchten::relativePermGas(Real sat_liq) const
 {
+  Real krel;
+
+  if (sat_liq < 0.0 )
+    sat_liq = 0.0;
+  if (sat_liq > 1.0)
+    sat_liq = 1.0;
 
   // Check whether liquid saturation is [0,1] - if not, print error message.
   if (sat_liq < 0.0 || sat_liq > 1.0)
@@ -89,17 +99,44 @@ RelativePermeabilityVanGenuchten::relativePermGas(Real sat_liq) const
   if (_sat_gr > 0.0) {
 
   Real sat_eff = (sat_liq - _sat_lr)/(1.0 - _sat_lr - _sat_gr);
-  Real krel = std::pow(1.0 - sat_eff, 2.0) * (1.0 - std::pow(sat_eff, 2.0));
+  krel = std::pow(1.0 - sat_eff, 2.0) * (1.0 - std::pow(sat_eff, 2.0));
 
   // Bound just in case
   if (krel < 0) { krel = 0;}
   if (krel > 1) { krel = 1;}
-
-  return krel;
   }
 
   else {
-  return 1.0 - RelativePermeabilityVanGenuchten::relativePermLiq(sat_liq);
+  krel = 1.0 - relativePermLiq(sat_liq);
   }
 
+  return krel;
+}
+
+Real
+RelativePermeabilityVanGenuchten::dRelativePermLiquid(Real sat_liq) const
+{
+  Real sat_eff = (sat_liq - _sat_lr)/(_sat_ls - _sat_lr);
+  Real a = 1.0 - std::pow(sat_eff, 1.0 / _m);
+  Real a2 = 1.0 - std::pow(a, _m);
+
+  Real dkrel = (0.5 * std::pow(sat_eff, -0.5) * a2 * a2 + 2.0 * std::pow(sat_eff, 1.0/_m - 0.5) * std::pow(a, _m - 1.0) * a2) / (sat_liq - _sat_lr);
+
+  return dkrel;
+} 
+
+Real
+RelativePermeabilityVanGenuchten::dRelativePermGas(Real sat_liq) const
+{
+  Real dkrel;
+
+  if (_sat_gr > 0.0) 
+  {
+    Real sat_eff = (sat_liq - _sat_lr)/(1.0 - _sat_lr - _sat_gr);
+    dkrel = (-2.0 * (1.0 + 2.0 * sat_eff) * std::pow(1.0 - sat_eff, 2.0)) / (1.0 - _sat_lr - _sat_gr);
+  }
+  else
+    dkrel = - dRelativePermLiquid(sat_liq);
+
+  return dkrel;
 }

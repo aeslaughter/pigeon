@@ -17,6 +17,7 @@
 #define SATURATIONAUX_H
 
 #include "AuxKernel.h"
+#include "FluidState.h"
 
 class SaturationAux;
 
@@ -45,7 +46,13 @@ protected:
 
 private:
 
-  VariableValue & _saturation;
+  /**
+   * This is the member reference that will hold the User Object
+   * value for fluid state.
+   */
+  const FluidState & _fluid_state;
+
+  VariableValue & _liquid_saturation;
 };
 
 #endif //SATURATIONAUX_H

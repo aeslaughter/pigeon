@@ -53,3 +53,15 @@ RelativePermeabilityPerfectlyMobile::relativePermGas(Real sat_liq) const
   return 1.0;
 
 }
+
+Real
+RelativePermeabilityPerfectlyMobile::dRelativePermLiquid(Real sat_liq) const
+{
+  return 0.0;
+}
+
+Real
+RelativePermeabilityPerfectlyMobile::dRelativePermGas(Real sat_liq) const
+{
+  return 0.0;
+}

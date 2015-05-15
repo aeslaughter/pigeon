@@ -28,7 +28,7 @@
 #include "PerturbationIC.h"
 
 // Boundary conditions
-//#include "ConstantMassFluxBC.h"
+#include "ConstantMassFluxBC.h"
 
 // Auxillary kernels
 #include "SaturationAux.h"
@@ -45,6 +45,7 @@
 
 // Materials
 #include "PorousMaterial.h"
+#include "FluidStateMaterial.h"
 
 // User object
 // Relative permeability
@@ -60,6 +61,7 @@
 #include "FluidPropertiesBrine.h"
 // Fluid states
 #include "FluidStateBrineCO2.h"
+#include "FluidStateWaterCO2.h"
 
 // Postprocessors
 #include "ComponentMassPostprocessor.h"
@@ -67,6 +69,9 @@
 
 // Dirac kernels
 //#include "TimeLimitedConstantPointSource.h"
+
+// Problems
+#include "MultiphaseProblem.h"
 
 template<>
 InputParameters validParams<QuollApp>()
@@ -130,7 +135,7 @@ QuollApp::registerObjects(Factory & factory)
 // registerInitialCondition(PerturbationIC);
 
    // Register the boundary conditions
-// registerBoundaryCondition(ConstantMassFluxBC);
+   registerBoundaryCondition(ConstantMassFluxBC);
 
    // Register the auxillary kernel to calculate the fluid velocities from the streamfunction
    // registerAux(VelocityAux);
@@ -146,8 +151,9 @@ QuollApp::registerObjects(Factory & factory)
    // Register the mesh modifier to rescale the vertical component so that the mesh is refined at the top
 // registerMeshModifier(VerticalRefine);
 
-   // Register the porous material
+   // Register the materials
    registerMaterial(PorousMaterial);
+   registerMaterial(FluidStateMaterial);
 
    // Register user objects for relative permeability and capillary pressure
    registerUserObject(RelativePermeabilityVanGenuchten);
@@ -163,6 +169,7 @@ QuollApp::registerObjects(Factory & factory)
 
    // Register user objects for fluid states
    registerUserObject(FluidStateBrineCO2);
+   registerUserObject(FluidStateWaterCO2);
 
    // Register postprocessors
    registerPostprocessor(ComponentMassPostprocessor);
@@ -170,6 +177,9 @@ QuollApp::registerObjects(Factory & factory)
 
    // Register Dirac kernel
 // registerDiracKernel(TimeLimitedConstantPointSource);
+
+   // Register problem
+   registerProblem(MultiphaseProblem);
 
 }
 

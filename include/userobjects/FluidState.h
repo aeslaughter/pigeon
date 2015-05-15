@@ -36,41 +36,87 @@ class FluidState : public GeneralUserObject
   void finalize();
 
   /**
-   * Liquid density must be over-written in all derived classes.
+   * Number of fluid phases
+   *
+   * @return number of fluid phases
+   */
+  virtual unsigned int numPhases() const = 0;
+
+  /**
+   * Number of components
+   *
+   * @return number of components
+   */
+  virtual unsigned int numComponents() const = 0;
+
+  /**
+   * Is the simulation isothermal?
+   *
+   * @return boolean isIsothermal
+   */
+  virtual bool isIsothermal() const = 0;
+
+  /**
+   * Temperature for isothermal simulations
+   *
+   * @return temperature (C)
+   */
+  virtual Real temperature() const = 0;
+
+  /**
+   * Fluid density must be over-written in all derived classes.
    *  
    * @param pressure liquid pressure (Pa)
    * @param temperature liquid temperature (C)
    * @param xmass vector of component mass fractions (kg/kg)
-   * @return liquid density (kg/m^3)
+   * @return fluid density vector (element for each phase) (kg/m^3)
    */
-  virtual Real liquidDensity(Real pressure, Real temperature, std::vector<Real> xmass) const = 0;
-
-  /**
-   * Gas density must be over-written in all derived classes.
-   *  
-   * @param pressure gas pressure (Pa)
-   * @param temperature gas temperature (C)
-   * @return gas density (kg/m^3)
-   */
-  virtual Real gasDensity(Real pressure, Real temperature, std::vector<Real> xmass) const = 0;
+  virtual std::vector<Real> density(Real pressure, Real temperature) const = 0;
 
   /**
    * Liquid viscosity must be over-written in all derived classes.
    *  
    * @param pressure liquid pressure (Pa)
    * @param temperature liquid temperature (C)
+   * @param xmass vector of component mass fractions (kg/kg)
    * @return liquid viscosity (Pa.s)
    */
-  virtual Real liquidViscosity(Real pressure, Real temperature, std::vector<Real> xmass) const = 0;
+  virtual std::vector<Real> viscosity(Real pressure, Real temperature) const = 0;
+
+ /**
+   * Mass fractions for each component in each phase.
+   * 2D vector - one row for each component, one column
+   * for each phsae.
+   *
+   * @return mass fracions (-)
+   */
+  virtual std::vector<std::vector<Real> > massFractions(Real pressure, Real temperature) const = 0;
 
   /**
-   * Gas viscosity must be over-written in all derived classes.
-   *  
-   * @param pressure gas pressure (Pa)
-   * @param temperature gas temperature (C)
-   * @return gas viscosity (Pa.s)
+   * Relative permeabilities of each phase
+   *
+   * @param saturation liquid saturation
+   * @return relative permeabilities for each phase (-)
    */
-  virtual Real gasViscosity(Real pressure, Real temperature, std::vector<Real> xmass) const = 0;
+  virtual std::vector<Real> relativePermeability(Real liquid_saturation) const = 0;
+
+
+  /**
+   * Phase pressures
+   *
+   * @param pressure primary pressure (Pa)
+   * @param saturation liquid saturation (-)
+   * @return pressure phase pressure (Pa)
+   */
+  virtual Real pressure(Real gas_pressure, Real liquid_saturation) const = 0;
+
+  /**
+   * Gas saturation given liquid saturation.
+   *
+   * @param saturation liquid saturation (-)
+   * @return saturation gas saturation (-)
+   */
+  virtual Real saturation(Real liquid_saturation) const = 0;
 };
 
 #endif // FLUIDSTATE_H

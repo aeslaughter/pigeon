@@ -18,7 +18,7 @@
 #define FLUIDPRESSUREAUX_H
 
 #include "AuxKernel.h"
-#include "CapillaryPressure.h"
+#include "FluidState.h"
 
 class FluidPressureAux;
 
@@ -40,9 +40,9 @@ private:
 
   /**
    * This is the member reference that will hold the User Object
-   * value for capillary pressure (Pa).
+   * value for fluid state.
    */
-  const CapillaryPressure & _capillary_pressure;
+  const FluidState & _fluid_state;
 
   /// Primary pressure variable at the nodes
   VariableValue & _primary_pressure;

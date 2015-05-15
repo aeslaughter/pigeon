@@ -19,7 +19,8 @@ template<>
 InputParameters validParams<SaturationAux>()
 {
   InputParameters params = validParams<AuxKernel>();
-  params.addRequiredCoupledVar("saturation_variable", "The primary saturation variable.");
+  params.addRequiredCoupledVar("liquid_saturation_variable", "The liquid saturation variable.");
+  params.addRequiredParam<UserObjectName>("fluid_state_uo", "The fluid state UserObject");
   return params;
 }
 
@@ -27,16 +28,11 @@ SaturationAux::SaturationAux(const std::string & name,
                        InputParameters parameters) :
     AuxKernel(name, parameters),
 
-    _saturation(coupledValue("saturation_variable"))
+    _fluid_state(getUserObject<FluidState>("fluid_state_uo")),
+    _liquid_saturation(coupledValue("liquid_saturation_variable"))
 {}
 
 Real SaturationAux::computeValue()
 {
-  Real sat = 1.0 - _saturation[_qp];
-
-  // Bound the saturation so that it is 0 <= sat <= 1 just in case
-  if (sat < 0.0) sat = 0.0;
-  if (sat > 1.0) sat = 1.0;
-
-  return sat;
+  return _fluid_state.saturation(_liquid_saturation[_qp]);
 }

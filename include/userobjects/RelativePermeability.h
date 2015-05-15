@@ -53,6 +53,20 @@ class RelativePermeability : public GeneralUserObject
    * @return gas phase relative permeability
    */
   virtual Real relativePermGas(Real sat_liq) const = 0;
+
+  /**
+   * Derivative of liquid relative permeability with respect to liquid saturation.
+   * @param sat_liq liquid phase saturation
+   * @return derivative of liquid relative permeability with respect to liquid saturation
+   */
+  virtual Real dRelativePermLiquid(Real sat_liq) const = 0;
+
+  /**
+   * Derivative of gas relative permeability with respect to liquid saturation.
+   * @param sat_liq liquid phase saturation
+   * @return derivative of gas relative permeability with respect to liquid saturation
+   */
+  virtual Real dRelativePermGas(Real sat_liq) const = 0;
 };
 
 #endif // RELATIVEPERMEABILITY_H

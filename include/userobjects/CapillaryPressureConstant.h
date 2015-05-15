@@ -36,6 +36,14 @@ class CapillaryPressureConstant : public CapillaryPressure
    */
   Real capillaryPressure(Real sat_liq) const;
 
+ /**
+   * Derivative of capillary pressure with respect to the liquid saturation.
+   * @param sat_liq liquid saturation
+   * @return derivativer of capillary pressure with respect to liquid saturation
+   */
+  Real dCapillaryPressure(Real sat_liq) const;
+
+
  protected:
 
   /// Constant value for the capillary pressure

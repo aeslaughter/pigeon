@@ -42,7 +42,7 @@ private:
    * This is the member reference that will hold the User Object
    * value for the fluid state User Object.
    */
-  const FluidState & _fluid_property;
+  const FluidState & _fluid_state;
 
   /// Brine phase pressure
   VariableValue & _pressure;
@@ -50,10 +50,8 @@ private:
   VariableValue & _temperature;
   /// Brine phase saturation
   VariableValue & _saturation;
-  /// Salt mass fraction in the brine 
-  VariableValue & _salt_mass_fraction;
   /// MooseEnum of fluid properties
-  const MooseEnum & state_property_enum;
+  const MooseEnum & _state_property_enum;
 };
 
 #endif //FLUIDSTATEAUX_H

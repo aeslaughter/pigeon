@@ -25,7 +25,7 @@ InputParameters validParams<ComponentMassTimeDerivative>()
   params.addRequiredCoupledVar("liquid_saturation_variable", "The liquid saturation variable.");
   params.addRequiredCoupledVar("xgas_variable", "The component mass fraction in gas variable.");
   params.addRequiredCoupledVar("xliquid_variable", "The component mass fraction in liquid variable.");
-  MooseEnum primary_variable_type("pressure, saturation, mass_fraction");
+  MooseEnum primary_variable_type("pressure gas_saturation liquid_saturation mass_fraction");
   params.addRequiredParam<MooseEnum>("primary_variable_type", primary_variable_type, "The type of primary variable for this kernel (e.g. pressure, saturation or component mass fraction");
   return params;
 }
