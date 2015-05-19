@@ -68,8 +68,6 @@ Real
   Tv = n1 + n2 * temperature;
 
   // The brine density is then given by the molar density of water
-  // TODO: In EOS code, add water density as an input parameter so that it is not calculated
-  // more than once per qp per iteration.
   water_density = _water_property.density(pressure, Tv);
 
   density = water_density * Mbrine / _Mh2o;

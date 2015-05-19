@@ -33,6 +33,68 @@ FluidPropertiesWater::FluidPropertiesWater(const std::string & name, InputParame
   _t_c2k = 273.15;
   _R = 0.461526;
 
+  /// Constants for region 1.
+  Real n1arr[34] = {0.14632971213167e0, -0.84548187169114e0, -0.37563603672040e1, 0.33855169168385e1,
+                -0.95791963387872e0, 0.15772038513228e0, -0.16616417199501e-1,0.81214629983568e-3,
+                 0.28319080123804e-3, -0.60706301565874e-3, -0.18990068218419e-1,-0.32529748770505e-1,
+                -0.21841717175414e-1, -0.52838357969930e-4, -0.47184321073267e-3, -0.30001780793026e-3,
+                 0.47661393906987e-4, -0.44141845330846e-5, -0.72694996297594e-15,-0.31679644845054e-4,
+                -0.28270797985312e-5, -0.85205128120103e-9, -0.22425281908000e-5,-0.65171222895601e-6,
+                -0.14341729937924e-12, -0.40516996860117e-6, -0.12734301741641e-8, -0.17424871230634e-9,
+                -0.68762131295531e-18, 0.14478307828521e-19, 0.26335781662795e-22,-0.11947622640071e-22,
+                 0.18228094581404e-23, -0.93537087292458e-25};
+  _n1.assign(n1arr, n1arr + 34);
+
+  int I1arr[34] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 8, 8, 21,
+                  23, 29, 30, 31, 32};
+  _I1.assign(I1arr, I1arr + 34);
+
+  int J1arr[34] = {-2, -1, 0, 1, 2, 3, 4, 5, -9, -7, -1, 0, 1, 3, -3, 0, 1, 3, 17, -4, 0, 6, -5, -2, 10, -8,
+                  -11, -6, -29, -31, -38, -39, -40, -41};
+  _J1.assign(J1arr, J1arr + 34);
+
+  /// Constants for region 2.
+  Real n02arr[9] = {-0.96927686500217e1,  0.10086655968018e2,-0.56087911283020e-2, 0.71452738081455e-1,
+                -0.40710498223928e0, 0.14240819171444e1, -0.43839511319450e1,  -0.28408632460772e0,
+                 0.21268463753307e-1};
+  _n02.assign(n02arr, n02arr + 9);
+
+  Real n2arr[43] = {-0.17731742473213e-2, -0.17834862292358e-1,-0.45996013696365e-1, -0.57581259083432e-1,
+                 -0.50325278727930e-1, -0.33032641670203e-4,-0.18948987516315e-3, -0.39392777243355e-2,
+                 -0.43797295650573e-1, -0.26674547914087e-4, 0.20481737692309e-7, 0.43870667284435e-6,
+                 -0.32277677238570e-4, -0.15033924542148e-2, -0.40668253562649e-1, -0.78847309559367e-9,
+                  0.12790717852285e-7, 0.48225372718507e-6, 0.22922076337661e-5, -0.16714766451061e-10,
+                 -0.21171472321355e-2, -0.23895741934104e2, -0.59059564324270e-17,-0.12621808899101e-5,
+                 -0.38946842435739e-1, 0.11256211360459e-10, -0.82311340897998e1, 0.19809712802088e-7,
+                  0.10406965210174e-18,-0.10234747095929e-12, -0.10018179379511e-8, -0.80882908646985e-10,
+                  0.10693031879409e0, -0.33662250574171e0, 0.89185845355421e-24, 0.30629316876232e-12,
+                 -0.42002467698208e-5, -0.59056029685639e-25, 0.37826947613457e-5, -0.12768608934681e-14,
+                  0.73087610595061e-28, 0.55414715350778e-16, -0.94369707241210e-6};
+  _n2.assign(n2arr, n2arr + 43);
+
+  int J02arr[9] = {0, 1, -5, -4, -3, -2, -1, 2, 3};
+  _J02.assign(J02arr, J02arr + 9);
+  int I2arr[43] = {1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 5, 6, 6, 6, 7, 7, 7, 8, 8, 9, 10, 10,
+                10, 16, 16, 18, 20, 20, 20, 21, 22, 23, 24, 24, 24};
+  _I2.assign(I2arr, I2arr + 43);
+  int J2arr[43] = {0, 1, 2, 3, 6, 1, 2, 4, 7, 36, 0, 1, 3, 6, 35, 1, 2, 3, 7, 3, 16, 35, 0, 11, 25, 8, 36, 13,
+                4, 10, 14, 29, 50, 57, 20, 35, 48, 21, 53, 39, 26, 40, 58};
+  _J2.assign(J2arr, J2arr + 43);
+
+  /// Constants for viscosity calculation.
+  int ivarr[21] = {0,1,2,3,0,1,2,3,5,0,1,2,3,4,0,1,0,3,4,3,5};
+  _iv.assign(ivarr, ivarr + 21);
+  int jvarr[21] = {0,0,0,0,1,1,1,1,1,2,2,2,2,2,3,3,4,4,5,6,6};
+  _jv.assign(jvarr, jvarr + 21);
+
+  Real h0varr[4] = {1.67752, 2.20462, 0.6366564, -0.241605};
+  _h0v.assign(h0varr, h0varr + 4);
+
+  Real h1varr[21] = {5.20094e-1, 8.50895e-2, -1.08374, -2.89555e-1, 2.22531e-1, 9.99115e-1,
+           1.88797, 1.26613, 1.20573e-1, -2.81378e-1, -9.06851e-1, -7.72479e-1,
+           -4.89837e-1, -2.57040e-1, 1.61913e-1, 2.57399e-1, -3.25372e-2, 6.98452e-2,
+           8.72102e-3, -4.35673e-3, -5.93264e-4};
+  _h1v.assign(h1varr, h1varr + 21);
 }
 
 Real
@@ -53,13 +115,13 @@ Real
     if (pressure > psat && pressure <= 100.e6)
     {
       // Region 1: single phase liquid
-      density = region1(pressure, temperature);
+      density = densityRegion1(pressure, temperature);
     }
     
     if (pressure <= psat)
     {
       // Region 2: vapour phase
-      density = region2(pressure, temperature);
+      density = densityRegion2(pressure, temperature);
     }
   }
 
@@ -70,14 +132,6 @@ Real
   FluidPropertiesWater::viscosity(Real temperature, Real density) const
 
 {
-  int iv[21] = {0,1,2,3,0,1,2,3,5,0,1,2,3,4,0,1,0,3,4,3,5};
-  int jv[21] = {0,0,0,0,1,1,1,1,1,2,2,2,2,2,3,3,4,4,5,6,6};
-
-  Real h0v[4] = {1.67752, 2.20462, 0.6366564, -0.241605};
-  Real h1v[21] = {5.20094e-1, 8.50895e-2, -1.08374, -2.89555e-1, 2.22531e-1, 9.99115e-1,
-           1.88797, 1.26613, 1.20573e-1, -2.81378e-1, -9.06851e-1, -7.72479e-1,
-           -4.89837e-1, -2.57040e-1, 1.61913e-1, 2.57399e-1, -3.25372e-2, 6.98452e-2,
-           8.72102e-3, -4.35673e-3, -5.93264e-4};
   Real t0[4], t1[6], d1[7];
 
   Real mu_star = 1.e-6;
@@ -107,15 +161,15 @@ Real
 
   // Calculate mu0
   Real sum0 = 0.;
-  for (int i = 0; i<= 3; i++)
-     sum0 += h0v[i] * t0[i];
+  for (int i = 0; i <= 3; i++)
+     sum0 += _h0v[i] * t0[i];
 
   Real mu0 = 100. * std::sqrt(tbar) / sum0;
 
   // Now calculate mu1
   Real sum1 = 0.;
-  for (int i = 0; i <= 21; i++)
-     sum1 += t1[iv[i]] * h1v[i] * d1[jv[i]];
+  for (int i = 0; i <= 20; i++)
+     sum1 += t1[_iv[i]] * _h1v[i] * d1[_jv[i]];
 
   Real mu1 = std::exp(rhobar * sum1);
 
@@ -198,27 +252,12 @@ Real
 }
 
 Real
-  FluidPropertiesWater::region1(Real pressure, Real temperature) const
+  FluidPropertiesWater::densityRegion1(Real pressure, Real temperature) const
 {
   Real p_star1 = 16.53e6;
   Real t_star1 = 1386.;
   Real tk = temperature + _t_c2k;
-
-  Real n1[34] = {0.14632971213167e0, -0.84548187169114e0, -0.37563603672040e1, 0.33855169168385e1,
-                -0.95791963387872e0, 0.15772038513228e0, -0.16616417199501e-1,0.81214629983568e-3,
-                 0.28319080123804e-3, -0.60706301565874e-3, -0.18990068218419e-1,-0.32529748770505e-1,
-                -0.21841717175414e-1, -0.52838357969930e-4, -0.47184321073267e-3, -0.30001780793026e-3,
-                 0.47661393906987e-4, -0.44141845330846e-5, -0.72694996297594e-15,-0.31679644845054e-4,
-                -0.28270797985312e-5, -0.85205128120103e-9, -0.22425281908000e-5,-0.65171222895601e-6,
-                -0.14341729937924e-12, -0.40516996860117e-6, -0.12734301741641e-8, -0.17424871230634e-9,
-                -0.68762131295531e-18, 0.14478307828521e-19, 0.26335781662795e-22,-0.11947622640071e-22,
-                 0.18228094581404e-23, -0.93537087292458e-25};
-
-  int I1[34] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 8, 8, 21,
-                  23, 29, 30, 31, 32};
-  int J1[34] = {-2, -1, 0, 1, 2, 3, 4, 5, -9, -7, -1, 0, 1, 3, -3, 0, 1, 3, 17, -4, 0, 6, -5, -2, 10, -8,
-                  -11, -6, -29, -31, -38, -39, -40, -41};
-
+  
   // Now evaluate the sums
   Real sum1 = 0.;
   Real tau1 = t_star1 / tk;
@@ -226,40 +265,19 @@ Real
 
   for (int i = 0; i <= 33; i++)
   {
-    sum1 -= n1[i] * I1[i] * std::pow(7.1 - pi1, I1[i]-1) * std::pow(tau1 - 1.222, J1[i]);
+    sum1 -= _n1[i] * _I1[i] * std::pow(7.1 - pi1, _I1[i]-1) * std::pow(tau1 - 1.222, _J1[i]);
   }
+  
   // The density of water in this region is then given by
   return p_star1 / (sum1 * _R * tk) / 1000.0;
 }
 
 Real
-  FluidPropertiesWater::region2(Real pressure, Real temperature) const
+  FluidPropertiesWater::densityRegion2(Real pressure, Real temperature) const
 {
   Real p_star2 = 1.e6;
   Real t_star2 = 540.;
   Real tk = temperature + _t_c2k;
-
-  Real n02[9] = {-0.96927686500217e1,  0.10086655968018e2,-0.56087911283020e-2, 0.71452738081455e-1,
-                -0.40710498223928e0, 0.14240819171444e1, -0.43839511319450e1,  -0.28408632460772e0,
-                 0.21268463753307e-1};
-
-  Real n2[43] = {-0.17731742473213e-2, -0.17834862292358e-1,-0.45996013696365e-1, -0.57581259083432e-1,
-                 -0.50325278727930e-1, -0.33032641670203e-4,-0.18948987516315e-3, -0.39392777243355e-2,
-                 -0.43797295650573e-1, -0.26674547914087e-4, 0.20481737692309e-7, 0.43870667284435e-6,
-                 -0.32277677238570e-4, -0.15033924542148e-2, -0.40668253562649e-1, -0.78847309559367e-9,
-                  0.12790717852285e-7, 0.48225372718507e-6, 0.22922076337661e-5, -0.16714766451061e-10,
-                 -0.21171472321355e-2, -0.23895741934104e2, -0.59059564324270e-17,-0.12621808899101e-5,
-                 -0.38946842435739e-1, 0.11256211360459e-10, -0.82311340897998e1, 0.19809712802088e-7,
-                  0.10406965210174e-18,-0.10234747095929e-12, -0.10018179379511e-8, -0.80882908646985e-10,
-                  0.10693031879409e0, -0.33662250574171e0, 0.89185845355421e-24, 0.30629316876232e-12,
-                 -0.42002467698208e-5, -0.59056029685639e-25, 0.37826947613457e-5, -0.12768608934681e-14,
-                  0.73087610595061e-28, 0.55414715350778e-16, -0.94369707241210e-6};
-
-  int J02[9] = {0, 1, -5, -4, -3, -2, -1, 2, 3};
-  int I2[43] = {1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 5, 6, 6, 6, 7, 7, 7, 8, 8, 9, 10, 10,
-                10, 16, 16, 18, 20, 20, 20, 21, 22, 23, 24, 24, 24};
-  int J2[43] = {0, 1, 2, 3, 6, 1, 2, 4, 7, 36, 0, 1, 3, 6, 35, 1, 2, 3, 7, 3, 16, 35, 0, 11, 25, 8, 36, 13,
-                4, 10, 14, 29, 50, 57, 20, 35, 48, 21, 53, 39, 26, 40, 58};
 
   // Ideal gas component of region 2 - Eq. (16)
   Real sum02 = 0.;
@@ -274,9 +292,9 @@ Real
   // Residual component of Gibbs free energy - Eq. (17).
   Real sumr2 = 0.;
 
-  for (int i = 0; i <= 43; i++)
+  for (int i = 0; i <= 42; i++)
   {
-    sumr2 += n2[i] * I2[i] * std::pow(pi2, I2[i] - 1) * std::pow(tau2 - 0.5, J2[i]);
+    sumr2 += _n2[i] * _I2[i] * std::pow(pi2, _I2[i] - 1) * std::pow(tau2 - 0.5, _J2[i]);
   }
 
   // The density in Region 2 is then given by
@@ -284,12 +302,93 @@ Real
 }
 
 Real
-  FluidPropertiesWater::region3(Real pressure, Real temperature) const
+  FluidPropertiesWater::densityRegion3(Real pressure, Real temperature) const
 {
   // Region 3 is subdivided into 26 subregions, each with a given 
   // backwards equation to directly calculate density from pressure 
   // and temperature without the need for expensive iterations.
-
+  //TODO: needs to be implemented!
 
   return 0.;
 }
+
+Real
+  FluidPropertiesWater::dDensity_dP(Real pressure, Real temperature) const
+{
+  // Valid for 273.15 K <= T <= 1073.15 K, p <= 100 MPa
+  //          1073.15 K <= T <= 2273.15 K, p <= 50 Mpa
+
+  Real ddensity;
+
+  // Determine which region the point is in. First calculate the saturated
+  // pressure from the input temperature
+  Real psat = pSat(temperature);
+
+  if (temperature >= 0. && temperature <= 350.)
+  {
+    if (pressure > psat && pressure <= 100.e6)
+    {
+      // Region 1: single phase liquid
+      ddensity = dDensityRegion1_dP(pressure, temperature);
+    }
+
+    if (pressure <= psat)
+    {
+      // Region 2: vapour phase
+      ddensity = dDensityRegion2_dP(pressure, temperature);
+    }
+  }
+
+  return ddensity;
+}
+
+
+Real
+  FluidPropertiesWater::dDensityRegion1_dP(Real pressure, Real temperature) const
+{
+  Real p_star1 = 16.53e6;
+  Real t_star1 = 1386.;
+  Real tk = temperature + _t_c2k;
+
+  // Now evaluate the sums
+  Real sum1 = 0.;
+  Real sum2 = 0.;
+  Real tau1 = t_star1 / tk;
+  Real pi1 = pressure / p_star1;
+
+  for (int i = 0; i <= 33; i++)
+  {
+    sum1 -= _n1[i] * _I1[i] * std::pow(7.1 - pi1, _I1[i]-1) * std::pow(tau1 - 1.222, _J1[i]);
+    sum2 += _n1[i] * _I1[i] * (_I1[i] - 1) * std::pow(7.1 - pi1, _I1[i]-2) * std::pow(tau1 - 1.222, _J1[i]);
+  }
+
+  // The derivative of the density of water with respect to pressure in this region is then given by
+  return - sum2 / (sum1 * sum1 * _R * tk) / 1000.0;
+}
+
+Real
+  FluidPropertiesWater::dDensityRegion2_dP(Real pressure, Real temperature) const
+{
+  Real p_star2 = 1.e6;
+  Real t_star2 = 540.;
+  Real tk = temperature + _t_c2k;
+
+  // Ideal gas component of region 2 - Eq. (16)
+  Real sum02 = 0.;
+  Real tau2 = t_star2 / tk;
+  Real pi2 = pressure / p_star2;
+
+ // Residual component of Gibbs free energy - Eq. (17).
+  Real sumr2 = 0.;
+  Real sumdr2 = 0.;
+
+  for (int i = 0; i <= 42; i++)
+  {
+    sumr2 += _n2[i] * _I2[i] * std::pow(pi2, _I2[i] - 1) * std::pow(tau2 - 0.5, _J2[i]);
+    sumdr2 += _n2[i] * _I2[i] * (_I2[i] - 1) * std::pow(pi2, _I2[i] - 2) * std::pow(tau2 - 0.5, _J2[i]);
+  }
+
+  // The derivative of the density in Region 2 with respect to pressure is then given by
+  return (-1.0/(pi2 * pi2) + sumdr2) / (_R * tk * (1.0 / pi2 + sumr2) * (1.0 / pi2 + sumr2)) / 1000.0;
+}
+

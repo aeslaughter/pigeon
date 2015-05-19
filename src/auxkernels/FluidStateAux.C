@@ -24,8 +24,10 @@ InputParameters validParams<FluidStateAux>()
   params.addCoupledVar("pressure_variable", 1.e6,  "The pressure variable corresponding to the phase.");
   params.addCoupledVar("temperature_variable", 50, "The temperature variable.");
   params.addCoupledVar("saturation_variable", 1.0, "The saturation variable corresponding to the phase.");
-  MooseEnum state_property_enum("liquid_density gas_density liquid_viscosity gas_viscosity mass_fraction saturation pressure liquid_relperm gas_relperm");
+  MooseEnum state_property_enum("density viscosity mass_fraction saturation pressure relperm");
   params.addRequiredParam<MooseEnum>("state_property_enum", state_property_enum, "The fluid property that this auxillary kernel is to calculate");
+  params.addParam<unsigned int>("phase_index", 0, "The index of the phase this auxillary kernel acts on");
+  params.addParam<unsigned int>("component_index", 0, "The index of the component this auxillary kernel acts on");
   return params;
 }
 
@@ -37,19 +39,14 @@ FluidStateAux::FluidStateAux(const std::string & name,
     _pressure(coupledValue("pressure_variable")),
     _temperature(coupledValue("temperature_variable")),
     _saturation(coupledValue("saturation_variable")),
-    _state_property_enum(getParam<MooseEnum>("state_property_enum"))
+    _state_property_enum(getParam<MooseEnum>("state_property_enum")),
+    _phase_index(getParam<unsigned int>("phase_index")),
+    _component_index(getParam<unsigned int>("component_index"))
 {}
 
 Real FluidStateAux::computeValue()
 {
   Real temperature, property;
-
-  // Vector of mass fractions of each component in each phase
-  std::vector<Real> xmass;
-  xmass.push_back(1.0); 		// Salt mass fraction in liquid
-  xmass.push_back(0.);                       // CO2 mass fraction in liquid
-  xmass.push_back(0.);                       // Salt mass fraction in gas
-  xmass.push_back(1.);                       // CO2 mass fraction in gas
 
   // If the simulation is isothermal, take the temperature from the FluidState UserObject.
   if (_fluid_state.isIsothermal())
@@ -57,31 +54,30 @@ Real FluidStateAux::computeValue()
   else
     temperature = _temperature[_qp];
 
-  if (_state_property_enum == "liquid_density") {
-    property = _fluid_state.density(_pressure[_qp], temperature)[0];
+  if (_state_property_enum == "density")
+  {
+    property = _fluid_state.density(_pressure[_qp], temperature)[_phase_index];
   }
-  if (_state_property_enum == "gas_density") {
-    property = _fluid_state.density(_pressure[_qp], temperature)[1];
+  if (_state_property_enum == "viscosity")
+  {
+    property = _fluid_state.viscosity(_pressure[_qp], temperature)[_phase_index];
   }
-  if (_state_property_enum == "liquid_viscosity") { 
-    property = _fluid_state.viscosity(_pressure[_qp], temperature)[0];
-  }
-  if (_state_property_enum == "gas_viscosity") { 
-    property = _fluid_state.viscosity(_pressure[_qp], temperature)[1];
-  }
-  if (_state_property_enum == "saturation") { 
+  if (_state_property_enum == "saturation")
+  {
     property = _fluid_state.saturation(_saturation[_qp]);
   }
-  if (_state_property_enum == "pressure") { 
+  if (_state_property_enum == "pressure")
+  {
     property = _fluid_state.pressure(_pressure[_qp], _saturation[_qp]);
   }
-  if (_state_property_enum == "liquid_relperm") { 
-    property = _fluid_state.relativePermeability(_saturation[_qp])[0];
+  if (_state_property_enum == "relperm")
+  {
+    property = _fluid_state.relativePermeability(_saturation[_qp])[_phase_index];
   }
-  if (_state_property_enum == "gas_relperm") { 
-    property = _fluid_state.relativePermeability(_saturation[_qp])[1];
+  if (_state_property_enum == "mass_fraction")
+  {
+    property = _fluid_state.massFractions(_pressure[_qp], temperature)[_phase_index][_component_index];
   }
-
 
   return property;
 }

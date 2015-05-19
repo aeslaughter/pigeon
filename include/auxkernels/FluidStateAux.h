@@ -52,6 +52,10 @@ private:
   VariableValue & _saturation;
   /// MooseEnum of fluid properties
   const MooseEnum & _state_property_enum;
+  /// Phase index
+  unsigned int _phase_index;
+  /// Component index
+  unsigned int _component_index;
 };
 
 #endif //FLUIDSTATEAUX_H

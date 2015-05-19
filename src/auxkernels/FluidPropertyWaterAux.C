@@ -64,10 +64,10 @@ Real FluidPropertyWaterAux::computeValue()
     property = _fluid_property.b23p(_temperature[_qp]);
   }
   if (fluid_property_enum == "region1") {
-    property = _fluid_property.region1(_pressure[_qp], _temperature[_qp]);
+    property = _fluid_property.densityRegion1(_pressure[_qp], _temperature[_qp]);
   }
   if (fluid_property_enum == "region2") {
-    property = _fluid_property.region2(_pressure[_qp], _temperature[_qp]);
+    property = _fluid_property.densityRegion2(_pressure[_qp], _temperature[_qp]);
   }
 
   return property;

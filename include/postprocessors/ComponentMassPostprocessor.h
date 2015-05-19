@@ -28,7 +28,8 @@ protected:
   MaterialProperty<Real> & _porosity;
 
   VariableValue & _fluid_density;
-  VariableValue & _component;
+  VariableValue & _component_mass_fraction;
+  VariableValue & _phase_saturation;
 
 };
 

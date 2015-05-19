@@ -73,7 +73,7 @@ Real ComponentMassTimeDerivative::computeQpJacobian() // TODO: Jacobians need fu
   }
 
   if (_primary_variable_type == "pressure") {
-    jacobian = 0.0;
+    jacobian = 0.0; // TODO: density depends on pressure
   }
 
   if (_primary_variable_type == "mass_fraction") {

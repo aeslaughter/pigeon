@@ -5,16 +5,16 @@
     csvdiff = 'CapillaryPressureConstant_vpp_0001.csv'
     abs_zero = 1.0E-6
   [../]
-  [./constant2]
-    type = 'RunException'
-    input = 'CapillaryPressureConstant.i Functions/initial_saturation/value=x-0.1' 
-    expect_err = 'CapillaryPressureConstant: Liquid saturation is outside the range 0 <= Sl <= 1'
-  [../]
-  [./constant3]
-    type = 'RunException'
-    input = 'CapillaryPressureConstant.i Functions/initial_saturation/value=x+0.1' 
-    expect_err = 'CapillaryPressureConstant: Liquid saturation is outside the range 0 <= Sl <= 1'
-  [../]
+# [./constant2]
+#   type = 'RunException'
+#   input = 'CapillaryPressureConstant.i Functions/initial_saturation/value=x-0.1' 
+#   expect_err = 'CapillaryPressureConstant: Liquid saturation is outside the range 0 <= Sl <= 1'
+# [../]
+# [./constant3]
+#   type = 'RunException'
+#   input = 'CapillaryPressureConstant.i Functions/initial_saturation/value=x+0.1' 
+#   expect_err = 'CapillaryPressureConstant: Liquid saturation is outside the range 0 <= Sl <= 1'
+# [../]
   [./van_genuchten1]
     type = 'CSVDiff'
     input = 'CapillaryPressureVanGenuchten.i'
@@ -39,14 +39,14 @@
     csvdiff = 'CapillaryPressureVanGenuchten4_vpp_0001.csv'
     abs_zero = 1.0E-6
   [../]
-  [./van_genuchten5]
-    type = 'RunException'
-    input = 'CapillaryPressureVanGenuchten.i Functions/initial_saturation/value=x-0.1' 
-    expect_err = 'CapillaryPressureVanGenuchten: Liquid saturation is outside the range 0 <= Sl <= 1'
-  [../]
-  [./van_genuchten6]
-    type = 'RunException'
-    input = 'CapillaryPressureVanGenuchten.i Functions/initial_saturation/value=x+0.1' 
-    expect_err = 'CapillaryPressureVanGenuchten: Liquid saturation is outside the range 0 <= Sl <= 1'
-  [../]
+# [./van_genuchten5]
+#   type = 'RunException'
+#   input = 'CapillaryPressureVanGenuchten.i Functions/initial_saturation/value=x-0.1' 
+#   expect_err = 'CapillaryPressureVanGenuchten: Liquid saturation is outside the range 0 <= Sl <= 1'
+# [../]
+# [./van_genuchten6]
+#   type = 'RunException'
+#   input = 'CapillaryPressureVanGenuchten.i Functions/initial_saturation/value=x+0.1' 
+#   expect_err = 'CapillaryPressureVanGenuchten: Liquid saturation is outside the range 0 <= Sl <= 1'
+# [../]
 []

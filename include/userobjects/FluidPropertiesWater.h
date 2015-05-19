@@ -113,7 +113,7 @@ class FluidPropertiesWater : public FluidProperties
    * @param temperature water temperature (C)
    * @return density (kg/m^3) in region 1
    */
-  Real region1(Real pressure, Real temperature) const;
+  Real densityRegion1(Real pressure, Real temperature) const;
 
   /** Density function for Region 2 - superheated steam
    *
@@ -125,7 +125,7 @@ class FluidPropertiesWater : public FluidProperties
    * @param temperature water temperature (C)
    * @return density (kg/m^3) in region 2
    */
-  Real region2(Real pressure, Real temperature) const;
+  Real densityRegion2(Real pressure, Real temperature) const;
 
   /** Density function for Region 3 - supercritical water and steam
    *
@@ -139,7 +139,46 @@ class FluidPropertiesWater : public FluidProperties
    * @param temperature water temperature (C)
    * @return density (kg/m^3) in region 3
    */
-  Real region3(Real pressure, Real temperature) const;
+  Real densityRegion3(Real pressure, Real temperature) const;
+
+  /**
+   * Derivative of the density of water with respect to pressure.
+   * From IAPWS IF97 Revised Release on the IAPWS Industrial
+   * Formulation 1997 for the Thermodynamic Properties of Water
+   * and Steam.
+   *
+   * Valid for 273.15 K <= T <= 1073.15 K, p <= 100 MPa
+   *          1073.15 K <= T <= 2273.15 K, p <= 50 Mpa
+   *
+   * @param pressure water pressure (Pa)
+   * @param temperature water temperature (C)
+   * @return derivative of water density (kg/m^3) with respect to pressure
+   */
+  Real dDensity_dP(Real pressure, Real temperature) const;
+
+  /**
+   * Derivative of density function for Region 1 - single phase liquid region
+   * with respect to presure.
+   * From Revised Release on the IAPWS Industrial Formulation 1997 for the 
+   * Thermodynamic Properties of Water and Steam, IAPWS 2007.
+   *
+   * @param pressure water pressure (Pa)
+   * @param temperature water temperature (C)
+   * @return derivative of density (kg/m^3) in region 1 with respect to pressure
+   */
+  Real dDensityRegion1_dP(Real pressure, Real temperature) const;
+
+  /**
+   * Derivative of density function for Region 2 - superheated steam
+   * with respect to presure.
+   * From Revised Release on the IAPWS Industrial Formulation 1997 for the 
+   * Thermodynamic Properties of Water and Steam, IAPWS 2007.
+   *
+   * @param pressure water pressure (Pa)
+   * @param temperature water temperature (C)
+   * @return derivative of density (kg/m^3) in region 2 with respect to pressure
+   */
+  Real dDensityRegion2_dP(Real pressure, Real temperature) const;
 
  protected:
   /// Temperature of water at the critical point
@@ -154,6 +193,19 @@ class FluidPropertiesWater : public FluidProperties
   Real _t_c2k;
   /// Universal gas constant
   Real _R;
+  // Constants
+  std::vector<Real> _n1;
+  std::vector<int> _I1;
+  std::vector<int> _J1;
+  std::vector<Real> _n02;
+  std::vector<Real> _n2;
+  std::vector<int> _J02;
+  std::vector<int> _I2;
+  std::vector<int> _J2;
+  std::vector<int> _iv;
+  std::vector<int> _jv;
+  std::vector<Real> _h0v;
+  std::vector<Real> _h1v;
 
 };
 
