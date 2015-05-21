@@ -60,6 +60,7 @@
 #include "FluidPropertiesWater.h"
 #include "FluidPropertiesBrine.h"
 // Fluid states
+#include "FluidStateSinglePhase.h"
 #include "FluidStateBrineCO2.h"
 #include "FluidStateWaterCO2.h"
 
@@ -168,6 +169,7 @@ QuollApp::registerObjects(Factory & factory)
    registerUserObject(FluidPropertiesBrine);
 
    // Register user objects for fluid states
+   registerUserObject(FluidStateSinglePhase);
    registerUserObject(FluidStateBrineCO2);
    registerUserObject(FluidStateWaterCO2);
 
