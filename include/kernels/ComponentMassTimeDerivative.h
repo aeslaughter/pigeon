@@ -10,6 +10,7 @@
 #define COMPONENTMASSTIMEDERIVATIVE_H
 
 #include "TimeKernel.h"
+#include "FluidState.h"
 
 class ComponentMassTimeDerivative;
 
@@ -31,19 +32,22 @@ protected:
 
 
 private:
-  VariableValue & _gas_density;
-  VariableValue & _gas_density_old;
-  VariableValue & _liquid_density;
-  VariableValue & _liquid_density_old;
-  VariableValue & _gas_saturation;
-  VariableValue & _gas_saturation_old;
-  VariableValue & _liquid_saturation;
-  VariableValue & _liquid_saturation_old;
-  VariableValue & _xgas;
-  VariableValue & _xgas_old;
-  VariableValue & _xliquid;
-  VariableValue & _xliquid_old;
+  std::vector<VariableValue *> _fluid_density;
+  std::vector<VariableValue *> _fluid_density_old;
+  std::vector<VariableValue *> _fluid_saturation;
+  std::vector<VariableValue *> _fluid_saturation_old;
+  std::vector<VariableValue *> _component_mass_fraction;
+  std::vector<VariableValue *> _component_mass_fraction_old;
+  std::vector<VariableValue *> _fluid_pressure;
   const MooseEnum & _primary_variable_type;
+  VariableValue & _temperature; 
+
+  /**
+   * This is the member reference that will hold the User Object
+   * value for the fluid state User Object.
+   */
+  const FluidState & _fluid_state;
+  unsigned int _num_phases;
 };
 
 #endif //COMPONENTMASSTIMEDERIVATIVE_H

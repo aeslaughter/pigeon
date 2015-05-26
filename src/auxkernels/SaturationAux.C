@@ -5,14 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Auxillary kernel to calculate saturation for multiphase flow */
-/* in porous media.                                             */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #include "SaturationAux.h"
 
 template<>
@@ -34,5 +26,5 @@ SaturationAux::SaturationAux(const std::string & name,
 
 Real SaturationAux::computeValue()
 {
-  return _fluid_state.saturation(_liquid_saturation[_qp]);
+  return _fluid_state.saturation(_liquid_saturation[_qp])[0];
 }

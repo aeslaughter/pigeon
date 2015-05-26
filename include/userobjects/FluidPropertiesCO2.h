@@ -45,6 +45,16 @@ class FluidPropertiesCO2 : public FluidProperties
   Real viscosity(Real pressure, Real temperature) const;
 //  Real henry(Real temperature) const;
 
+  /**
+   * Derivative of the density of gaseous CO2 as a function of
+   * pressure.
+   *
+   * @param pressure gas pressure (Pa)
+   * @param temperature gas temperature (C)
+   * @return derivative of CO2 density (kg/m^3) with respect to pressure
+   */
+  Real dDensity_dP(Real pressure, Real temperature) const;
+
  protected:
   /// Conversion of temperature from Celcius to Kelvin
   Real _t_c2k;

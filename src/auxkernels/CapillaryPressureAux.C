@@ -5,16 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Auxillary kernel to calculate capillary pressure             */
-/* Pc = Pg - Pw for multiphase flow in porous media using the   */
-/* capillary pressure relationship defined in the Capillary     */
-/* Pressure UserObject.                                         */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #include "CapillaryPressureAux.h"
 
 template<>

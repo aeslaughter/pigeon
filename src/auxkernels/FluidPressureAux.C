@@ -5,15 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Auxillary kernel to calculate nodal pressure of one phase    */
-/* given the pressure of the other phase and the capillary      */
-/* pressure defined in the Capillary Pressure UserObject.       */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #include "FluidPressureAux.h"
 
 template<>

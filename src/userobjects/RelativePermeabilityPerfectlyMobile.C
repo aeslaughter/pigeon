@@ -5,16 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Perfectly mobile relative permeability for multiphase flow   */
-/* in porous media.                                             */
-/*                                                              */
-/* Relative permeability is unity for all saturations.          */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #include "RelativePermeabilityPerfectlyMobile.h"
 
 template<>
@@ -33,6 +23,10 @@ RelativePermeabilityPerfectlyMobile::RelativePermeabilityPerfectlyMobile(const s
 Real
 RelativePermeabilityPerfectlyMobile::relativePermLiq(Real sat_liq) const
 {
+  if (sat_liq < 0.0)
+    sat_liq = 0.0;
+  if (sat_liq > 1.0)
+    sat_liq = 1.0;
 
   // Check whether liquid saturation is [0,1] - if not, print error message.
   if (sat_liq < 0.0 || sat_liq > 1.0)
@@ -45,7 +39,11 @@ RelativePermeabilityPerfectlyMobile::relativePermLiq(Real sat_liq) const
 Real
 RelativePermeabilityPerfectlyMobile::relativePermGas(Real sat_liq) const
 {
-
+  if (sat_liq < 0.0)
+    sat_liq = 0.0;
+  if (sat_liq > 1.0)
+    sat_liq = 1.0;
+ 
   // Check whether liquid saturation is [0,1] - if not, print error message.
   if (sat_liq < 0.0 || sat_liq > 1.0)
     mooseError("RelativePermeabilityPerfectlyMobile: Liquid saturation is outside the range 0 <= Sl <= 1\n");

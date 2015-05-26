@@ -5,28 +5,20 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Mass time derivative kernel for multiphase flow in porous    */
-/* media for each component.                                    */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #include "ComponentMassTimeDerivative.h"
 
 template<>
 InputParameters validParams<ComponentMassTimeDerivative>()
 {
   InputParameters params = validParams<TimeKernel>();
-  params.addRequiredCoupledVar("gas_density_variable", "The gas density nodal auxillary variable.");
-  params.addRequiredCoupledVar("liquid_density_variable", "The liquid density nodal auxillary variable.");
-  params.addRequiredCoupledVar("gas_saturation_variable", "The gas saturation variable.");
-  params.addRequiredCoupledVar("liquid_saturation_variable", "The liquid saturation variable.");
-  params.addRequiredCoupledVar("xgas_variable", "The component mass fraction in gas variable.");
-  params.addRequiredCoupledVar("xliquid_variable", "The component mass fraction in liquid variable.");
-  MooseEnum primary_variable_type("pressure gas_saturation liquid_saturation mass_fraction");
+  params.addRequiredCoupledVar("fluid_density_variables", "The list of fluid density auxiallary variables for each phase.");
+  params.addRequiredCoupledVar("fluid_saturation_variables", "The list of fluid saturation variables for each phase.");
+  params.addRequiredCoupledVar("fluid_pressure_variables", "The list of fluid pressure variables for each phase.");
+  params.addCoupledVar("temperature_variable", 50, "The temperature variable.");
+  params.addCoupledVar("component_mass_fraction_variables", 1.0, "The list of component mass fraction variables for each phase.");
+  MooseEnum primary_variable_type("pressure saturation mass_fraction");
   params.addRequiredParam<MooseEnum>("primary_variable_type", primary_variable_type, "The type of primary variable for this kernel (e.g. pressure, saturation or component mass fraction");
+  params.addRequiredParam<UserObjectName>("fluid_state_uo", "Name of the User Object defining the fluid state");
   return params;
 }
 
@@ -34,51 +26,81 @@ ComponentMassTimeDerivative::ComponentMassTimeDerivative(const std::string & nam
                        InputParameters parameters) :
     TimeKernel(name, parameters),
     _porosity(getMaterialProperty<Real>("porosity")),
-    _gas_density(coupledValue("gas_density_variable")),
-    _gas_density_old(coupledValueOld("gas_density_variable")),
-    _liquid_density(coupledValue("liquid_density_variable")),
-    _liquid_density_old(coupledValueOld("liquid_density_variable")),
-    _gas_saturation(coupledNodalValue("gas_saturation_variable")),
-    _gas_saturation_old(coupledNodalValueOld("gas_saturation_variable")),
-    _liquid_saturation(coupledNodalValue("liquid_saturation_variable")),
-    _liquid_saturation_old(coupledNodalValueOld("liquid_saturation_variable")),
-    _xgas(coupledNodalValue("xgas_variable")),
-    _xgas_old(coupledNodalValueOld("xgas_variable")),
-    _xliquid(coupledNodalValue("xliquid_variable")),
-    _xliquid_old(coupledNodalValueOld("xliquid_variable")),
-    _primary_variable_type(getParam<MooseEnum>("primary_variable_type"))
-{}
+    _primary_variable_type(getParam<MooseEnum>("primary_variable_type")),
+    _temperature(coupledValue("temperature_variable")),
+    _fluid_state(getUserObject<FluidState>("fluid_state_uo"))
+
+{
+  // The number of phases in the given fluid state model
+  _num_phases = _fluid_state.numPhases();
+
+  // Check that the required number of auxillary variables have been provided
+  if (coupledComponents("fluid_density_variables") != _num_phases)
+    mooseError("The number of phase densities provided in the ComponentMassTimeDerivative kernel is not equal to the number of phases in the FluidState UserObject");
+  if (coupledComponents("fluid_saturation_variables") != _num_phases)
+    mooseError("The number of phase saturations provided in the ComponentMassTimeDerivative kernel is not equal to the number of phases in the FluidState UserObject");
+  if (coupledComponents("component_mass_fraction_variables") != _num_phases)
+    mooseError("The number of phase components provided in the ComponentMassTimeDerivative kernel is not equal to the number of phases in the FluidState UserObject");
+  if (coupledComponents("fluid_pressure_variables") != _num_phases)
+    mooseError("The number of pressure variables provided in the ComponentMassTimeDerivative kernel is not equal to the number of phases in the FluidState UserObject");
+
+  // Filling the vectors with VariableValue pointers to nodal values
+  _fluid_density.resize(_num_phases);
+  _fluid_density_old.resize(_num_phases);
+  _fluid_saturation.resize(_num_phases);
+  _fluid_saturation_old.resize(_num_phases);
+  _component_mass_fraction.resize(_num_phases);
+  _component_mass_fraction_old.resize(_num_phases);
+  _fluid_pressure.resize(_num_phases);
+
+  for (unsigned int n = 0; n < _num_phases; ++n)
+  {
+    _fluid_density[n] = &coupledNodalValue("fluid_density_variables", n);
+    _fluid_density_old[n] = &coupledNodalValueOld("fluid_density_variables", n);
+    _fluid_saturation[n] = &coupledNodalValue("fluid_saturation_variables", n);
+    _fluid_saturation_old[n] = &coupledNodalValueOld("fluid_saturation_variables", n);
+    _component_mass_fraction[n] = &coupledNodalValue("component_mass_fraction_variables", n);
+    _component_mass_fraction_old[n] = &coupledNodalValueOld("component_mass_fraction_variables", n);
+    _fluid_pressure[n] = &coupledValue("fluid_pressure_variables");
+  }
+
+}
 
 // Note that this kernel lumps the mass terms to the nodes, so that there is no mass at the qp's.
 Real ComponentMassTimeDerivative::computeQpResidual()
 {
-  Real mass = _porosity[_qp] * (_xgas[_qp] * _gas_density[_qp] * _gas_saturation[_qp] + _xliquid[_qp] * _liquid_density[_qp] *
-              _liquid_saturation[_qp]);
-  Real mass_old = _porosity[_qp] * (_xgas_old[_qp] * _gas_density_old[_qp] * _gas_saturation_old[_qp] + _xliquid_old[_qp] *
-                  _liquid_density_old[_qp] * _liquid_saturation_old[_qp]);
+  Real mass = 0.;
+  Real mass_old = 0.;
 
-  return _test[_i][_qp] * (mass - mass_old)/_dt;
+  // Loop over all phases and sum the mass contributions
+  for (unsigned int n = 0; n < _num_phases; ++n)
+  {
+   mass += (*_component_mass_fraction[n])[_i] * (*_fluid_density[n])[_i] * (*_fluid_saturation[n])[_i];
+   mass_old += (*_component_mass_fraction_old[n])[_i] * (*_fluid_density_old[n])[_i] * (*_fluid_saturation_old[n])[_i];
+  }
+
+  //TODO: allow for porosity change
+  return _test[_i][_qp] * _porosity[_qp] * (mass - mass_old)/_dt;
 }
 
 Real ComponentMassTimeDerivative::computeQpJacobian() // TODO: Jacobians need further work!
 {
-  Real jacobian;
-
-  if (_primary_variable_type == "gas_saturation") {
-    jacobian = _test[_i][_qp] * _porosity[_qp] * _xgas[_qp] * _gas_density[_qp] * _phi[_j][_qp]/_dt;
+  Real jacobian = 0.;
+  // TODO: Currently only liquid saturation
+  if (_primary_variable_type == "saturation") { 
+    jacobian = _test[_i][_qp] * _porosity[_qp] * (*_component_mass_fraction[0])[_qp] * (*_fluid_density[0])[_qp] * _phi[_j][_qp]/_dt;
   }
 
-  if (_primary_variable_type == "liquid_saturation") {
-    jacobian = _test[_i][_qp] * _porosity[_qp] * _xliquid[_qp] * _liquid_density[_qp] * _phi[_j][_qp]/_dt;
-  }
-
+  // TODO: Currently only liquid pressure
   if (_primary_variable_type == "pressure") {
-    jacobian = 0.0; // TODO: density depends on pressure
+
+    Real dDensity_dP = _fluid_state.dDensity_dP((*_fluid_pressure[0])[_qp], _temperature[_qp])[0]; 
+    jacobian = _test[_i][_qp] * _porosity[_qp] * (*_component_mass_fraction[0])[_qp] * (*_fluid_saturation[0])[_qp] * _phi[_j][_qp] * dDensity_dP;
   }
 
   if (_primary_variable_type == "mass_fraction") {
-    jacobian = _test[_i][_qp] * _porosity[_qp] * _phi[_j][_qp] * (_gas_density[_qp] * _gas_saturation[_qp] +
-           _liquid_density[_qp] * _liquid_saturation[_qp])/_dt;
+
+    jacobian = _test[_i][_qp] * _porosity[_qp] * _phi[_j][_qp] * (*_fluid_density[0])[_qp] * (*_fluid_saturation[0])[_qp];
   }
 
   return jacobian;

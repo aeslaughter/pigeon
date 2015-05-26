@@ -5,15 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Auxillary kernel to calculate brine property using the given */
-/* Fluid Property UserObject for multiphase flow in porous      */
-/* media.                                                       */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #include "FluidPropertyBrineAux.h"
 
 template<>

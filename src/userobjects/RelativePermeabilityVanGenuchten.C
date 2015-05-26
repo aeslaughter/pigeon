@@ -5,22 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* van Genuchten relative permeability for multiphase flow in   */
-/* porous media.                                                */
-/*                                                              */
-/* Liquid relative permeability given by                        */
-/* van Genuchten, M. Th., A closed for equation for             */
-/* predicting the hydraulic conductivity of unsaturated soils,  */
-/* Soil Sci. Soc., 44, 892-898 (1980). Gas relative             */
-/* given by                                                     */
-/* Corey, A. T., The interrelation between gas and oil          */
-/* relative permeabilities, Prod. Month. 38-41 (1954).          */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #include "RelativePermeabilityVanGenuchten.h"
 
 template<>

@@ -5,13 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Fluid properties of brine.                                   */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #include "FluidStateBrineCO2.h"
 
 template<>
@@ -128,9 +121,31 @@ Real
   return gas_pressure - capillary_pressure;
 }
 
-Real
+std::vector<Real>
    FluidStateBrineCO2::saturation(Real liquid_saturation) const
 {
-  return 1.0 - liquid_saturation;
+  std::vector<Real> saturations;
+
+  saturations.push_back(liquid_saturation);
+  saturations.push_back(1.0 - liquid_saturation);
+
+  return saturations;
 }
 
+std::vector<Real>
+   FluidStateBrineCO2::dDensity_dP(Real pressure, Real temperature) const
+{
+  Real xmass = 0.1; //FIX
+
+  Real dbrine_density = _brine_property.dDensity_dP(pressure, temperature, xmass);
+  Real dco2_density = _co2_property.dDensity_dP(pressure, temperature);
+
+  // Assuming that the liquid density is water, and gas is CO2 - ie no CO2 in liquid, no vapour in gas
+  std::vector<Real> ddensities;
+  ddensities.push_back(dbrine_density);
+  ddensities.push_back(dco2_density);
+
+  return ddensities;
+}
+
+ 

@@ -5,14 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Constant capillary pressure for multiphase flow in porous    */
-/*  media.                                                      */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #include "CapillaryPressureConstant.h"
 
 template<>
@@ -33,6 +25,11 @@ CapillaryPressureConstant::CapillaryPressureConstant(const std::string & name, I
 Real
 CapillaryPressureConstant::capillaryPressure(Real sat_liq) const
 {
+  if (sat_liq < 0.0)
+    sat_liq = 0.0;
+  if (sat_liq > 1.0)
+    sat_liq = 1.0;
+
   // Check whether liquid saturation is [0,1] - if not, print error message.
   if (sat_liq < 0.0 || sat_liq > 1.0)
     mooseError("CapillaryPressureConstant: Liquid saturation is outside the range 0 <= Sl <= 1\n");

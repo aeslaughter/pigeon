@@ -10,6 +10,7 @@
 #define COMPONENTFLUX_H
 
 #include "Kernel.h"
+#include "FluidState.h"
 
 class ComponentFlux;
 
@@ -37,14 +38,20 @@ protected:
   MaterialProperty<RealVectorValue> & _gravity;
 
 private:
-  VariableValue & _fluid_density;
-  VariableValue & _fluid_viscosity;
-  VariableGradient & _grad_fluid_pressure;
-  VariableValue & _xfluid;
-  VariableValue & _fluid_relperm;
+  std::vector<VariableValue *> _fluid_density;
+  std::vector<VariableValue *> _fluid_viscosity;
+  std::vector<VariableGradient *> _grad_fluid_pressure;
+  std::vector<VariableValue *> _component_mass_fraction;
+  std::vector<VariableValue *> _fluid_relperm;
   const MooseEnum & _primary_variable_type;
+
+  /**
+   * This is the member reference that will hold the User Object
+   * value for the fluid state User Object.
+   */
+  const FluidState & _fluid_state;  
   unsigned int _fluid_pressure_var;
-  
+  unsigned int _num_phases;
 };
 
 #endif //COMPONENTFLUX_H

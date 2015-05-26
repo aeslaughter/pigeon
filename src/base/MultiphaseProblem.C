@@ -12,7 +12,7 @@ template<>
 InputParameters validParams<MultiphaseProblem>()
 {
   InputParameters params = validParams<FEProblem>();
-  params.addRequiredParam<NonlinearVariableName>("saturation_variable", "The saturation variable.");
+  params.addRequiredParam<NonlinearVariableName>("saturation_variable", "The saturation non-linear variable.");
   return params;
 }
 

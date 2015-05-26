@@ -5,13 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Fluid properties of brine.                                   */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #include "FluidPropertiesBrine.h"
 
 template<>
@@ -27,7 +20,6 @@ FluidPropertiesBrine::FluidPropertiesBrine(const std::string & name, InputParame
   FluidProperties(name, parameters),
 
   _water_property(getUserObject<FluidPropertiesWater>("water_property_uo"))
-//_water_property(getUserObjectByName<FluidPropertiesWater>("FluidPropertiesWater")) // Hard code fluid properties name
 {
   /// Reference constants used in to calculate thermophysical properties of water.
   _Mh2o = 18.015e-3;
@@ -148,4 +140,10 @@ Real
   // using this effective temperature
 
   return _water_property.pSat(th20);
+}
+
+Real
+  FluidPropertiesBrine::dDensity_dP(Real pressure, Real temperature, Real xnacl) const
+{
+  return 0.; //TODO: implement brine density derivative wrt P
 }

@@ -5,13 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Fluid properties of fresh water.                             */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #include "FluidPropertiesWater.h"
 
 template<>
@@ -130,7 +123,6 @@ Real
 
 Real
   FluidPropertiesWater::viscosity(Real temperature, Real density) const
-
 {
   Real t0[4], t1[6], d1[7];
 
@@ -161,14 +153,14 @@ Real
 
   // Calculate mu0
   Real sum0 = 0.;
-  for (int i = 0; i <= 3; i++)
+  for (unsigned int i = 0; i <= 3; i++)
      sum0 += _h0v[i] * t0[i];
 
   Real mu0 = 100. * std::sqrt(tbar) / sum0;
 
   // Now calculate mu1
   Real sum1 = 0.;
-  for (int i = 0; i <= 20; i++)
+  for (unsigned int i = 0; i <= 20; i++)
      sum1 += t1[_iv[i]] * _h1v[i] * d1[_jv[i]];
 
   Real mu1 = std::exp(rhobar * sum1);
@@ -263,7 +255,7 @@ Real
   Real tau1 = t_star1 / tk;
   Real pi1 = pressure / p_star1;
 
-  for (int i = 0; i <= 33; i++)
+  for (unsigned int i = 0; i <= 33; i++)
   {
     sum1 -= _n1[i] * _I1[i] * std::pow(7.1 - pi1, _I1[i]-1) * std::pow(tau1 - 1.222, _J1[i]);
   }
@@ -292,7 +284,7 @@ Real
   // Residual component of Gibbs free energy - Eq. (17).
   Real sumr2 = 0.;
 
-  for (int i = 0; i <= 42; i++)
+  for (unsigned int i = 0; i <= 42; i++)
   {
     sumr2 += _n2[i] * _I2[i] * std::pow(pi2, _I2[i] - 1) * std::pow(tau2 - 0.5, _J2[i]);
   }
@@ -356,7 +348,7 @@ Real
   Real tau1 = t_star1 / tk;
   Real pi1 = pressure / p_star1;
 
-  for (int i = 0; i <= 33; i++)
+  for (unsigned int i = 0; i <= 33; i++)
   {
     sum1 -= _n1[i] * _I1[i] * std::pow(7.1 - pi1, _I1[i]-1) * std::pow(tau1 - 1.222, _J1[i]);
     sum2 += _n1[i] * _I1[i] * (_I1[i] - 1) * std::pow(7.1 - pi1, _I1[i]-2) * std::pow(tau1 - 1.222, _J1[i]);
@@ -382,7 +374,7 @@ Real
   Real sumr2 = 0.;
   Real sumdr2 = 0.;
 
-  for (int i = 0; i <= 42; i++)
+  for (unsigned int i = 0; i <= 42; i++)
   {
     sumr2 += _n2[i] * _I2[i] * std::pow(pi2, _I2[i] - 1) * std::pow(tau2 - 0.5, _J2[i]);
     sumdr2 += _n2[i] * _I2[i] * (_I2[i] - 1) * std::pow(pi2, _I2[i] - 2) * std::pow(tau2 - 0.5, _J2[i]);
@@ -390,5 +382,44 @@ Real
 
   // The derivative of the density in Region 2 with respect to pressure is then given by
   return (-1.0/(pi2 * pi2) + sumdr2) / (_R * tk * (1.0 / pi2 + sumr2) * (1.0 / pi2 + sumr2)) / 1000.0;
+}
+
+Real
+  FluidPropertiesWater::dViscosity_dDensity(Real temperature, Real density) const
+{
+  Real t1[6], d1[7];
+
+  Real mu_star = 1.e-6;
+
+  Real tbar = (temperature + _t_c2k) / _t_critical;
+  Real rhobar = density / _rho_critical;
+
+  t1[0] = 1.;
+  t1[1] = 1. / tbar - 1.;
+  t1[2] = t1[1] * t1[1];
+  t1[3] = t1[2] * t1[1];
+  t1[4] = t1[3] * t1[1];
+  t1[5] = t1[4] * t1[1];
+
+  d1[0] = 1.;
+  d1[1] = rhobar - 1.;
+  d1[2] = d1[1] * d1[1];
+  d1[3] = d1[2] * d1[1];
+  d1[4] = d1[3] * d1[1];
+  d1[5] = d1[4] * d1[1];
+  d1[6] = d1[5] * d1[1];
+
+  // Prefactor to derivative of viscosity
+  Real sum1 = 0.;
+  Real sum2 = 0.;
+  for (unsigned int i = 0; i <= 20; i++)
+  {
+    sum1 += t1[_iv[i]] * _h1v[i] * d1[_jv[i]];
+    sum2 += t1[_iv[i]] * _jv[i] * _h1v[i] * d1[_jv[i]] / (rhobar - 1.0);
+  }
+
+  Real viscosity = FluidPropertiesWater::viscosity(temperature, density);
+
+  return viscosity * rhobar * sum1 * sum2;
 }
 

@@ -103,4 +103,10 @@
     csvdiff = 'WaterProperty_region2_density3_vpp_0001.csv'
     abs_zero = 1.0E-6
   [../]
+  [./water_region1_dDensitydP]
+   type = 'CSVDiff'
+    input = 'WaterProperty.i Outputs/file_base=WaterProperty_region1_dDensitydP AuxKernels/FluidPropertyAux/fluid_property_enum=dDensity_dP Functions/initial_temperature/value=50'
+    csvdiff = 'WaterProperty_region1_dDensitydP_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
 []

@@ -5,13 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Fluid properties of water.                                   */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #include "FluidStateWaterCO2.h"
 
 template<>
@@ -131,8 +124,28 @@ Real
   return gas_pressure - capillary_pressure;
 }
 
-Real
+std::vector<Real>
    FluidStateWaterCO2::saturation(Real liquid_saturation) const
 {
-  return 1.0 - liquid_saturation;
+  std::vector<Real> saturations;
+
+  saturations.push_back(liquid_saturation);
+  saturations.push_back(1.0 - liquid_saturation);
+
+  return saturations;
 }
+
+std::vector<Real>
+   FluidStateWaterCO2::dDensity_dP(Real pressure, Real temperature) const
+{
+  Real dwater_density = _water_property.dDensity_dP(pressure, temperature);
+  Real dco2_density = _co2_property.dDensity_dP(pressure, temperature);
+
+  // Assuming that the liquid density is water, and gas is CO2 - ie no CO2 in liquid, no vapour in gas
+  std::vector<Real> ddensities;
+  ddensities.push_back(dwater_density);
+  ddensities.push_back(dco2_density);
+
+  return ddensities;
+}
+

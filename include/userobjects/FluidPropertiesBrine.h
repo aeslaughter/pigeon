@@ -106,6 +106,17 @@ class FluidPropertiesBrine : public FluidProperties
    * @return brine vapour pressure (Pa)
    */
   Real pSat(Real temperature, Real xnacl) const;
+
+  /**
+   * Derivative of brine density with respect to presure.
+   *
+   * @param pressure brine pressure (Pa)
+   * @param temperature brine temperature (C)
+   * @param xnacl salt mass fraction (-)
+   * @return water density (kg/m^3)
+   */
+  Real dDensity_dP(Real pressure, Real temperature, Real xnacl) const;
+
  
 
  protected:

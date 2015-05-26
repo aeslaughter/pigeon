@@ -4,28 +4,11 @@
 #include "ModulesApp.h"
 
 // Kernels
-//#include "TwoDConvectionDiffusionDDC.h"
-//#include "TwoDDarcyDDC.h"
-//#include "ThreeDConvectionDiffusionDDC.h"
-//#include "ThreeDDarcyDDCx.h"
-//#include "ThreeDDarcyDDCy.h"
-//#include "MassTimeDerivative1.h"
-//#include "MassTimeDerivative2.h"
-//#include "Flux1.h"
-//#include "Flux2.h"
-//#include "SinglePhaseFlux1.h"
-//#include "SinglePhaseFlux2.h"
-//#include "SinglePhaseMassTimeDerivative1.h"
-//#include "SinglePhaseMassTimeDerivative2.h"
-//#include "MultiphaseFluxN.h"
-//#include "MultiphaseFluxW.h"
-//#include "MultiphaseMassTimeDerivativeN.h"
-//#include "MultiphaseMassTimeDerivativeW.h"
 #include "ComponentMassTimeDerivative.h"
 #include "ComponentFlux.h"
 
 // Initial conditions
-#include "PerturbationIC.h"
+// #include "PerturbationIC.h"
 
 // Boundary conditions
 #include "ConstantMassFluxBC.h"
@@ -112,23 +95,6 @@ QuollApp::registerObjects(Factory & factory)
 {
 
    // Register the custom convection and Darcy kernels defined for this problem
-// registerKernel(TwoDConvectionDiffusionDDC);
-// registerKernel(TwoDDarcyDDC);
-// registerKernel(ThreeDConvectionDiffusionDDC);
-// registerKernel(ThreeDDarcyDDCx);
-// registerKernel(ThreeDDarcyDDCy);
-// registerKernel(MassTimeDerivative1);
-// registerKernel(MassTimeDerivative2);
-// registerKernel(Flux1);
-// registerKernel(Flux2);
-// registerKernel(SinglePhaseFlux1);
-// registerKernel(SinglePhaseFlux2);
-// registerKernel(SinglePhaseMassTimeDerivative1);
-// registerKernel(SinglePhaseMassTimeDerivative2);
-// registerKernel(MultiphaseFluxN);
-// registerKernel(MultiphaseFluxW);
-// registerKernel(MultiphaseMassTimeDerivativeN);
-// registerKernel(MultiphaseMassTimeDerivativeW);
    registerKernel(ComponentMassTimeDerivative);
    registerKernel(ComponentFlux);
 

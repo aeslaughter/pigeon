@@ -5,15 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Auxillary kernel to calculate fluid property using the given */
-/* Fluid Property UserObject for multiphase flow in porous      */
-/* media.                                                       */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #include "FluidPropertyWaterAux.h"
 
 template<>
@@ -24,7 +15,7 @@ InputParameters validParams<FluidPropertyWaterAux>()
   params.addCoupledVar("pressure_variable", 1.e6,  "The pressure variable corresponding to the fluid phase.");
   params.addCoupledVar("temperature_variable", 50, "The temperature variable.");
   params.addCoupledVar("saturation_variable", 1.0, "The saturation variable corresponding to the fluid phase.");
-  MooseEnum fluid_property_enum("density viscosity tsat psat b23t b23p region1 region2");
+  MooseEnum fluid_property_enum("density viscosity tsat psat b23t b23p region1 region2 dDensity_dP");
   params.addRequiredParam<MooseEnum>("fluid_property_enum", fluid_property_enum, "The fluid property that this auxillary kernel is to calculate");
   return params;
 }
@@ -44,30 +35,42 @@ Real FluidPropertyWaterAux::computeValue()
 {
   Real property;
 
-  if (fluid_property_enum == "density") {
+  if (fluid_property_enum == "density")
+  {
     property = _fluid_property.density(_pressure[_qp], _temperature[_qp]);
   }
-  if (fluid_property_enum == "viscosity") {
+  if (fluid_property_enum == "viscosity")
+  {
     Real density = _fluid_property.density(_pressure[_qp], _temperature[_qp]);
     property = _fluid_property.viscosity(_temperature[_qp], density);
   }
-  if (fluid_property_enum == "tsat") {
+  if (fluid_property_enum == "tsat")
+  {
     property = _fluid_property.tSat(_pressure[_qp]);
   }
-  if (fluid_property_enum == "psat") {
+  if (fluid_property_enum == "psat")
+  {
     property = _fluid_property.pSat(_temperature[_qp]);
   }
-  if (fluid_property_enum == "b23t") {
+  if (fluid_property_enum == "b23t")
+  {
     property = _fluid_property.b23t(_pressure[_qp]);
   }
-  if (fluid_property_enum == "b23p") {
+  if (fluid_property_enum == "b23p")
+  {
     property = _fluid_property.b23p(_temperature[_qp]);
   }
-  if (fluid_property_enum == "region1") {
+  if (fluid_property_enum == "region1")
+  {
     property = _fluid_property.densityRegion1(_pressure[_qp], _temperature[_qp]);
   }
-  if (fluid_property_enum == "region2") {
+  if (fluid_property_enum == "region2")
+  {
     property = _fluid_property.densityRegion2(_pressure[_qp], _temperature[_qp]);
+  }
+  if (fluid_property_enum == "dDensity_dP")
+  {
+    property = _fluid_property.dDensity_dP(_pressure[_qp], _temperature[_qp]);
   }
 
   return property;

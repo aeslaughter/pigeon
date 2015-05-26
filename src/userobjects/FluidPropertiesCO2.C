@@ -5,13 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Fluid properties of gas phase CO2.                           */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #include "FluidPropertiesCO2.h"
 
 template<>
@@ -64,6 +57,13 @@ Real
 
   return (C[0] + C[1] * temperature + C[2] * t2 + C[3] * t3 + C[4] * t4) * 1.e-8;
 }
+
+Real
+  FluidPropertiesCO2::dDensity_dP(Real pressure, Real temperature) const
+{
+  return 0.;
+}
+
 /*
 /// Henry coefficient of CO2 as a function of temperature.
 Real

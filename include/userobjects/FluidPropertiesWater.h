@@ -180,6 +180,18 @@ class FluidPropertiesWater : public FluidProperties
    */
   Real dDensityRegion2_dP(Real pressure, Real temperature) const;
 
+  /**
+   * Derivative of viscosity with respect to density. Derived from
+   * Eq. (10) from Release on the IAPWS Formulation 2008 for the
+   * Viscosity of Ordinary Water Substance.
+   *
+   * @param temperature water temperature (C)
+   * @param density water density (kg/m^3)
+   * @return dViscosity_dDensity
+   */
+  Real dViscosity_dDensity(Real temperature, Real density) const;
+
+
  protected:
   /// Temperature of water at the critical point
   Real _t_critical;

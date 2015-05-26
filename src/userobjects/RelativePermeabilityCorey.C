@@ -4,17 +4,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Corey relative permeability for multiphase flow in porous    */
-/*  media.                                                      */
-/*                                                              */
-/* Based on Corey, A. T., The interrelation between gas and oil */
-/* relative permeabilities, Prod. Month. 38-41 (1954).          */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #include "RelativePermeabilityCorey.h"
 
 template<>

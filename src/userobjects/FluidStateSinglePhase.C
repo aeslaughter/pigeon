@@ -109,8 +109,23 @@ Real
   return 0.;
 }
 
-Real
+std::vector<Real>
    FluidStateSinglePhase::saturation(Real liquid_saturation) const
 {
-  return 1.0;
+  std::vector<Real> saturations;
+
+  saturations.push_back(liquid_saturation);
+
+  return saturations;
+}
+
+std::vector<Real>
+  FluidStateSinglePhase::dDensity_dP(Real pressure, Real temperature) const
+{
+  Real dfluid_density = _fluid_property.dDensity_dP(pressure, temperature);
+
+  std::vector<Real> ddensities;
+  ddensities.push_back(dfluid_density);
+
+  return ddensities;
 }

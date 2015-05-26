@@ -120,7 +120,17 @@ class FluidStateWaterCO2 : public FluidState
    * @param saturation liquid saturation (-)
    * @return saturation gas phase saturation (-)
    */
-  virtual Real saturation(Real liquid_saturation) const;
+  virtual std::vector<Real> saturation(Real liquid_saturation) const;
+
+  /**
+   * Derivative of fluid  density with respect to fluid pressure.
+   *  
+   * @param pressure fluid pressure (Pa)
+   * @param temperature fluid temperature (C)
+   * @param xmass vector of component mass fractions (kg/kg)
+   * @return fluid density vector (element for each phase) (kg/m^3)
+   */
+  virtual std::vector<Real> dDensity_dP(Real pressure, Real temperature) const;
 
  protected:
 

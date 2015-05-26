@@ -116,7 +116,17 @@ class FluidState : public GeneralUserObject
    * @param saturation liquid saturation (-)
    * @return saturation gas saturation (-)
    */
-  virtual Real saturation(Real liquid_saturation) const = 0;
+  virtual std::vector<Real> saturation(Real liquid_saturation) const = 0;
+
+/**
+   * Derivative of fluid  density with respect to fluid pressure.
+   *  
+   * @param pressure fluid pressure (Pa)
+   * @param temperature fluid temperature (C)
+   * @param xmass vector of component mass fractions (kg/kg)
+   * @return fluid density vector (element for each phase) (kg/m^3)
+   */
+  virtual std::vector<Real> dDensity_dP(Real pressure, Real temperature) const = 0;
 };
 
 #endif // FLUIDSTATE_H
