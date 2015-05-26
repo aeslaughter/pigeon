@@ -1,0 +1,26 @@
+[Tests]
+  [./liquid_density]
+    type = 'CSVDiff'
+    input = 'WaterCO2.i'
+    csvdiff = 'FluidStateWaterCO2_liquidDensity_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./liquid_viscosity]
+    type = 'CSVDiff'
+    input = 'WaterCO2.i AuxKernels/FluidStateAux/state_property_enum=viscosity Outputs/file_base=FluidStateWaterCO2_liquidViscosity'
+    csvdiff = 'FluidStateWaterCO2_liquidViscosity_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./gas_density]
+    type = 'CSVDiff'
+    input = 'WaterCO2.i AuxKernels/FluidStateAux/state_property_enum=density AuxKernels/FluidStateAux/phase_index=1 Outputs/file_base=FluidStateWaterCO2_gasDensity Functions/initial_pressure/value=1.5e6*x'
+    csvdiff = 'FluidStateWaterCO2_gasDensity_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./gas_viscosity]
+    type = 'CSVDiff'
+    input = 'WaterCO2.i AuxKernels/FluidStateAux/state_property_enum=viscosity AuxKernels/FluidStateAux/phase_index=1 Outputs/file_base=FluidStateWaterCO2_gasViscosity Functions/initial_pressure/value=1.5e6*x'
+    csvdiff = 'FluidStateWaterCO2_gasViscosity_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+[]

@@ -272,14 +272,8 @@ Real
   Real tk = temperature + _t_c2k;
 
   // Ideal gas component of region 2 - Eq. (16)
-  Real sum02 = 0.;
   Real tau2 = t_star2 / tk;
   Real pi2 = pressure / p_star2;
-
-// not needed for density
-//  for (int i = 0; i <= 8; i++) {
-//  sum02 += n02[i] * std::pow(tau2, J02[i]);
-//}
 
   // Residual component of Gibbs free energy - Eq. (17).
   Real sumr2 = 0.;
@@ -366,7 +360,6 @@ Real
   Real tk = temperature + _t_c2k;
 
   // Ideal gas component of region 2 - Eq. (16)
-  Real sum02 = 0.;
   Real tau2 = t_star2 / tk;
   Real pi2 = pressure / p_star2;
 
@@ -381,7 +374,7 @@ Real
   }
 
   // The derivative of the density in Region 2 with respect to pressure is then given by
-  return (-1.0/(pi2 * pi2) + sumdr2) / (_R * tk * (1.0 / pi2 + sumr2) * (1.0 / pi2 + sumr2)) / 1000.0;
+  return - (- 1.0/(pi2 * pi2) + sumdr2) / (_R * tk * (1.0 / pi2 + sumr2) * (1.0 / pi2 + sumr2)) / 1000.0;
 }
 
 Real
