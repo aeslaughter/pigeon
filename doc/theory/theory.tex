@@ -1,0 +1,62 @@
+\documentclass[11pt, oneside, a4paper]{article}   	
+\usepackage{graphicx}					
+
+\title{Multicomponent, multiphase flow in porous media}
+\author{Chris Green}
+\date{\today}	
+
+\begin{document}
+\maketitle
+
+\section{Governing equations}
+
+\subsection{Definitions and nomenclature}
+
+\subsubsection*{Phase}
+
+
+\subsubsection*{Component}
+
+\subsubsection*{Notation and nomenclature}
+
+In all following equations, the subscript $\alpha$ refers to the phase, while the superscript $\kappa$ refers to the component.
+
+\begin{table}[h]
+\begin{tabular}{llll}
+$P_{\alpha}$ & Phase pressure & $\phi$ & Porosity \\
+$T$ & Temperature & $K$ & Permeability \\
+$S_{\alpha}$ & Phase saturation & $k_{r \alpha}$ & Relative permeability \\
+$P_c$ & Capillary pressure & $\rho_{\alpha}$ & Phase density \\
+$\mu_{\alpha}$ & Phase viscosity & $\mathbf{g}$ & Gravity \\
+$X_{\alpha}^{\kappa}$ & Mass fraction of component $\kappa$ in phase $\alpha$ & & \\
+$q_{\alpha}^{\kappa}$ & Source/sink term of $\kappa$ in phase $\alpha$ & &
+\end{tabular}
+\label{default}
+\end{table}
+
+\subsection{Mass balance equation}
+
+Conservation of mass of of each component $\kappa$ gives the following balance equation for each component (for an isothermal system)
+
+\begin{equation}
+\phi \frac{\partial}{\partial t} \left(\sum_{\alpha} \rho_{\alpha} X_{\alpha}^{\kappa} S_{\alpha} \right) =  \sum_{\alpha} \nabla \cdot \left\{\frac{K k_{r \alpha} \rho_{\alpha} X_{\alpha}^{\kappa}}{\mu_{\alpha}} \left( \nabla P_{\alpha} - \rho_{\alpha} \mathbf{g} \right) \right\} + \sum_{\alpha} q_{\alpha}^{\kappa}.
+\label{eq:massbalance}
+\end{equation}
+
+The number of unknown variables can be reduced using fundamental relationships and constitutive models. The phase saturations must sum to unity (assuming that the entire pore space is occupied)
+\begin{equation}
+\sum_{\alpha} S_{\alpha} = 1,
+\end{equation}
+while the sum of mass fraction components in each phase must be unity by definition
+\begin{equation}
+\sum_{\kappa} X_{\alpha}^{\kappa} = 1.
+\end{equation}
+
+Relative permeability is calculated as a function of saturation (using a prescribed relationship). The pressure of each phase is related by capillary pressure, defined as 
+\begin{equation}
+P_c = P_n - Pw,
+\end{equation}
+where the subscripts $n$ and $w$ refer to the non-wetting and wetting phases, respectively. Like relative permeability, capillary pressure can be calculated as a function of saturation using prescribed relationships.
+
+
+\end{document}  
