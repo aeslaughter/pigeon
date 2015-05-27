@@ -58,6 +58,36 @@ Real
   return _fluid_temperature;
 }
 
+std::vector<std::string>
+  FluidStateWaterCO2::variable_names() const
+{
+  std::vector<std::string> varnames;
+  varnames.push_back("gas_pressure");
+  varnames.push_back("liquid_saturation");
+
+  return varnames;
+}
+
+std::vector<std::string>
+  FluidStateWaterCO2::variable_types() const
+{
+  std::vector<std::string> varnames;
+  varnames.push_back("pressure");
+  varnames.push_back("saturation");
+
+  return varnames;
+}
+
+std::vector<unsigned int>
+  FluidStateWaterCO2::variable_phase() const
+{
+  std::vector<unsigned int> varphases;
+  varphases.push_back(1);
+  varphases.push_back(0);
+
+  return varphases;
+}
+
 std::vector<Real>
   FluidStateWaterCO2::density(Real pressure, Real temperature) const
 {
@@ -116,12 +146,16 @@ std::vector<Real>
   return relperm;
 }
 
-Real
+std::vector<Real>
    FluidStateWaterCO2::pressure(Real gas_pressure, Real liquid_saturation) const
 {
+  std::vector<Real> pressures;
   Real capillary_pressure = _capillary_pressure.capillaryPressure(liquid_saturation);
 
-  return gas_pressure - capillary_pressure;
+  pressures.push_back(gas_pressure);
+  pressures.push_back(gas_pressure - capillary_pressure);
+
+  return pressures;
 }
 
 std::vector<Real>
@@ -148,4 +182,3 @@ std::vector<Real>
 
   return ddensities;
 }
-

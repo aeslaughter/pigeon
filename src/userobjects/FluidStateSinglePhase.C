@@ -54,6 +54,34 @@ Real
   return _fluid_temperature;
 }
 
+std::vector<std::string>
+  FluidStateSinglePhase::variable_names() const
+{
+  std::vector<std::string> varnames;
+  varnames.push_back("pressure");
+
+  return varnames;
+}
+
+
+std::vector<std::string>
+  FluidStateSinglePhase::variable_types() const
+{
+  std::vector<std::string> vartypes;
+  vartypes.push_back("pressure");
+
+  return vartypes;
+}
+
+std::vector<unsigned int>
+  FluidStateSinglePhase::variable_phase() const
+{
+  std::vector<unsigned int> varphases;
+  varphases.push_back(0);
+
+  return varphases;
+}
+
 std::vector<Real>
   FluidStateSinglePhase::density(Real pressure, Real temperature) const
 {
@@ -103,10 +131,14 @@ std::vector<Real>
   return relperm;
 }
 
-Real
-   FluidStateSinglePhase::pressure(Real gas_pressure, Real liquid_saturation) const
+std::vector<Real>
+   FluidStateSinglePhase::pressure(Real pressure, Real liquid_saturation) const
 {
-  return 0.;
+  std::vector<Real> pressures;
+
+  pressures.push_back(pressure);
+
+  return pressures;
 }
 
 std::vector<Real>

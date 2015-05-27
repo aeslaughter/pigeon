@@ -5,14 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Fluid state for brine (H20 - NaCl mixture) and CO2.          */
-/*                                                              */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #ifndef FLUIDSTATEBRINECO2_H
 #define FLUIDSTATEBRINECO2_H
 
@@ -63,6 +55,21 @@ class FluidStateBrineCO2 : public FluidState
   virtual Real temperature() const;
 
   /**
+   * List of primary variable names
+   */
+  virtual std::vector<std::string> variable_names() const;
+
+  /**
+   * List of primary variable names
+   */
+  virtual std::vector<std::string> variable_types() const;
+
+  /**
+    * List of phase index for each variable
+   */
+  virtual std::vector<unsigned int> variable_phase() const;
+
+  /**
    * Fluid density using FluidPropertiesBrine and FluidPropertiesCO2 UserObjects.
    *
    * @param pressure liquid pressure (Pa)
@@ -73,7 +80,7 @@ class FluidStateBrineCO2 : public FluidState
 
   /**
    * Fluid viscosity must be over-written in all derived classes.
-   *  
+   *
    * @param pressure liquid pressure (Pa)
    * @param temperature liquid temperature (C)
    * @return liquid viscosity (Pa.s)
@@ -104,7 +111,7 @@ class FluidStateBrineCO2 : public FluidState
    * @param saturation liquid saturation (-)
    * @return pressure liquid phase pressure (Pa)
    */
-  virtual Real pressure(Real gas_pressure, Real liquid_saturation) const;
+   virtual std::vector<Real> pressure(Real gas_pressure, Real liquid_saturation) const;
 
   /**
    * Saturation of gas phase
@@ -116,7 +123,7 @@ class FluidStateBrineCO2 : public FluidState
 
   /**
    * Derivative of fluid  density with respect to fluid pressure.
-   *  
+   *
    * @param pressure fluid pressure (Pa)
    * @param temperature fluid temperature (C)
    * @param xmass vector of component mass fractions (kg/kg)

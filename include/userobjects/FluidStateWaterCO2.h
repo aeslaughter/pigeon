@@ -5,14 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Fluid state for water (H20) and CO2.                         */
-/*                                                              */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #ifndef FLUIDSTATEWATERCO2_H
 #define FLUIDSTATEWATERCO2_H
 
@@ -28,7 +20,7 @@ class FluidStateWaterCO2;
 /**
  * Default primary variables are gas pressure and liquid saturation.
  * Default components are H2O and CO2.
- * 
+ *
  * In all vectors, the first element is for liquid, the second for gas
  * In matrices, the first row is for H2O, the second for CO2.
  */
@@ -71,6 +63,22 @@ class FluidStateWaterCO2 : public FluidState
   virtual Real temperature() const;
 
   /**
+   * List of primary variable names
+   */
+  virtual std::vector<std::string> variable_names() const;
+
+
+  /**
+   * List of primary variable names
+   */
+  virtual std::vector<std::string> variable_types() const;
+
+  /**
+   * List of phase index for each variable
+   */
+  virtual std::vector<unsigned int> variable_phase() const;
+
+  /**
    * Fluid density using FluidPropertiesWater and FluidPropertiesCO2 UserObjects.
    *
    * @param pressure liquid pressure (Pa)
@@ -106,13 +114,13 @@ class FluidStateWaterCO2 : public FluidState
   virtual std::vector<Real> relativePermeability(Real liquid_saturation) const;
 
   /**
-   * Pressure of liquid phase
+   * Pressure of each phase
    *
    * @param pressure gas pressure (Pa)
    * @param saturation liquid saturation (-)
    * @return pressure liquid phase pressure (Pa)
    */
-  virtual Real pressure(Real gas_pressure, Real liquid_saturation) const;
+  virtual std::vector<Real> pressure(Real gas_pressure, Real liquid_saturation) const;
 
   /**
    * Saturation of gas phase
@@ -124,7 +132,7 @@ class FluidStateWaterCO2 : public FluidState
 
   /**
    * Derivative of fluid  density with respect to fluid pressure.
-   *  
+   *
    * @param pressure fluid pressure (Pa)
    * @param temperature fluid temperature (C)
    * @param xmass vector of component mass fractions (kg/kg)

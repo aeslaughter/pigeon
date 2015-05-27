@@ -5,13 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Fluid state base clase for multiphase flow in porous media   */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #ifndef FLUIDSTATE_H
 #define FLUIDSTATE_H
 
@@ -64,8 +57,23 @@ class FluidState : public GeneralUserObject
   virtual Real temperature() const = 0;
 
   /**
+   * List of primary variable names
+   */
+  virtual std::vector<std::string> variable_names() const = 0;
+
+  /**
+    * List of primary variable names
+    */
+  virtual std::vector<std::string> variable_types() const = 0;
+
+  /**
+   * List of phase index for each variable
+   */
+  virtual std::vector<unsigned int> variable_phase() const = 0;
+
+  /**
    * Fluid density must be over-written in all derived classes.
-   *  
+   *
    * @param pressure liquid pressure (Pa)
    * @param temperature liquid temperature (C)
    * @param xmass vector of component mass fractions (kg/kg)
@@ -75,7 +83,7 @@ class FluidState : public GeneralUserObject
 
   /**
    * Liquid viscosity must be over-written in all derived classes.
-   *  
+   *
    * @param pressure liquid pressure (Pa)
    * @param temperature liquid temperature (C)
    * @param xmass vector of component mass fractions (kg/kg)
@@ -108,7 +116,7 @@ class FluidState : public GeneralUserObject
    * @param saturation liquid saturation (-)
    * @return pressure phase pressure (Pa)
    */
-  virtual Real pressure(Real gas_pressure, Real liquid_saturation) const = 0;
+  virtual std::vector<Real> pressure(Real gas_pressure, Real liquid_saturation) const = 0;
 
   /**
    * Gas saturation given liquid saturation.
@@ -120,7 +128,7 @@ class FluidState : public GeneralUserObject
 
 /**
    * Derivative of fluid  density with respect to fluid pressure.
-   *  
+   *
    * @param pressure fluid pressure (Pa)
    * @param temperature fluid temperature (C)
    * @param xmass vector of component mass fractions (kg/kg)

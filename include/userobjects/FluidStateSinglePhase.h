@@ -5,14 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Fluid state for single phase fluid.                          */
-/*                                                              */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #ifndef FLUIDSTATESINGLEPHASE_H
 #define FLUIDSTATESINGLEPHASE_H
 
@@ -24,7 +16,7 @@ class FluidStateSinglePhase;
 /**
  * Default primary variable is fluid pressure.
  * Default number of components in 1.
- * 
+ *
  */
 
 
@@ -64,8 +56,25 @@ class FluidStateSinglePhase : public FluidState
    */
   virtual Real temperature() const;
 
+
   /**
-   * Fluid density 
+    * List of primary variable names
+   */
+  virtual std::vector<std::string> variable_names() const;
+
+
+  /**
+    * List of primary variable names
+   */
+  virtual std::vector<std::string> variable_types() const;
+
+  /**
+   * List of phase index for each variable
+   */
+  virtual std::vector<unsigned int> variable_phase() const;
+
+  /**
+   * Fluid density
    *
    * @param pressure liquid pressure (Pa)
    * @param temperature liquid temperature (C)
@@ -106,7 +115,7 @@ class FluidStateSinglePhase : public FluidState
    * @param saturation liquid saturation (-)
    * @return pressure liquid phase pressure (Pa)
    */
-  virtual Real pressure(Real gas_pressure, Real liquid_saturation) const;
+  virtual std::vector<Real> pressure(Real gas_pressure, Real liquid_saturation) const;
 
   /**
    * Saturation of gas phase
@@ -118,7 +127,7 @@ class FluidStateSinglePhase : public FluidState
 
   /**
    * Derivative of fluid  density with respect to fluid pressure.
-   *  
+   *
    * @param pressure fluid pressure (Pa)
    * @param temperature fluid temperature (C)
    * @param xmass vector of component mass fractions (kg/kg)

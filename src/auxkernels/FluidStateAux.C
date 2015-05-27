@@ -48,7 +48,7 @@ Real FluidStateAux::computeValue()
   if (_state_property_enum == "density")
   {
     // If the saturation of this phase is zero, set density to zero.
-    Real eps = 1.e-10; 
+    Real eps = 1.e-10;
     if (_fluid_state.saturation(_saturation[_qp])[_phase_index] < eps)
       property = 0.;
     else
@@ -64,7 +64,7 @@ Real FluidStateAux::computeValue()
   }
   if (_state_property_enum == "pressure")
   {
-    property = _fluid_state.pressure(_pressure[_qp], _saturation[_qp]);
+    property = _fluid_state.pressure(_pressure[_qp], _saturation[_qp])[_phase_index];
   }
   if (_state_property_enum == "relperm")
   {

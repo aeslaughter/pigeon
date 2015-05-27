@@ -76,7 +76,7 @@ void ComponentFlux::computeResidual()
 Real ComponentFlux::computeQpJacobian()
 {
   return 0.0; // Not used in the upwinding code.
-
+/*
   Real jacobian = 0.0;
 
   if (_primary_variable_type == "saturation") {
@@ -96,6 +96,7 @@ Real ComponentFlux::computeQpJacobian()
   }
 
   return jacobian;
+  */
 }
 
 void ComponentFlux::computeJacobian()
@@ -143,6 +144,7 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
   local_ke_phase.resize(_num_phases);
 
   Real qpresidual;
+  Real qpjacobian;
 
   // Loop over each phsae and form the _local_re contribution to the residual without the mobility term, but
   // with the density (used to zero contribution where saturation is zero)
@@ -251,7 +253,7 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
         }
         local_re_phase[n](nodenum) *= mobility[n][nodenum];
         total_mass_out += local_re_phase[n](nodenum);
-        _console << "n = " << n << " nodenum = " << nodenum << " mass out " << local_re_phase[n](nodenum) << std::endl;
+//        _console << "n = " << n << " nodenum = " << nodenum << " mass out " << local_re_phase[n](nodenum) << std::endl;
       }
       else
       {
