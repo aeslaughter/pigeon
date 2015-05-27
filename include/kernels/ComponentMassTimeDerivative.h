@@ -1,9 +1,8 @@
 /****************************************************************/
-/* Mass time derivative kernel for multiphase flow in porous    */
-/* media for each component.                                    */
+/* MOOSE - Multiphysics Object Oriented Simulation Environment  */
 /*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
+/*          All contents are licensed under LGPL V2.1           */
+/*             See LICENSE for full restrictions                */
 /****************************************************************/
 
 #ifndef COMPONENTMASSTIMEDERIVATIVE_H
@@ -40,7 +39,7 @@ private:
   std::vector<VariableValue *> _component_mass_fraction_old;
   std::vector<VariableValue *> _fluid_pressure;
   const MooseEnum & _primary_variable_type;
-  VariableValue & _temperature; 
+  VariableValue & _temperature;
 
   /**
    * This is the member reference that will hold the User Object
@@ -48,6 +47,7 @@ private:
    */
   const FluidState & _fluid_state;
   unsigned int _num_phases;
+  unsigned int _phase_index;
 };
 
 #endif //COMPONENTMASSTIMEDERIVATIVE_H

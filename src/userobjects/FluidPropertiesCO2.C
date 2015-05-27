@@ -11,7 +11,7 @@ template<>
 InputParameters validParams<FluidPropertiesCO2>()
 {
   InputParameters params = validParams<FluidProperties>();
-  params.addClassDescription("Thermophysical fluid properties of CO2.");
+  params.addClassDescription("Thermophysical fluid properties of gas phase CO2.");
   return params;
 }
 
@@ -30,8 +30,8 @@ Real
   Real pc = pressure * 1.e-6;
 
   Real vc1 = 1.8882e-4 * tk;
-  Real vc2 = - pc * (8.24e-2 + 1.249e-2 * pc) / tc; 
-  
+  Real vc2 = - pc * (8.24e-2 + 1.249e-2 * pc) / tc;
+
   return pc / (vc1 + vc2);
 }
 
@@ -48,7 +48,7 @@ Real
 
   if (xx > 1.0) xx = 1.0;
 
-  for (int i = 0; i<=4; i++)
+  for (int i = 0; i<5; i++)
     C[i] = A[i] + xx * (B[i] - A[i]);
 
   Real t2 = temperature * temperature;
@@ -61,17 +61,27 @@ Real
 Real
   FluidPropertiesCO2::dDensity_dP(Real pressure, Real temperature) const
 {
-  return 0.;
+  Real tk = temperature + _t_c2k;
+  Real tc = std::pow((tk * 1.e-2), 10./3.);
+  Real pc = pressure * 1.e-6;
+
+  Real vc1 = 1.8882e-4 * tk;
+  Real vc2 = - pc * (8.24e-2 + 1.249e-2 * pc) / tc;
+  Real dvc2 = - (8.24e-2 + 2.498e-2 * pc) / tc;
+
+  return (vc1 + vc2 - pc * dvc2) / ((vc1 + vc2) * (vc1 + vc2));
 }
 
-/*
-/// Henry coefficient of CO2 as a function of temperature.
 Real
   FluidPropertiesCO2::henry(Real temperature) const
 
 {
+  Real a[6] = {7.83666e7, 1.96025e6, 8.20574e4, -7.40674e2, 2.1838, -2.20999e-3};
 
-  Real co2henry = 200.0e+6; // Henry coefficient at T = 50C
+  Real co2henry = 0.;
+
+  for(unsigned int i = 0; i< 6; i++)
+    co2henry += a[i] * std::pow(temperature, i);
 
   return co2henry;
-}*/
+}

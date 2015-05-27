@@ -49,9 +49,10 @@ private:
    * This is the member reference that will hold the User Object
    * value for the fluid state User Object.
    */
-  const FluidState & _fluid_state;  
+  const FluidState & _fluid_state;
   unsigned int _fluid_pressure_var;
   unsigned int _num_phases;
+  unsigned int _phase_index;
 };
 
 #endif //COMPONENTFLUX_H

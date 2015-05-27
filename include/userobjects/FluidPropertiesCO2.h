@@ -5,13 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Fluid properties of gaseous CO2.                             */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #ifndef FLUIDPROPERTIESCO2_H
 #define FLUIDPROPERTIESCO2_H
 
@@ -43,7 +36,6 @@ class FluidPropertiesCO2 : public FluidProperties
    * @return viscosity (Pa.s)
    */
   Real viscosity(Real pressure, Real temperature) const;
-//  Real henry(Real temperature) const;
 
   /**
    * Derivative of the density of gaseous CO2 as a function of
@@ -54,6 +46,18 @@ class FluidPropertiesCO2 : public FluidProperties
    * @return derivative of CO2 density (kg/m^3) with respect to pressure
    */
   Real dDensity_dP(Real pressure, Real temperature) const;
+
+  /**
+   * Henry's law coefficient for dissolution of CO2 into water.
+   * From Battistelli et al, A fluid property module for the TOUGH2 simulator
+   * for saline brines with non-condensible gas. Proc. Eighteenth Workshop on
+   * Geothermal Reservoir Engineering, Stanford University, 1993.
+   *
+   * @param temperature fluid temperature (C)
+   * @return Henry's coefficient Kh (Pa)
+   */
+  Real henry(Real temperature) const;
+
 
  protected:
   /// Conversion of temperature from Celcius to Kelvin

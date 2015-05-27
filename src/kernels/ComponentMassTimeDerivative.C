@@ -19,6 +19,7 @@ InputParameters validParams<ComponentMassTimeDerivative>()
   MooseEnum primary_variable_type("pressure saturation mass_fraction");
   params.addRequiredParam<MooseEnum>("primary_variable_type", primary_variable_type, "The type of primary variable for this kernel (e.g. pressure, saturation or component mass fraction");
   params.addRequiredParam<UserObjectName>("fluid_state_uo", "Name of the User Object defining the fluid state");
+  params.addParam<unsigned int>("phase_index", 0, "The index of the phase this auxillary kernel acts on");
   return params;
 }
 
@@ -28,7 +29,8 @@ ComponentMassTimeDerivative::ComponentMassTimeDerivative(const std::string & nam
     _porosity(getMaterialProperty<Real>("porosity")),
     _primary_variable_type(getParam<MooseEnum>("primary_variable_type")),
     _temperature(coupledValue("temperature_variable")),
-    _fluid_state(getUserObject<FluidState>("fluid_state_uo"))
+    _fluid_state(getUserObject<FluidState>("fluid_state_uo")),
+    _phase_index(getParam<unsigned int>("phase_index"))
 
 {
   // The number of phases in the given fluid state model
@@ -89,25 +91,33 @@ Real ComponentMassTimeDerivative::computeQpJacobian() // TODO: Jacobians need fu
   if (_i != _j)
     return 0.0;
 
-  Real jacobian = 0.;
-  // TODO: Currently only liquid saturation
-  if (_primary_variable_type == "saturation") {
-    jacobian = _test[_i][_qp] * _porosity[_qp] * (*_component_mass_fraction[0])[_i] * (*_fluid_density[0])[_i] / _dt;
+  Real qpjacobian = 0.;
+
+  // Loop over all phases and sum the mass contributions
+  for (unsigned int n = 0; n < _num_phases; ++n)
+  {
+    if (_primary_variable_type == "saturation")
+    {
+      if (n == _phase_index)
+        qpjacobian += (*_component_mass_fraction[n])[_i] * (*_fluid_density[n])[_i];
+      else
+        qpjacobian -= (*_component_mass_fraction[n])[_i] * (*_fluid_density[n])[_i];
+    }
+
+    if (_primary_variable_type == "pressure")
+    {
+      Real dDensity_dP = _fluid_state.dDensity_dP((*_fluid_pressure[n])[_i], _temperature[_i])[n];
+      qpjacobian += (*_component_mass_fraction[n])[_i] * (*_fluid_saturation[n])[_i] * dDensity_dP;
+    }
+
+    if (_primary_variable_type == "mass_fraction")
+    {
+      //TODO: properly implement this
+      qpjacobian += (*_fluid_density[n])[_i] * (*_fluid_saturation[n])[_i];
+    }
   }
 
-  // TODO: Currently only liquid pressure
-  if (_primary_variable_type == "pressure") {
-
-    Real dDensity_dP = _fluid_state.dDensity_dP((*_fluid_pressure[0])[_i], _temperature[_i])[0];
-    jacobian = _test[_i][_qp] * _porosity[_i] * (*_component_mass_fraction[0])[_i] * (*_fluid_saturation[0])[_i] * dDensity_dP / _dt;
-  }
-
-  if (_primary_variable_type == "mass_fraction") {
-
-    jacobian = _test[_i][_qp] * _porosity[_qp] * (*_fluid_density[0])[_i] * (*_fluid_saturation[0])[_i] / _dt;
-  }
-
-  return jacobian;
+  return _test[_i][_qp] * _porosity[_i] * qpjacobian / _dt;
 }
 
 Real ComponentMassTimeDerivative::computeQpOffDiagJacobian(unsigned int jvar)

@@ -11,4 +11,10 @@
     csvdiff = 'CO2Property_viscosity_vpp_0001.csv'
     abs_zero = 1.0E-6
   [../]
+  [./co2_henry]
+    type = 'CSVDiff'
+    input = 'CO2Property.i Outputs/file_base=CO2Property_henry AuxKernels/CO2PropertyAux/co2_property_enum=henry Functions/initial_temperature/value=175*x Mesh/nx=20'
+    csvdiff = 'CO2Property_henry_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
 []
