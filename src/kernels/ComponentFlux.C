@@ -65,16 +65,18 @@ ComponentFlux::ComponentFlux(const std::string & name,
 
 Real ComponentFlux::computeQpResidual()
 {
-  return 0.; // Not used
+  return 0.; // Not used in the upwinding code.
 }
 
 void ComponentFlux::computeResidual()
 {
   upwind(true, false, 0.);
 }
-  
-Real ComponentFlux::computeQpJacobian() //TODO: Jacobian terms need work!
+
+Real ComponentFlux::computeQpJacobian()
 {
+  return 0.0; // Not used in the upwinding code.
+
   Real jacobian = 0.0;
 
   if (_primary_variable_type == "saturation") {
@@ -113,9 +115,10 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
 
   unsigned int num_nodes = _test.size();
   mobility.resize(_num_phases);
-  
+
   // The mobility calculated at the nodes for each phase. Note that the component mass fraction is not
   // included yet. Instead, determine the flux of gas and liquid, and then scale by the mass fraction.
+  // Also, fluid density is used in the local_re calculations later.
   for (unsigned int n = 0; n < _num_phases; ++n)
     for (_i = 0; _i < num_nodes; _i++)
     {
@@ -123,41 +126,44 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
       mobility[n].push_back(mobtmp);
     }
 
-  // Compute the residual without the mobility terms (given in computeQpResidual). 
-  // Even if we are computing the jacobian we still need this in order to see which 
-  // nodes are upwind and which are downwind.
-  // Note: this code is taken from kernel.C computeResidual() and computeJacobian()
+  // Compute the residual and jacobian without the mobility terms. Even if we are computing the jacobian
+  // we still need this in order to see which nodes are upwind and which are downwind.
   DenseVector<Number> & re = _assembly.residualBlock(_var.number());
   _local_re.resize(re.size());
 
-  // Vector of _local_re's for each phase.
+  DenseMatrix<Number> & ke = _assembly.jacobianBlock(_var.number(), jvar);
+  _local_ke.resize(ke.m(), ke.n());
+
+
+  // Vector of _local_re's and _local_ke's for each phase.
   std::vector<DenseVector<Number> > local_re_phase;
   local_re_phase.resize(_num_phases);
+
+  std::vector<DenseMatrix<Number> > local_ke_phase;
+  local_ke_phase.resize(_num_phases);
+
   Real qpresidual;
 
-  // Loop over each phsae and form the _local_re contribution to the residual without the mobility term
-  // Note that computeQpResidual is not called
+  // Loop over each phsae and form the _local_re contribution to the residual without the mobility term, but
+  // with the density (used to zero contribution where saturation is zero)
+  // Note that computeQpResidual is not called, instead the residual is calculated at each qp
   for (unsigned int n = 0; n < _num_phases; ++n)
   {
     // Set the local_re = 0 initially for each phase
     _local_re.zero();
-//  _console << "************* n =" << n << std::endl;
     for (_i = 0; _i < _test.size(); _i++)
       for (_qp = 0; _qp < _qrule->n_points(); _qp++)
       {
         qpresidual = _grad_test[_i][_qp] * (_permeability[_qp] * (*_fluid_density[n])[_qp]* ((*_grad_fluid_pressure[n])[_qp] + (*_fluid_density[n])[_qp]
                      * _gravity[_qp]));
         _local_re(_i) += _JxW[_qp] * _coord[_qp] * qpresidual;
-//      _console << "grad_p " << (*_grad_fluid_pressure[n])[_qp] << std::endl;
       }
     local_re_phase[n] = _local_re;
-//  _console << "n " << n << "local_re_phase(n) " << _local_re << std::endl;
   }
 
-  DenseMatrix<Number> & ke = _assembly.jacobianBlock(_var.number(), jvar);
+  //
   if (compute_jac)
   {
-    _local_ke.resize(ke.m(), ke.n());
     _local_ke.zero();
 
     for (_i = 0; _i < _test.size(); _i++)
@@ -192,7 +198,7 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
 
 
   for (unsigned int n = 0; n < _num_phases; ++n)
-  { 
+  {
 
   // FIRST:
   // this is a dirty way of getting around precision loss problems
@@ -280,13 +286,13 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
   DenseVector<Number> local_re_sum;
   local_re_sum.resize(re.size());
   local_re_sum.zero();
-  
+
     for (unsigned int n = 0; n < _num_phases; ++n)
   for (unsigned int nodenum = 0; nodenum < num_nodes; ++nodenum)
 {     local_re_sum(nodenum) += local_re_phase[n](nodenum) * (*_component_mass_fraction[n])[nodenum];
 // _console << "nodenum = " << nodenum << " n = " << n << " local_re_phase = " << local_re_phase[n](nodenum) << std::endl;
 // _console << "nodenum = " << nodenum << " n = " << n << " component_mass_fraction[n] = " << (*_component_mass_fraction[n])[nodenum] << std::endl;
- 
+
 //  _console << "nodenum = " << nodenum << " n = " << n << " local_re_sum = " << local_re_sum(nodenum) <<std::endl;
 }
   // Add results to the Residual or Jacobian

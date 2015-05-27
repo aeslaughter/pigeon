@@ -85,22 +85,26 @@ Real ComponentMassTimeDerivative::computeQpResidual()
 
 Real ComponentMassTimeDerivative::computeQpJacobian() // TODO: Jacobians need further work!
 {
+  // No off-diagonal mass entries in jacobian
+  if (_i != _j)
+    return 0.0;
+
   Real jacobian = 0.;
   // TODO: Currently only liquid saturation
-  if (_primary_variable_type == "saturation") { 
-    jacobian = _test[_i][_qp] * _porosity[_qp] * (*_component_mass_fraction[0])[_qp] * (*_fluid_density[0])[_qp] * _phi[_j][_qp]/_dt;
+  if (_primary_variable_type == "saturation") {
+    jacobian = _test[_i][_qp] * _porosity[_qp] * (*_component_mass_fraction[0])[_i] * (*_fluid_density[0])[_i] / _dt;
   }
 
   // TODO: Currently only liquid pressure
   if (_primary_variable_type == "pressure") {
 
-    Real dDensity_dP = _fluid_state.dDensity_dP((*_fluid_pressure[0])[_qp], _temperature[_qp])[0]; 
-    jacobian = _test[_i][_qp] * _porosity[_qp] * (*_component_mass_fraction[0])[_qp] * (*_fluid_saturation[0])[_qp] * _phi[_j][_qp] * dDensity_dP;
+    Real dDensity_dP = _fluid_state.dDensity_dP((*_fluid_pressure[0])[_i], _temperature[_i])[0];
+    jacobian = _test[_i][_qp] * _porosity[_i] * (*_component_mass_fraction[0])[_i] * (*_fluid_saturation[0])[_i] * dDensity_dP / _dt;
   }
 
   if (_primary_variable_type == "mass_fraction") {
 
-    jacobian = _test[_i][_qp] * _porosity[_qp] * _phi[_j][_qp] * (*_fluid_density[0])[_qp] * (*_fluid_saturation[0])[_qp];
+    jacobian = _test[_i][_qp] * _porosity[_qp] * (*_fluid_density[0])[_i] * (*_fluid_saturation[0])[_i] / _dt;
   }
 
   return jacobian;
