@@ -5,13 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Fluid material for multiphase flow                           */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #include "FluidStateMaterial.h"
 
 template<>
@@ -20,13 +13,14 @@ InputParameters validParams<FluidStateMaterial>()
   InputParameters params = validParams<Material>();
 
   params.addRequiredParam<UserObjectName>("fluid_state_uo", "Name of the User Object defining the fluid state model");
-  params.addRequiredCoupledVar("liquid_saturation_variable","The liquid saturation variable");
-  params.addRequiredCoupledVar("liquid_pressure_variable","The primary pressure variable");
-  params.addCoupledVar("temperature_variable", "The temperature variable");
+  params.addRequiredCoupledVar("primary_saturation_variable","The primary saturation variable");
+  params.addRequiredCoupledVar("primary_pressure_variable","The primary pressure variable");
+  params.addCoupledVar("temperature_variable", 50., "The temperature variable");
+  params.addParam<unsigned int>("phase_index", 0, "The phase index of the primary pressure variable");
 
   // Aux variable for gas pressure - must be elemental to couple into material. TODO: gradient of capillary presure uo
   // to use directly in material
-  params.addRequiredCoupledVar("gas_pressure_variable", "The gas pressure variable");
+  //params.addRequiredCoupledVar("gas_pressure_variable", "The gas pressure variable");
   return params;
 }
 
@@ -34,20 +28,23 @@ FluidStateMaterial::FluidStateMaterial(const std::string & name,
                                    InputParameters parameters) :
     Material(name, parameters),
 
+    // Get gravity from PorousMaterial class
     _gravity(getMaterialProperty<RealVectorValue>("gravity")),
-    // Declare gas and liquid fluxes (without mobility)
-    _gas_flux_no_mobility(declareProperty<RealVectorValue>("gas_flux_no_mobility")),
-    _liquid_flux_no_mobility(declareProperty<RealVectorValue>("liqiud_flux_no_mobility")),
 
-    _liquid_saturation(coupledValue("liquid_saturation_variable")),
-    _liquid_pressure(coupledValue("liquid_pressure_variable")), // NOTE: Assuming it is liquid pressure at the moment
-    _grad_liquid_pressure(coupledGradient("liquid_pressure_variable")),
-    _gas_pressure(coupledValue("gas_pressure_variable")),
-    _grad_gas_pressure(coupledGradient("gas_pressure_variable")),
+    // Declare vector of phase fluxes (without mobility)
+    _phase_flux_no_mobility(declareProperty<std::vector<RealVectorValue> >("phase_flux_no_mobility")),
+
+    _primary_saturation(coupledValue("primary_saturation_variable")),
+    _grad_primary_saturation(coupledGradient("primary_saturation_variable")),
+    _primary_pressure(coupledValue("primary_pressure_variable")),
+    _grad_primary_pressure(coupledGradient("primary_pressure_variable")),
     _temperature(coupledValue("temperature_variable")),
+    _phase_index(getParam<unsigned int>("phase_index")),
     _fluid_state(getUserObject<FluidState>("fluid_state_uo"))
 
 {
+  // The number of phases in the given fluid state model
+  _num_phases = _fluid_state.numPhases();
 }
 
 void
@@ -61,16 +58,23 @@ FluidStateMaterial::computeQpProperties()
   else
     temperature = _temperature[_qp];
 
-// Vector of mass fractions of each component in each phase. TODO: fix this!
+  // Vector of mass fractions of each component in each phase. TODO: fix this!
   std::vector<Real> xmass;
   xmass.push_back(1.0); // Salt mass fraction in liquid
-  xmass.push_back(0.);                       // CO2 mass fraction in liquid
-  xmass.push_back(0.);                       // Salt mass fraction in gas
-  xmass.push_back(1.);                       // CO2 mass fraction in gas
+  xmass.push_back(0.);  // CO2 mass fraction in liquid
+  xmass.push_back(0.);  // Salt mass fraction in gas
+  xmass.push_back(1.);  // CO2 mass fraction in gas
 
-  _gas_flux_no_mobility[_qp] = _grad_gas_pressure[_qp]+ _fluid_state.density(_gas_pressure[_qp], temperature)[0] *  
-                               _gravity[_qp]; 
-  _liquid_flux_no_mobility[_qp] = _grad_liquid_pressure[_qp] + _fluid_state.density(_liquid_pressure[_qp], temperature)[1] *
-                                  _gravity[_qp];
 
+  _phase_flux_no_mobility[_qp].resize(_num_phases);
+
+  for (unsigned int n = 0; n < _num_phases; ++n)
+  {
+    RealVectorValue grad_pressure;
+    grad_pressure = _grad_primary_pressure[_qp] - _fluid_state.dCapillaryPressure(_primary_saturation[_qp])[n] *
+      _grad_primary_saturation[_qp];
+
+    _phase_flux_no_mobility[_qp][n] = grad_pressure + _fluid_state.density(_primary_pressure[_qp], temperature)[n] *
+      _gravity[_qp];
+  }
 }

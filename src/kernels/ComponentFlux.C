@@ -13,25 +13,24 @@ InputParameters validParams<ComponentFlux>()
   InputParameters params = validParams<Kernel>();
   params.addRequiredCoupledVar("fluid_density_variables", "The list of fluid density auxiallary variables for each phase.");
   params.addRequiredCoupledVar("fluid_viscosity_variables", "The list of fluid viscosity auxillary variables for each phase.");
-  params.addRequiredCoupledVar("fluid_pressure_variables", "The list of fluid pressure variables for each phase.");
   params.addRequiredCoupledVar("component_mass_fraction_variables", "The list of mass fraction of the kernels component in each phase.");
   params.addRequiredCoupledVar("relperm_variables", "The list of relative permeability auxillary variables for each phase.");
   MooseEnum primary_variable_type("pressure saturation mass_fraction");
   params.addRequiredParam<MooseEnum>("primary_variable_type", primary_variable_type, "The type of primary variable for this kernel (e.g. pressure, saturation or component mass fraction");
   params.addRequiredParam<UserObjectName>("fluid_state_uo", "Name of the User Object defining the fluid state");
-  params.addParam<unsigned int>("phase_index", 0, "The index of the phase this auxillary kernel acts on");
+  params.addParam<unsigned int>("phase_index", 0, "The index of the primary variable this kernel acts on");
   return params;
 }
 
 ComponentFlux::ComponentFlux(const std::string & name,
                        InputParameters parameters) :
-    Kernel(name, parameters),
-    _permeability(getMaterialProperty<RealTensorValue>("permeability")),
-    _gravity(getMaterialProperty<RealVectorValue>("gravity")),
-    _primary_variable_type(getParam<MooseEnum>("primary_variable_type")),
-    _fluid_state(getUserObject<FluidState>("fluid_state_uo")),
-    _fluid_pressure_var(coupled("fluid_pressure_variables")),
-    _phase_index(getParam<unsigned int>("phase_index"))
+  Kernel(name, parameters),
+  _permeability(getMaterialProperty<RealTensorValue>("permeability")),
+  _gravity(getMaterialProperty<RealVectorValue>("gravity")),
+  _phase_flux_no_mobility(getMaterialProperty<std::vector<RealVectorValue> >("phase_flux_no_mobility")),
+  _primary_variable_type(getParam<MooseEnum>("primary_variable_type")),
+  _fluid_state(getUserObject<FluidState>("fluid_state_uo")),
+  _phase_index(getParam<unsigned int>("phase_index"))
 
 {
   // The number of phases in the given fluid state model
@@ -42,8 +41,6 @@ ComponentFlux::ComponentFlux(const std::string & name,
     mooseError("The number of phase densities provided in the ComponentFlux kernel is not equal to the number of phases in the FluidState UserObject");
   if (coupledComponents("fluid_viscosity_variables") != _num_phases)
     mooseError("The number of phase viscosities provided in the ComponentFlux kernel is not equal to the number of phases in the FluidState UserObject");
-  if (coupledComponents("fluid_pressure_variables") != _num_phases)
-    mooseError("The number of phase pressures provided in the ComponentFlux kernel is not equal to the number of phases in the FluidState UserObject");
   if (coupledComponents("relperm_variables") != _num_phases)
     mooseError("The number of phase relative permeabilities provided in the ComponentFlux kernel is not equal to the number of phases in the FluidState UserObject");
   if (coupledComponents("component_mass_fraction_variables") != _num_phases)
@@ -52,7 +49,6 @@ ComponentFlux::ComponentFlux(const std::string & name,
   // Filling the vectors with VariableValue pointers
   _fluid_density.resize(_num_phases);
   _fluid_viscosity.resize(_num_phases);
-  _grad_fluid_pressure.resize(_num_phases);
   _component_mass_fraction.resize(_num_phases);
   _fluid_relperm.resize(_num_phases);
 
@@ -60,7 +56,6 @@ ComponentFlux::ComponentFlux(const std::string & name,
   {
     _fluid_density[n] = &coupledNodalValue("fluid_density_variables", n);
     _fluid_viscosity[n] = &coupledNodalValue("fluid_viscosity_variables", n);
-    _grad_fluid_pressure[n] = &coupledGradient("fluid_pressure_variables", n);
     _component_mass_fraction[n] = &coupledNodalValue("component_mass_fraction_variables", n);
     _fluid_relperm[n] = &coupledNodalValue("relperm_variables", n);
   }
@@ -126,7 +121,7 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
   for (unsigned int n = 0; n < _num_phases; ++n)
     for (_i = 0; _i < num_nodes; _i++)
     {
-      mobtmp = (*_fluid_relperm[n])[_i] / (*_fluid_viscosity[n])[_i];
+      mobtmp = (*_fluid_relperm[n])[_i] * (*_fluid_density[n])[_i] / (*_fluid_viscosity[n])[_i];
       mobility[n].push_back(mobtmp);
     }
 
@@ -159,8 +154,8 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
     for (_i = 0; _i < _test.size(); _i++)
       for (_qp = 0; _qp < _qrule->n_points(); _qp++)
       {
-        qpresidual = _grad_test[_i][_qp] * (_permeability[_qp] * (*_fluid_density[n])[_qp]* ((*_grad_fluid_pressure[n])[_qp] + (*_fluid_density[n])[_qp]
-                     * _gravity[_qp]));
+        qpresidual = _grad_test[_i][_qp] * (_permeability[_qp] * (*_fluid_density[n])[_qp] *
+          _phase_flux_no_mobility[_qp][n]);
         _local_re(_i) += _JxW[_qp] * _coord[_qp] * qpresidual;
       }
     local_re_phase[n] = _local_re;
@@ -174,7 +169,7 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
           for (_qp = 0; _qp < _qrule->n_points(); _qp++)
           {
             if (_primary_variable_type == "pressure") //TODO: other primary variable types
-              qpjacobian = _grad_test[_i][_qp] * (_permeability[_qp] * (*_fluid_density[n])[_qp]* _grad_phi[_j][_qp]);
+              qpjacobian = _grad_test[_i][_qp] * (_permeability[_qp] * (*_fluid_density[n])[_qp] *_grad_phi[_j][_qp]);
             _local_ke(_i, _j) += _JxW[_qp] * _coord[_qp] * qpjacobian;
           }
       local_ke_phase[n] = _local_ke;
@@ -254,6 +249,7 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
         {
           for (_j = 0; _j < _phi.size(); _j++)
             local_ke_phase[n](nodenum, _j) *= mobility[n][nodenum];
+// FIX THIS
 //        _local_ke(nodenum, nodenum) += _dmobility_dv[nodenum][dvar]*_local_re(nodenum);
           for (_j = 0; _j < _phi.size(); _j++)
             dtotal_mass_out[_j] += local_ke_phase[n](nodenum, _j);

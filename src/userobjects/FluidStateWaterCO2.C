@@ -35,31 +35,31 @@ FluidStateWaterCO2::FluidStateWaterCO2(const std::string & name, InputParameters
 }
 
 unsigned int
-  FluidStateWaterCO2::numPhases() const
+FluidStateWaterCO2::numPhases() const
 {
   return 2;
 }
 
 unsigned int
-  FluidStateWaterCO2::numComponents() const
+FluidStateWaterCO2::numComponents() const
 {
   return 2;
 }
 
 bool
-   FluidStateWaterCO2::isIsothermal() const
+FluidStateWaterCO2::isIsothermal() const
 {
    return _is_isothermal;
 }
 
 Real
-   FluidStateWaterCO2::temperature() const
+FluidStateWaterCO2::temperature() const
 {
   return _fluid_temperature;
 }
 
 std::vector<std::string>
-  FluidStateWaterCO2::variable_names() const
+FluidStateWaterCO2::variable_names() const
 {
   std::vector<std::string> varnames;
   varnames.push_back("gas_pressure");
@@ -69,7 +69,7 @@ std::vector<std::string>
 }
 
 std::vector<std::string>
-  FluidStateWaterCO2::variable_types() const
+FluidStateWaterCO2::variable_types() const
 {
   std::vector<std::string> varnames;
   varnames.push_back("pressure");
@@ -79,7 +79,7 @@ std::vector<std::string>
 }
 
 std::vector<unsigned int>
-  FluidStateWaterCO2::variable_phase() const
+FluidStateWaterCO2::variable_phase() const
 {
   std::vector<unsigned int> varphases;
   varphases.push_back(1);
@@ -89,21 +89,27 @@ std::vector<unsigned int>
 }
 
 std::vector<Real>
-  FluidStateWaterCO2::density(Real pressure, Real temperature) const
+FluidStateWaterCO2::density(Real pressure, Real temperature) const
 {
   Real water_density = _water_property.density(pressure, temperature);
   Real co2_density = _co2_property.density(pressure, temperature);
 
-  // Assuming that the liquid density is water, and gas is CO2 - ie no CO2 in liquid, no vapour in gas
+  // Calculate the density of liquid with dissolved CO2.
+  // TODO: move this to aux variable using FluidStateAux.
+  Real xco2l = FluidStateWaterCO2::massFractions(pressure, temperature)[1][0];
+  Real liquid_density = 1.0 / (xco2l / _co2_property.partialDensity(temperature) +
+    (1.0 - xco2l) / water_density);
+
+
   std::vector<Real> densities;
-  densities.push_back(water_density);
+  densities.push_back(liquid_density);
   densities.push_back(co2_density);
 
   return densities;
 }
 
 std::vector<Real>
-  FluidStateWaterCO2::viscosity(Real pressure, Real temperature) const
+FluidStateWaterCO2::viscosity(Real pressure, Real temperature) const
 {
   // TODO: Fix this so that density isn't calculated twice.
   Real water_density = _water_property.density(pressure, temperature);
@@ -119,7 +125,7 @@ std::vector<Real>
 }
 
 std::vector<std::vector<Real> >
-   FluidStateWaterCO2::massFractions(Real pressure, Real temperature) const
+FluidStateWaterCO2::massFractions(Real pressure, Real temperature) const
 {
   std::vector<std::vector<Real> > xmass;
   unsigned int numcomp = numComponents();
@@ -136,7 +142,7 @@ std::vector<std::vector<Real> >
 }
 
 std::vector<Real>
-   FluidStateWaterCO2::relativePermeability(Real liquid_saturation) const
+FluidStateWaterCO2::relativePermeability(Real liquid_saturation) const
 {
   std::vector<Real> relperm;
 
@@ -147,7 +153,7 @@ std::vector<Real>
 }
 
 std::vector<Real>
-   FluidStateWaterCO2::pressure(Real gas_pressure, Real liquid_saturation) const
+FluidStateWaterCO2::pressure(Real gas_pressure, Real liquid_saturation) const
 {
   std::vector<Real> pressures;
   Real capillary_pressure = _capillary_pressure.capillaryPressure(liquid_saturation);
@@ -159,7 +165,18 @@ std::vector<Real>
 }
 
 std::vector<Real>
-   FluidStateWaterCO2::saturation(Real liquid_saturation) const
+FluidStateWaterCO2::dCapillaryPressure(Real liquid_saturation) const
+{
+  std::vector<Real> dpc;
+
+  dpc.push_back(0.);
+  dpc.push_back(_capillary_pressure.dCapillaryPressure(liquid_saturation));
+
+  return dpc;
+}
+
+std::vector<Real>
+FluidStateWaterCO2::saturation(Real liquid_saturation) const
 {
   std::vector<Real> saturations;
 
@@ -170,7 +187,7 @@ std::vector<Real>
 }
 
 std::vector<Real>
-   FluidStateWaterCO2::dDensity_dP(Real pressure, Real temperature) const
+FluidStateWaterCO2::dDensity_dP(Real pressure, Real temperature) const
 {
   Real dwater_density = _water_property.dDensity_dP(pressure, temperature);
   Real dco2_density = _co2_property.dDensity_dP(pressure, temperature);
@@ -184,8 +201,12 @@ std::vector<Real>
 }
 
 Real
-  FluidStateWaterCO2::henry(Real temperature) const
+FluidStateWaterCO2::henry(Real temperature) const
 {
+  // Check temperature to make sure that it isn't out of the region of validity
+  if (temperature < 1.04 || temperature > 369.51)
+    mooseError("The temperature is out of range in FluidStateWaterCO2::henry");
+
   Real t_critical = 647.096;
   Real t_c2k = 273.15;
   std::vector<Real> a = _co2_property.henryConstants();
@@ -194,6 +215,5 @@ Real
   Real kh = a[0] / tr + (a[1] / tr) * std::pow(1.0 - tr, 0.355) + a[2] *
             std::pow(tr, -0.41) * std::exp(1.0 - tr);
 
-_console << "a " << a[1] << " " << a[2]<< std::endl;
   return _water_property.pSat(temperature) * std::exp(kh);
 }

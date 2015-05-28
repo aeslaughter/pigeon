@@ -1,9 +1,8 @@
 /****************************************************************/
-/* Flux kernel for multiphase flow in porous media for each     */
-/*  component.                                                  */
+/* MOOSE - Multiphysics Object Oriented Simulation Environment  */
 /*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
+/*          All contents are licensed under LGPL V2.1           */
+/*             See LICENSE for full restrictions                */
 /****************************************************************/
 
 #ifndef COMPONENTFLUX_H
@@ -37,10 +36,12 @@ protected:
   MaterialProperty<RealTensorValue> & _permeability;
   MaterialProperty<RealVectorValue> & _gravity;
 
+  // Member reference to phase flux (without mobility) material properties
+  MaterialProperty<std::vector<RealVectorValue> > & _phase_flux_no_mobility;
+
 private:
   std::vector<VariableValue *> _fluid_density;
   std::vector<VariableValue *> _fluid_viscosity;
-  std::vector<VariableGradient *> _grad_fluid_pressure;
   std::vector<VariableValue *> _component_mass_fraction;
   std::vector<VariableValue *> _fluid_relperm;
   const MooseEnum & _primary_variable_type;

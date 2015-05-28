@@ -119,6 +119,15 @@ class FluidState : public GeneralUserObject
   virtual std::vector<Real> pressure(Real gas_pressure, Real liquid_saturation) const = 0;
 
   /**
+   * Derivative of capillary pressure for each phase with respect to the
+   * liquid saturation
+   *
+   * @param saturation liquid saturation (-)
+  * @return derivative of capillary pressure (Pa)
+  */
+  virtual std::vector<Real> dCapillaryPressure(Real liquid_saturation) const = 0;
+
+  /**
    * Gas saturation given liquid saturation.
    *
    * @param saturation liquid saturation (-)

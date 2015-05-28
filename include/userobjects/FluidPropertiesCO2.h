@@ -57,10 +57,21 @@ class FluidPropertiesCO2 : public FluidProperties
    */
   std::vector<Real> henryConstants() const;
 
+  /**
+   * Partial density of dissolved CO2. From Garcia, Density of aqueous
+   * solutions of CO2, LBNL-49023 (2001).
+   *
+   * @param temperature liquid temperature (C)
+   * @return partial molar density (kg/m^3)
+   */
+  Real partialDensity(Real temperature) const;
+
 
  protected:
   /// Conversion of temperature from Celcius to Kelvin
   Real _t_c2k;
+  /// Molar mass of pure CO2
+  Real _Mco2;
 
 };
 

@@ -111,7 +111,16 @@ class FluidStateBrineCO2 : public FluidState
    * @param saturation liquid saturation (-)
    * @return pressure liquid phase pressure (Pa)
    */
-   virtual std::vector<Real> pressure(Real gas_pressure, Real liquid_saturation) const;
+  virtual std::vector<Real> pressure(Real gas_pressure, Real liquid_saturation) const;
+
+  /**
+   * Derivative of capillary pressure for each phase with respect to the
+   * liquid saturation
+   *
+   * @param saturation liquid saturation (-)
+   * @return derivative of capillary pressure (Pa)
+   */
+  virtual std::vector<Real> dCapillaryPressure(Real liquid_saturation) const;
 
   /**
    * Saturation of gas phase

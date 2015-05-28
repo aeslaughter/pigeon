@@ -142,6 +142,16 @@ std::vector<Real>
 }
 
 std::vector<Real>
+FluidStateSinglePhase::dCapillaryPressure(Real liquid_saturation) const
+{
+  std::vector<Real> dpc;
+
+  dpc.push_back(0.);
+
+  return dpc;
+}
+
+std::vector<Real>
    FluidStateSinglePhase::saturation(Real liquid_saturation) const
 {
   std::vector<Real> saturations;

@@ -156,6 +156,17 @@ std::vector<Real>
 }
 
 std::vector<Real>
+FluidStateBrineCO2::dCapillaryPressure(Real liquid_saturation) const
+{
+  std::vector<Real> dpc;
+
+  dpc.push_back(0.);
+  dpc.push_back(_capillary_pressure.dCapillaryPressure(liquid_saturation));
+
+  return dpc;
+}
+
+std::vector<Real>
    FluidStateBrineCO2::saturation(Real liquid_saturation) const
 {
   std::vector<Real> saturations;
@@ -174,7 +185,7 @@ std::vector<Real>
   Real dbrine_density = _brine_property.dDensity_dP(pressure, temperature, xmass);
   Real dco2_density = _co2_property.dDensity_dP(pressure, temperature);
 
-  // Assuming that the liquid density is water, and gas is CO2 - ie no CO2 in liquid, no vapour in gas
+  // Assuming that the liquid density is brine, and gas is CO2 - ie no CO2 in liquid, no vapour in gas
   std::vector<Real> ddensities;
   ddensities.push_back(dbrine_density);
   ddensities.push_back(dco2_density);
@@ -185,5 +196,19 @@ std::vector<Real>
 Real
   FluidStateBrineCO2::henry(Real temperature) const
 {
-  return 0.;
+  // TODO: implement brine salting out correlation
+  // Check temperature to make sure that it isn't out of the region of validity
+  if (temperature < 1.04 || temperature > 369.51)
+    mooseError("The temperature is out of range in FluidStateBrineCO2::henry");
+
+  Real xmass = 0.1; //FIX THIS
+  Real t_critical = 647.096;
+  Real t_c2k = 273.15;
+  std::vector<Real> a = _co2_property.henryConstants();
+  Real tr = (temperature + t_c2k) / t_critical;
+
+  Real kh = a[0] / tr + (a[1] / tr) * std::pow(1.0 - tr, 0.355) + a[2] *
+            std::pow(tr, -0.41) * std::exp(1.0 - tr);
+
+  return _brine_property.pSat(temperature, xmass) * std::exp(kh);
 }

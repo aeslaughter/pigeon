@@ -1,7 +1,7 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  ny = 3
+  ny = 10
   xmax = 100
   ymax = 100
 []
@@ -26,6 +26,7 @@
   [../]
   [./xh20liquid]
     initial_condition = 1
+  [../]
 []
 
 [Functions]
@@ -36,7 +37,6 @@
 []
 
 [Kernels]
-  active = 'H2OMassTime H2OLiquidFlux'
   [./H2OMassTime]
     type = ComponentMassTimeDerivative
     variable = liquid_pressure
@@ -89,7 +89,6 @@
 []
 
 [Materials]
-  active = 'PorousMaterial'
   [./PorousMaterial]
     type = PorousMaterial
     block = 0
@@ -101,6 +100,13 @@
     diffusivity = 0.
     permeability = '1e-12 0 0 0 1e-12 0 0 0 1e-12'
     porosity = 0.25
+  [../]
+  [./FluidStateMaterial]
+    type = FluidStateMaterial
+    block = 0
+    primary_pressure_variable = liquid_pressure
+    primary_saturation_variable = liquid_saturation
+    fluid_state_uo = FluidState
   [../]
 []
 
@@ -179,7 +185,7 @@
   print_perf_log = true
   [./ex]
     type = Exodus
-    output_on = 'TIMESTEP_END'
+    output_on = TIMESTEP_END
   [../]
   [./con]
     output_linear = true
@@ -200,3 +206,4 @@
     type = FunctionIC
   [../]
 []
+

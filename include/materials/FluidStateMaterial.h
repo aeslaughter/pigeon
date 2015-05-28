@@ -1,8 +1,8 @@
 /****************************************************************/
-/* Fluid state material for multiphase flow                     */
+/* MOOSE - Multiphysics Object Oriented Simulation Environment  */
 /*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
+/*          All contents are licensed under LGPL V2.1           */
+/*             See LICENSE for full restrictions                */
 /****************************************************************/
 
 #ifndef FLUIDSTATEMATERIAL_H
@@ -32,18 +32,15 @@ protected:
 
 private:
   MaterialProperty<RealVectorValue> & _gravity;
-  MaterialProperty<RealVectorValue> & _gas_flux_no_mobility;
-  MaterialProperty<RealVectorValue> & _liquid_flux_no_mobility;
+  MaterialProperty<std::vector<RealVectorValue> > & _phase_flux_no_mobility;
 
-  /**
-   * The member reference of the liquid saturation variable
-   */
-  VariableValue & _liquid_saturation;
-  VariableValue & _liquid_pressure;
-  VariableGradient & _grad_liquid_pressure;
-  VariableValue & _gas_pressure;
-  VariableGradient & _grad_gas_pressure;
+  VariableValue & _primary_saturation;
+  VariableGradient & _grad_primary_saturation;
+  VariableValue & _primary_pressure;
+  VariableGradient & _grad_primary_pressure;
   VariableValue & _temperature;
+  unsigned int _num_phases;
+  unsigned int _phase_index;
 
  /**
    * This is the member reference that will hold the User Object
