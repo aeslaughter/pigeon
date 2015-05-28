@@ -181,3 +181,9 @@ std::vector<Real>
 
   return ddensities;
 }
+
+Real
+  FluidStateBrineCO2::henry(Real temperature) const
+{
+  return 0.;
+}

@@ -14,7 +14,7 @@ InputParameters validParams<FluidPropertyCO2Aux>()
   params.addRequiredParam<UserObjectName>("co2_property_uo", "Name of the User Object defining the co2 properties");
   params.addCoupledVar("pressure_variable", 1.e6,  "The pressure variable corresponding to the co2 phase.");
   params.addCoupledVar("temperature_variable", 50, "The temperature variable.");
-  MooseEnum co2_property_enum("density viscosity henry");
+  MooseEnum co2_property_enum("density viscosity");
   params.addRequiredParam<MooseEnum>("co2_property_enum", co2_property_enum, "The co2 property that this auxillary kernel is to calculate");
   return params;
 }
@@ -40,10 +40,6 @@ Real FluidPropertyCO2Aux::computeValue()
   if (co2_property_enum == "viscosity")
   {
     property = _co2_property.viscosity(_pressure[_qp], _temperature[_qp]);
-  }
-  if (co2_property_enum == "henry")
-  {
-    property = _co2_property.henry(_temperature[_qp]);
   }
 
   return property;

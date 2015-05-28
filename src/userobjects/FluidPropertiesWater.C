@@ -110,7 +110,7 @@ Real
       // Region 1: single phase liquid
       density = densityRegion1(pressure, temperature);
     }
-    
+
     if (pressure <= psat)
     {
       // Region 2: vapour phase
@@ -249,7 +249,7 @@ Real
   Real p_star1 = 16.53e6;
   Real t_star1 = 1386.;
   Real tk = temperature + _t_c2k;
-  
+
   // Now evaluate the sums
   Real sum1 = 0.;
   Real tau1 = t_star1 / tk;
@@ -259,7 +259,7 @@ Real
   {
     sum1 -= _n1[i] * _I1[i] * std::pow(7.1 - pi1, _I1[i]-1) * std::pow(tau1 - 1.222, _J1[i]);
   }
-  
+
   // The density of water in this region is then given by
   return p_star1 / (sum1 * _R * tk) / 1000.0;
 }
@@ -290,8 +290,8 @@ Real
 Real
   FluidPropertiesWater::densityRegion3(Real pressure, Real temperature) const
 {
-  // Region 3 is subdivided into 26 subregions, each with a given 
-  // backwards equation to directly calculate density from pressure 
+  // Region 3 is subdivided into 26 subregions, each with a given
+  // backwards equation to directly calculate density from pressure
   // and temperature without the need for expensive iterations.
   //TODO: needs to be implemented!
 
@@ -415,4 +415,3 @@ Real
 
   return viscosity * rhobar * sum1 * sum2;
 }
-

@@ -182,3 +182,18 @@ std::vector<Real>
 
   return ddensities;
 }
+
+Real
+  FluidStateWaterCO2::henry(Real temperature) const
+{
+  Real t_critical = 647.096;
+  Real t_c2k = 273.15;
+  std::vector<Real> a = _co2_property.henryConstants();
+  Real tr = (temperature + t_c2k) / t_critical;
+
+  Real kh = a[0] / tr + (a[1] / tr) * std::pow(1.0 - tr, 0.355) + a[2] *
+            std::pow(tr, -0.41) * std::exp(1.0 - tr);
+
+_console << "a " << a[1] << " " << a[2]<< std::endl;
+  return _water_property.pSat(temperature) * std::exp(kh);
+}

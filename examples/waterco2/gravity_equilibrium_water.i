@@ -21,24 +21,11 @@
   [../]
   [./liquid_relperm]
   [../]
-  [./gas_relperm]
-  [../]
-  [./gas_pressure]
-  [../]
-  [./gas_saturation]
-  [../]
-  [./gas_density]
-  [../]
-  [./gas_viscosity]
-  [../]
   [./liquid_saturation]
     initial_condition = 1
   [../]
   [./xh20liquid]
     initial_condition = 1
-  [../]
-  [./xh20gas]
-  [../]
 []
 
 [Functions]
@@ -71,28 +58,6 @@
     fluid_viscosity_variables = liquid_viscosity
     component_mass_fraction_variables = xh20liquid
   [../]
-  [./CO2GasFlux]
-    type = ComponentFlux
-    variable = liquid_saturation
-    fluid_viscosity_variable = gas_viscosity
-    fluid_density_variable = gas_density
-    primary_variable_type = pressure
-    xfluid_variable = 1
-    relperm_variable = gas_relperm
-    fluid_pressure_variable = gas_pressure
-  [../]
-  [./CO2MassTime]
-    type = ComponentMassTimeDerivative
-    variable = liquid_saturation
-    liquid_density_variable = liquid_density
-    xliquid_variable = 0
-    gas_saturation_variable = gas_saturation
-    primary_variable_type = liquid_saturation
-    gas_density_variable = gas_density
-    liquid_saturation_variable = liquid_saturation
-    fluid_pressure_variables = liquid_pressure
-    xgas_variable = 1
-  [../]
 []
 
 [AuxKernels]
@@ -121,55 +86,6 @@
     pressure_variable = liquid_pressure
     saturation_variable = liquid_saturation
   [../]
-  [./GasDensityAux]
-    type = FluidStateAux
-    variable = gas_density
-    saturation_variable = liquid_saturation
-    phase_index = 1
-    state_property_enum = density
-    execute_on = 'LINEAR initial'
-    fluid_state_uo = FluidState
-    pressure_variable = gas_pressure
-  [../]
-  [./GasPressureAux]
-    type = FluidStateAux
-    variable = gas_pressure
-    saturation_variable = liquid_saturation
-    state_property_enum = pressure
-    execute_on = 'LINEAR initial'
-    fluid_state_uo = FluidState
-    pressure_variable = liquid_pressure
-  [../]
-  [./GasSaturationAux]
-    type = FluidStateAux
-    variable = gas_saturation
-    saturation_variable = liquid_saturation
-    state_property_enum = saturation
-    execute_on = 'LINEAR initial'
-    fluid_state_uo = FluidState
-    pressure_variable = gas_pressure
-    phase_index = 1
-  [../]
-  [./GasViscosityAux]
-    type = FluidStateAux
-    variable = gas_viscosity
-    saturation_variable = liquid_saturation
-    phase_index = 1
-    state_property_enum = viscosity
-    execute_on = 'LINEAR initial'
-    fluid_state_uo = FluidState
-    pressure_variable = gas_pressure
-  [../]
-  [./GasRelPermAux]
-    type = FluidStateAux
-    variable = gas_relperm
-    saturation_variable = liquid_saturation
-    phase_index = 1
-    state_property_enum = relperm
-    execute_on = 'LINEAR initial'
-    fluid_state_uo = FluidState
-    pressure_variable = gas_pressure
-  [../]
 []
 
 [Materials]
@@ -185,14 +101,6 @@
     diffusivity = 0.
     permeability = '1e-12 0 0 0 1e-12 0 0 0 1e-12'
     porosity = 0.25
-  [../]
-  [./FluidStateMaterial]
-    type = FluidStateMaterial
-    liquid_saturation_variable = liquid_saturation
-    temperature_variable = temperature
-    gas_pressure_variable = gas_pressure
-    liquid_pressure_variable = liquid_pressure
-    fluid_state_uo = FluidState
   [../]
 []
 
@@ -271,7 +179,7 @@
   print_perf_log = true
   [./ex]
     type = Exodus
-    output_on = 'TIMESTEP_END failed failed failed failed failed failed failed failed failed failed failed failed failed failed failed failed failed failed failed failed failed failed failed failed failed failed failed failed failed failed failed failed failed'
+    output_on = 'TIMESTEP_END'
   [../]
   [./con]
     output_linear = true
@@ -292,4 +200,3 @@
     type = FunctionIC
   [../]
 []
-

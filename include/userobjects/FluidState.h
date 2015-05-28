@@ -135,6 +135,18 @@ class FluidState : public GeneralUserObject
    * @return fluid density vector (element for each phase) (kg/m^3)
    */
   virtual std::vector<Real> dDensity_dP(Real pressure, Real temperature) const = 0;
+
+/**
+ * General formulation for Henry's constant for gas solubility in
+ * water. Eq. (3) from Guidelines on the Henry's constant and vapour
+ * liquid distribution constant for gases in H20 and D20 at high
+ * temperatures, IAPWS (2004).
+ *
+ * @param temperature water temperature (C)
+ * @return Kh Henry's constant (MPa)
+ */
+virtual Real henry(Real temperature) const = 0;
+
 };
 
 #endif // FLUIDSTATE_H

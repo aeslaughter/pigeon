@@ -48,15 +48,14 @@ class FluidPropertiesCO2 : public FluidProperties
   Real dDensity_dP(Real pressure, Real temperature) const;
 
   /**
-   * Henry's law coefficient for dissolution of CO2 into water.
-   * From Battistelli et al, A fluid property module for the TOUGH2 simulator
-   * for saline brines with non-condensible gas. Proc. Eighteenth Workshop on
-   * Geothermal Reservoir Engineering, Stanford University, 1993.
+   * Henry's law constant coefficients for dissolution of CO2 into water.
+   * From Guidelines on the Henry's constant and vapour
+   * liquid distribution constant for gases in H20 and D20 at high
+   * temperatures, IAPWS (2004).
    *
-   * @param temperature fluid temperature (C)
-   * @return Henry's coefficient Kh (Pa)
+   * @return constants for Henry's constant (-)
    */
-  Real henry(Real temperature) const;
+  std::vector<Real> henryConstants() const;
 
 
  protected:

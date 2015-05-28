@@ -45,7 +45,7 @@ class FluidPropertiesWater : public FluidProperties
   Real density(Real pressure, Real temperature) const;
 
   /**
-   * Viscosity of water. 
+   * Viscosity of water.
    * Eq. (10) from Release on the IAPWS Formulation 2008 for the
    * Viscosity of Ordinary Water Substance.
    *
@@ -130,9 +130,9 @@ class FluidPropertiesWater : public FluidProperties
   /** Density function for Region 3 - supercritical water and steam
    *
    * To avoid iteration, use the backwards equations for region 3
-   * from Revised Supplementary Release on Backward Equations for 
+   * from Revised Supplementary Release on Backward Equations for
    * Specific Volume as a Function of Pressure and Temperature v(p,T)
-   * for Region 3 of the IAPWS Industrial Formulation 1997 for the 
+   * for Region 3 of the IAPWS Industrial Formulation 1997 for the
    * Thermodynamic Properties of Water and Steam.
    *
    * @param pressure water pressure (Pa)
@@ -159,7 +159,7 @@ class FluidPropertiesWater : public FluidProperties
   /**
    * Derivative of density function for Region 1 - single phase liquid region
    * with respect to presure.
-   * From Revised Release on the IAPWS Industrial Formulation 1997 for the 
+   * From Revised Release on the IAPWS Industrial Formulation 1997 for the
    * Thermodynamic Properties of Water and Steam, IAPWS 2007.
    *
    * @param pressure water pressure (Pa)
@@ -171,7 +171,7 @@ class FluidPropertiesWater : public FluidProperties
   /**
    * Derivative of density function for Region 2 - superheated steam
    * with respect to presure.
-   * From Revised Release on the IAPWS Industrial Formulation 1997 for the 
+   * From Revised Release on the IAPWS Industrial Formulation 1997 for the
    * Thermodynamic Properties of Water and Steam, IAPWS 2007.
    *
    * @param pressure water pressure (Pa)
@@ -190,6 +190,7 @@ class FluidPropertiesWater : public FluidProperties
    * @return dViscosity_dDensity
    */
   Real dViscosity_dDensity(Real temperature, Real density) const;
+
 
 
  protected:

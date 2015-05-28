@@ -140,6 +140,18 @@ class FluidStateWaterCO2 : public FluidState
    */
   virtual std::vector<Real> dDensity_dP(Real pressure, Real temperature) const;
 
+  /**
+   * General formulation for Henry's constant for gas solubility in
+   * water. Eq. (3) from Guidelines on the Henry's constant and vapour
+   * liquid distribution constant for gases in H20 and D20 at high
+   * temperatures, IAPWS (2004).
+   *
+   * @param temperature water temperature (C)
+   * @param fitting constants for each gas
+   * @return Kh Henry's constant (MPa)
+   */
+  virtual Real henry(Real temperature) const;
+
  protected:
 
   /**

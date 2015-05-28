@@ -72,16 +72,22 @@ Real
   return (vc1 + vc2 - pc * dvc2) / ((vc1 + vc2) * (vc1 + vc2));
 }
 
-Real
-  FluidPropertiesCO2::henry(Real temperature) const
+std::vector<Real>
+  FluidPropertiesCO2::henryConstants() const
 
 {
+  std::vector<Real> co2henry;
+  co2henry.push_back(-8.55445);
+  co2henry.push_back(4.01195);
+  co2henry.push_back(9.52345);
+
+  /* Battistelli formulation from TOUGH2
   Real a[6] = {7.83666e7, 1.96025e6, 8.20574e4, -7.40674e2, 2.1838, -2.20999e-3};
 
   Real co2henry = 0.;
 
   for(unsigned int i = 0; i< 6; i++)
     co2henry += a[i] * std::pow(temperature, i);
-
+*/
   return co2henry;
 }

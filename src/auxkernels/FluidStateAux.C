@@ -15,7 +15,7 @@ InputParameters validParams<FluidStateAux>()
   params.addCoupledVar("pressure_variable", 1.e6,  "The pressure variable corresponding to the phase.");
   params.addCoupledVar("temperature_variable", 50, "The temperature variable.");
   params.addCoupledVar("liquid_saturation_variable", 1.0, "The saturation variable corresponding to the liquid phase.");
-  MooseEnum state_property_enum("density viscosity mass_fraction saturation pressure relperm");
+  MooseEnum state_property_enum("density viscosity mass_fraction saturation pressure relperm henry");
   params.addRequiredParam<MooseEnum>("state_property_enum", state_property_enum, "The fluid property that this auxillary kernel is to calculate");
   params.addParam<unsigned int>("phase_index", 0, "The index of the phase this auxillary kernel acts on");
   params.addParam<unsigned int>("component_index", 0, "The index of the component this auxillary kernel acts on");
@@ -73,6 +73,10 @@ Real FluidStateAux::computeValue()
   if (_state_property_enum == "mass_fraction")
   {
     property = _fluid_state.massFractions(_pressure[_qp], temperature)[_phase_index][_component_index];
+  }
+  if (_state_property_enum == "henry")
+  {
+    property = _fluid_state.henry(temperature);
   }
 
   return property;
