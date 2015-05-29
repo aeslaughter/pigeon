@@ -54,9 +54,9 @@ ComponentFlux::ComponentFlux(const std::string & name,
 
   for (unsigned int n = 0; n < _num_phases; ++n)
   {
-    _fluid_density[n] = &coupledNodalValue("fluid_density_variables", n);
+    _fluid_density[n] = &coupledValue("fluid_density_variables", n);
     _fluid_viscosity[n] = &coupledNodalValue("fluid_viscosity_variables", n);
-    _component_mass_fraction[n] = &coupledNodalValue("component_mass_fraction_variables", n);
+    _component_mass_fraction[n] = &coupledValue("component_mass_fraction_variables", n);
     _fluid_relperm[n] = &coupledNodalValue("relperm_variables", n);
   }
 }
@@ -74,27 +74,6 @@ void ComponentFlux::computeResidual()
 Real ComponentFlux::computeQpJacobian()
 {
   return 0.0; // Not used in the upwinding code.
-/*
-  Real jacobian = 0.0;
-
-  if (_primary_variable_type == "saturation") {
-
-    jacobian = 0.0;
-  }
-
-  if (_primary_variable_type == "pressure") {
-
-    jacobian = _grad_test[_i][_qp] * (_permeability[_qp] * (*_fluid_density[0])[_qp]* _grad_phi[_j][_qp] / (*_fluid_viscosity[0])[_qp]);
-
-  }
-
-  if (_primary_variable_type == "mass_fraction") {
-
-    jacobian = 0.;
-  }
-
-  return jacobian;
-  */
 }
 
 void ComponentFlux::computeJacobian()
@@ -121,7 +100,7 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
   for (unsigned int n = 0; n < _num_phases; ++n)
     for (_i = 0; _i < num_nodes; _i++)
     {
-      mobtmp = (*_fluid_relperm[n])[_i] * (*_fluid_density[n])[_i] / (*_fluid_viscosity[n])[_i];
+      mobtmp = (*_fluid_relperm[n])[_i]  / (*_fluid_viscosity[n])[_i];
       mobility[n].push_back(mobtmp);
     }
 
@@ -144,7 +123,7 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
   Real qpresidual;
   Real qpjacobian;
 
-  // Loop over each phsae and form the _local_re contribution to the residual without the mobility term, but
+  // Loop over each phase and form the _local_re contribution to the residual without the mobility term, but
   // with the density (used to zero contribution where saturation is zero)
   // Note that computeQpResidual is not called, instead the residual is calculated at each qp
   for (unsigned int n = 0; n < _num_phases; ++n)
@@ -154,8 +133,7 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
     for (_i = 0; _i < _test.size(); _i++)
       for (_qp = 0; _qp < _qrule->n_points(); _qp++)
       {
-        qpresidual = _grad_test[_i][_qp] * (_permeability[_qp] * (*_fluid_density[n])[_qp] *
-          _phase_flux_no_mobility[_qp][n]);
+        qpresidual = _grad_test[_i][_qp] *  (*_component_mass_fraction[n])[_qp] * (_permeability[_qp] * _phase_flux_no_mobility[_qp][n]);
         _local_re(_i) += _JxW[_qp] * _coord[_qp] * qpresidual;
       }
     local_re_phase[n] = _local_re;
@@ -169,7 +147,13 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
           for (_qp = 0; _qp < _qrule->n_points(); _qp++)
           {
             if (_primary_variable_type == "pressure") //TODO: other primary variable types
-              qpjacobian = _grad_test[_i][_qp] * (_permeability[_qp] * (*_fluid_density[n])[_qp] *_grad_phi[_j][_qp]);
+              qpjacobian = _grad_test[_i][_qp] *  (*_component_mass_fraction[n])[_qp] * (_permeability[_qp] * (*_fluid_density[n])[_qp] * _grad_phi[_j][_qp]);
+
+            if (_primary_variable_type == "saturation")
+              qpjacobian = 0.; //TODO Grad pressure depends on saturation through capillary pressure
+
+            if (_primary_variable_type == "mass_fraction")
+              qpjacobian = 0.; //TODO dependence of
             _local_ke(_i, _j) += _JxW[_qp] * _coord[_qp] * qpjacobian;
           }
       local_ke_phase[n] = _local_ke;
@@ -286,7 +270,6 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
 }
 
   // Sum all of the contributions to the residual and jacobian of each phase,
-  // scaled by the component mass fraction.
   DenseVector<Number> local_re_sum;
   local_re_sum.resize(re.size());
   local_re_sum.zero();
@@ -299,10 +282,10 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
   {
     for (unsigned int nodenum = 0; nodenum < num_nodes; ++nodenum)
     {
-      local_re_sum(nodenum) += local_re_phase[n](nodenum) * (*_component_mass_fraction[n])[nodenum];
+      local_re_sum(nodenum) += local_re_phase[n](nodenum);
       if (compute_jac)
         for (_j = 0; _j < _phi.size(); _j++)
-          local_ke_sum(nodenum, _j) += local_ke_phase[n](nodenum, _j) * (*_component_mass_fraction[n])[nodenum];
+          local_ke_sum(nodenum, _j) += local_ke_phase[n](nodenum, _j);
     }
   }
 

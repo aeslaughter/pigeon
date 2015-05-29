@@ -20,6 +20,7 @@
 #include "FluidPropertyWaterAux.h"
 #include "FluidPropertyBrineAux.h"
 #include "FluidPropertyCO2Aux.h"
+#include "FluidPropertyMethaneAux.h"
 #include "RelativePermeabilityAux.h"
 #include "FluidStateAux.h"
 
@@ -42,6 +43,9 @@
 #include "FluidPropertiesCO2.h"
 #include "FluidPropertiesWater.h"
 #include "FluidPropertiesBrine.h"
+#include "FluidPropertiesIdealGas.h"
+#include "FluidPropertiesMethane.h"
+
 // Fluid states
 #include "FluidStateSinglePhase.h"
 #include "FluidStateBrineCO2.h"
@@ -113,6 +117,7 @@ QuollApp::registerObjects(Factory & factory)
    registerAux(FluidPropertyWaterAux);
    registerAux(FluidPropertyBrineAux);
    registerAux(FluidPropertyCO2Aux);
+   registerAux(FluidPropertyMethaneAux);
    registerAux(FluidStateAux);
 
    // Register the mesh modifier to rescale the vertical component so that the mesh is refined at the top
@@ -133,6 +138,8 @@ QuollApp::registerObjects(Factory & factory)
    registerUserObject(FluidPropertiesCO2);
    registerUserObject(FluidPropertiesWater);
    registerUserObject(FluidPropertiesBrine);
+   registerUserObject(FluidPropertiesIdealGas);
+   registerUserObject(FluidPropertiesMethane);
 
    // Register user objects for fluid states
    registerUserObject(FluidStateSinglePhase);

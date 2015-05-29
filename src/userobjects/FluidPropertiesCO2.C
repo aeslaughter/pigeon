@@ -23,7 +23,7 @@ FluidPropertiesCO2::FluidPropertiesCO2(const std::string & name, InputParameters
 }
 
 Real
-  FluidPropertiesCO2::density(Real pressure, Real temperature) const
+FluidPropertiesCO2::density(Real pressure, Real temperature) const
 
 {
   Real tk = temperature + _t_c2k;
@@ -37,7 +37,7 @@ Real
 }
 
 Real
-  FluidPropertiesCO2::viscosity(Real pressure, Real temperature) const
+FluidPropertiesCO2::viscosity(Real pressure, Real temperature) const
 
 {
   Real A[5] = {1357.8, 4.9227, -2.9661e-3, 2.8529e-6, -2.1829e-9};
@@ -60,7 +60,7 @@ Real
 }
 
 Real
-  FluidPropertiesCO2::dDensity_dP(Real pressure, Real temperature) const
+FluidPropertiesCO2::dDensity_dP(Real pressure, Real temperature) const
 {
   Real tk = temperature + _t_c2k;
   Real tc = std::pow((tk * 1.e-2), 10./3.);
@@ -74,7 +74,7 @@ Real
 }
 
 std::vector<Real>
-  FluidPropertiesCO2::henryConstants() const
+FluidPropertiesCO2::henryConstants() const
 
 {
   std::vector<Real> co2henry;
@@ -94,7 +94,7 @@ std::vector<Real>
 }
 
 Real
-  FluidPropertiesCO2::partialDensity(Real temperature) const
+FluidPropertiesCO2::partialDensity(Real temperature) const
 {
   Real t2 = temperature * temperature;
   Real t3 = t2 * temperature;
