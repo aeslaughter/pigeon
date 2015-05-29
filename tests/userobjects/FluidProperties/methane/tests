@@ -1,0 +1,14 @@
+[Tests]
+  [./ch4_density]
+    type = 'CSVDiff'
+    input = 'MethaneProperty.i Outputs/file_base=MethaneProperty_density AuxKernels/MethanePropertyAux/ch4_property_enum=density'
+    csvdiff = 'MethaneProperty_density_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./ch4_viscosity]
+    type = 'CSVDiff'
+    input = 'MethaneProperty.i Outputs/file_base=MethaneProperty_viscosity AuxKernels/MethanePropertyAux/ch4_property_enum=viscosity Functions/initial_pressure=1e6 Functions/initial_temperature/value=100*x'
+    csvdiff = 'MethaneProperty_viscosity_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+[]

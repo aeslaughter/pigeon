@@ -18,6 +18,7 @@ InputParameters validParams<FluidPropertiesIdealGas>()
 FluidPropertiesIdealGas::FluidPropertiesIdealGas(const std::string & name, InputParameters parameters) :
   FluidProperties(name, parameters)
 {
+  _t_c2k = 273.15;
   _R = 8.3144621;
 }
 
@@ -25,18 +26,19 @@ Real
 FluidPropertiesIdealGas::density(Real pressure, Real temperature, Real molar_mass) const
 
 {
-  return pressure * molar_mass / (_R * temperature);
+  return pressure * molar_mass / (_R * (temperature + _t_c2k)) / 1000.;
 }
 
 
 Real
 FluidPropertiesIdealGas::dDensity_dP(Real temperature, Real molar_mass) const
 {
-  return molar_mass / (_R * temperature);
+  return molar_mass / (_R * (temperature + _t_c2k));
 }
 
 Real
 FluidPropertiesIdealGas::dDensity_dT(Real pressure, Real temperature, Real molar_mass) const
 {
-  return - pressure * molar_mass / (_R * temperature * temperature);
+  Real tk = temperature + _t_c2k;
+  return - pressure * molar_mass / (_R * tk * tk);
 }

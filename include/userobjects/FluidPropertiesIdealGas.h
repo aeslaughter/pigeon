@@ -55,8 +55,9 @@ class FluidPropertiesIdealGas : public FluidProperties
 
 
  protected:
-
- // Gas constant
+ /// Conversion of temperature from Celcius to Kelvin
+ Real _t_c2k;
+ /// Gas constant
  Real _R;
 
 };
