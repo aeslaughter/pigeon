@@ -28,7 +28,8 @@ VelocityAux::VelocityAux(const std::string & name,
     _velocity(coupledGradient("streamfunction_variable"))
 {}
 
-Real VelocityAux::computeValue()
+Real
+VelocityAux::computeValue()
 {
   return 1.0;
 }

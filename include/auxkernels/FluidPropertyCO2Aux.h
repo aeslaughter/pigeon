@@ -5,15 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Auxillary kernel to calculate fluid property using the given */
-/* Fluid Property UserObject for multiphase flow in porous      */
-/* media.                                                       */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #ifndef FLUIDPROPERTYCO2AUX_H
 #define FLUIDPROPERTYCO2AUX_H
 

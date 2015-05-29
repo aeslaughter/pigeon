@@ -38,7 +38,7 @@ class FluidProperties : public GeneralUserObject
 
   /**
    * Fluid density must be over-written in all derived classes.
-   *  
+   *
    * @param pressure fluid pressure (Pa)
    * @param temperature fluid temperature (C)
    * @return fluid density (kg/m^3)
@@ -47,7 +47,7 @@ class FluidProperties : public GeneralUserObject
 
   /**
    * Fluid viscosity must be over-written in all derived classes.
-   *  
+   *
    * @param pressure fluid pressure (Pa)
    * @param temperature fluid temperature (C)
    * @return fluid viscosity (Pa.s)

@@ -5,15 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Auxillary kernel to calculate fluid property using the given */
-/* Fluid Property UserObject for multiphase flow in porous      */
-/* media.                                                       */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #ifndef FLUIDPROPERTYBRINEAUX_H
 #define FLUIDPROPERTYBRINEAUX_H
 
@@ -56,7 +47,7 @@ private:
   VariableValue & _temperature;
   /// Brine phase saturation
   VariableValue & _saturation;
-  /// Salt mass fraction in the brine 
+  /// Salt mass fraction in the brine
   VariableValue & _salt_mass_fraction;
   /// MooseEnum of fluid properties
   const MooseEnum & brine_property_enum;

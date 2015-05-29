@@ -29,7 +29,8 @@ FluidPropertyCO2Aux::FluidPropertyCO2Aux(const std::string & name,
     co2_property_enum(getParam<MooseEnum>("co2_property_enum"))
 {}
 
-Real FluidPropertyCO2Aux::computeValue()
+Real
+FluidPropertyCO2Aux::computeValue()
 {
   Real property;
 

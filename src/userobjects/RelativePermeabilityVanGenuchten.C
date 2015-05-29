@@ -107,14 +107,14 @@ RelativePermeabilityVanGenuchten::dRelativePermLiquid(Real sat_liq) const
   Real dkrel = (0.5 * std::pow(sat_eff, -0.5) * a2 * a2 + 2.0 * std::pow(sat_eff, 1.0/_m - 0.5) * std::pow(a, _m - 1.0) * a2) / (sat_liq - _sat_lr);
 
   return dkrel;
-} 
+}
 
 Real
 RelativePermeabilityVanGenuchten::dRelativePermGas(Real sat_liq) const
 {
   Real dkrel;
 
-  if (_sat_gr > 0.0) 
+  if (_sat_gr > 0.0)
   {
     Real sat_eff = (sat_liq - _sat_lr)/(1.0 - _sat_lr - _sat_gr);
     dkrel = (-2.0 * (1.0 + 2.0 * sat_eff) * std::pow(1.0 - sat_eff, 2.0)) / (1.0 - _sat_lr - _sat_gr);

@@ -5,16 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Auxillary kernel to calculate relative permeability for      */
-/*  multiphase flow in porous media using the relative          */
-/* permeability relationship defined in the relative            */
-/*  permeability UserObject.                                    */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #ifndef RELATIVEPERMEABILITYAUX_H
 #define RELATIVEPERMEABILITYAUX_H
 

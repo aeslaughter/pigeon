@@ -28,7 +28,7 @@ FluidPropertiesBrine::FluidPropertiesBrine(const std::string & name, InputParame
 }
 
 Real
-  FluidPropertiesBrine::density(Real pressure, Real temperature, Real xnacl) const
+FluidPropertiesBrine::density(Real pressure, Real temperature, Real xnacl) const
 {
   Real n1, n2, n11, n12, n1x1, n20, n21, n22, n23, n2x1, Tv;
   Real water_density, density;
@@ -68,14 +68,14 @@ Real
 }
 
 Real
-  FluidPropertiesBrine::viscosityDens(Real temperature, Real density, Real xnacl) const
+FluidPropertiesBrine::viscosityDens(Real temperature, Real density, Real xnacl) const
 {
   // Correlation requires molar concentration (mol/kg)
   Real mol = xnacl / ((1.0 - xnacl) * _Mnacl);
   Real mol2 = mol * mol;
   Real mol3 = mol2 * mol;
 
-  Real a = 1.0 + 0.0816 * mol + 0.0122 * mol2 + 0.128e-3 * mol3 + 0.629e-3 * temperature 
+  Real a = 1.0 + 0.0816 * mol + 0.0122 * mol2 + 0.128e-3 * mol3 + 0.629e-3 * temperature
            * (1.0 - std::exp(-0.7 * mol));
 
   // The brine viscosity is then given by a multiplied by the viscosity of pure water. Note
@@ -86,7 +86,7 @@ Real
 }
 
 Real
-  FluidPropertiesBrine::viscosity(Real pressure, Real temperature, Real xnacl) const
+FluidPropertiesBrine::viscosity(Real pressure, Real temperature, Real xnacl) const
 {
   // Calculate the water density
   Real water_density = _water_property.density(pressure, temperature);
@@ -95,7 +95,7 @@ Real
 }
 
 Real
-  FluidPropertiesBrine::haliteDensity(Real pressure, Real temperature) const
+FluidPropertiesBrine::haliteDensity(Real pressure, Real temperature) const
 {
   // Correlation needs pressure in bar
   Real pbar = pressure * 1.e-5;
@@ -105,12 +105,12 @@ Real
 
   // Halite density as a function of pressure
   Real l = 5.727e-3 + 2.715e-3 * std::exp(temperature / 733.4);
-  
-  return density0 + l * pbar; 
+
+  return density0 + l * pbar;
 }
 
 Real
-  FluidPropertiesBrine::haliteSolubility(Real temperature) const
+FluidPropertiesBrine::haliteSolubility(Real temperature) const
 {
   Real solubility = (26.18 + 7.2e-3 * temperature + 1.06e-4 * temperature * temperature)/100.;
 
@@ -118,7 +118,7 @@ Real
 }
 
 Real
-  FluidPropertiesBrine::pSat(Real temperature, Real xnacl) const
+FluidPropertiesBrine::pSat(Real temperature, Real xnacl) const
 {
   // Temperature in K
   Real tk = temperature + _t_c2k;
@@ -143,7 +143,7 @@ Real
 }
 
 Real
-  FluidPropertiesBrine::dDensity_dP(Real pressure, Real temperature, Real xnacl) const
+FluidPropertiesBrine::dDensity_dP(Real pressure, Real temperature, Real xnacl) const
 {
   return 0.; //TODO: implement brine density derivative wrt P
 }

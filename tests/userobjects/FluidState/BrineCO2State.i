@@ -1,6 +1,6 @@
 # #############################################################################
 # Test the FluidStateBrineCO2 UserObject properties:
-# 
+#
 # * liquidDensity - the density of liquid as a function of pressure, temperature
 #                   and mass fraction
 # * gasDensity - the density of gas as a function of pressure, temperature and
@@ -9,7 +9,7 @@
 #                     and mass fraction
 # * gasViscosity - the viscosity of gas as as a function of pressure, temperature
 #                  and mass fraction
-# 
+#
 # #############################################################################
 
 [UserObjects]

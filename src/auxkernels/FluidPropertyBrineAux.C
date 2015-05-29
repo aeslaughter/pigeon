@@ -35,7 +35,8 @@ FluidPropertyBrineAux::FluidPropertyBrineAux(const std::string & name,
     brine_property_enum(getParam<MooseEnum>("brine_property_enum"))
 {}
 
-Real FluidPropertyBrineAux::computeValue()
+Real
+FluidPropertyBrineAux::computeValue()
 {
   Real property;
 

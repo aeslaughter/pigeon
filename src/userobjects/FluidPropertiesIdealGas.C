@@ -22,7 +22,7 @@ FluidPropertiesIdealGas::FluidPropertiesIdealGas(const std::string & name, Input
 }
 
 Real
-  FluidPropertiesIdealGas::density(Real pressure, Real temperature, Real molar_mass) const
+FluidPropertiesIdealGas::density(Real pressure, Real temperature, Real molar_mass) const
 
 {
   return pressure * molar_mass / (_R * temperature);
@@ -30,13 +30,13 @@ Real
 
 
 Real
-  FluidPropertiesIdealGas::dDensity_dP(Real temperature, Real molar_mass) const
+FluidPropertiesIdealGas::dDensity_dP(Real temperature, Real molar_mass) const
 {
   return molar_mass / (_R * temperature);
 }
 
 Real
-  FluidPropertiesIdealGas::dDensity_dT(Real pressure, Real temperature, Real molar_mass) const
+FluidPropertiesIdealGas::dDensity_dT(Real pressure, Real temperature, Real molar_mass) const
 {
   return - pressure * molar_mass / (_R * temperature * temperature);
 }

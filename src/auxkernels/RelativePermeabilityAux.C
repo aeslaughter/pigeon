@@ -27,7 +27,8 @@ RelativePermeabilityAux::RelativePermeabilityAux(const std::string & name,
     fluid_phase_enum(getParam<MooseEnum>("fluid_phase_enum"))
 {}
 
-Real RelativePermeabilityAux::computeValue()
+Real
+RelativePermeabilityAux::computeValue()
 {
   Real relperm;
 

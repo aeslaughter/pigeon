@@ -24,7 +24,8 @@ CapillaryPressureAux::CapillaryPressureAux(const std::string & name,
     _liquid_saturation(coupledValue("liquid_saturation_variable"))
 {}
 
-Real CapillaryPressureAux::computeValue()
+Real
+CapillaryPressureAux::computeValue()
 {
   return _capillary_pressureUO.capillaryPressure(_liquid_saturation[_qp]);
 }

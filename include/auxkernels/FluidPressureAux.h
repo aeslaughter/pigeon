@@ -5,15 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Auxillary kernel to calculate nodal pressure of one phase    */
-/* given the pressure of the other phase and the capillary      */
-/* pressure defined in the Capillary Pressure UserObject.       */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #ifndef FLUIDPRESSUREAUX_H
 #define FLUIDPRESSUREAUX_H
 
@@ -47,7 +38,7 @@ private:
   /// Primary pressure variable at the nodes
   VariableValue & _primary_pressure;
   /// Liquid phase saturation at the nodes
-  VariableValue & _liquid_saturation; 
+  VariableValue & _liquid_saturation;
 };
 
 #endif //FLUIDPRESSUREAUX_H

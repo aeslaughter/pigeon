@@ -29,7 +29,8 @@ FluidPropertyMethaneAux::FluidPropertyMethaneAux(const std::string & name,
     ch4_property_enum(getParam<MooseEnum>("ch4_property_enum"))
 {}
 
-Real FluidPropertyMethaneAux::computeValue()
+Real
+FluidPropertyMethaneAux::computeValue()
 {
   Real property;
 

@@ -31,31 +31,31 @@ FluidStateSinglePhase::FluidStateSinglePhase(const std::string & name, InputPara
 }
 
 unsigned int
-  FluidStateSinglePhase::numPhases() const
+FluidStateSinglePhase::numPhases() const
 {
   return 1;
 }
 
 unsigned int
-  FluidStateSinglePhase::numComponents() const
+FluidStateSinglePhase::numComponents() const
 {
   return _num_components;
 }
 
 bool
-   FluidStateSinglePhase::isIsothermal() const
+FluidStateSinglePhase::isIsothermal() const
 {
    return _is_isothermal;
 }
 
 Real
-   FluidStateSinglePhase::temperature() const
+FluidStateSinglePhase::temperature() const
 {
   return _fluid_temperature;
 }
 
 std::vector<std::string>
-  FluidStateSinglePhase::variable_names() const
+FluidStateSinglePhase::variable_names() const
 {
   std::vector<std::string> varnames;
   varnames.push_back("pressure");
@@ -65,7 +65,7 @@ std::vector<std::string>
 
 
 std::vector<std::string>
-  FluidStateSinglePhase::variable_types() const
+FluidStateSinglePhase::variable_types() const
 {
   std::vector<std::string> vartypes;
   vartypes.push_back("pressure");
@@ -74,7 +74,7 @@ std::vector<std::string>
 }
 
 std::vector<unsigned int>
-  FluidStateSinglePhase::variable_phase() const
+FluidStateSinglePhase::variable_phase() const
 {
   std::vector<unsigned int> varphases;
   varphases.push_back(0);
@@ -83,7 +83,7 @@ std::vector<unsigned int>
 }
 
 std::vector<Real>
-  FluidStateSinglePhase::density(Real pressure, Real temperature) const
+FluidStateSinglePhase::density(Real pressure, Real temperature) const
 {
   Real fluid_density = _fluid_property.density(pressure, temperature);
 
@@ -94,7 +94,7 @@ std::vector<Real>
 }
 
 std::vector<Real>
-  FluidStateSinglePhase::viscosity(Real pressure, Real temperature) const
+FluidStateSinglePhase::viscosity(Real pressure, Real temperature) const
 {
   // TODO: Fix this so that density isn't calculated twice.
   Real fluid_density = _fluid_property.density(pressure, temperature);
@@ -107,7 +107,7 @@ std::vector<Real>
 }
 
 std::vector<std::vector<Real> >
-   FluidStateSinglePhase::massFractions(Real pressure, Real temperature) const
+FluidStateSinglePhase::massFractions(Real pressure, Real temperature) const
 {
   std::vector<std::vector<Real> > xmass;
   unsigned int numcomp = numComponents();
@@ -122,7 +122,7 @@ std::vector<std::vector<Real> >
 }
 
 std::vector<Real>
-   FluidStateSinglePhase::relativePermeability(Real liquid_saturation) const
+FluidStateSinglePhase::relativePermeability(Real liquid_saturation) const
 {
   std::vector<Real> relperm;
 
@@ -132,7 +132,7 @@ std::vector<Real>
 }
 
 std::vector<Real>
-   FluidStateSinglePhase::pressure(Real pressure, Real liquid_saturation) const
+FluidStateSinglePhase::pressure(Real pressure, Real liquid_saturation) const
 {
   std::vector<Real> pressures;
 
@@ -152,7 +152,7 @@ FluidStateSinglePhase::dCapillaryPressure(Real liquid_saturation) const
 }
 
 std::vector<Real>
-   FluidStateSinglePhase::saturation(Real liquid_saturation) const
+FluidStateSinglePhase::saturation(Real liquid_saturation) const
 {
   std::vector<Real> saturations;
 
@@ -162,7 +162,7 @@ std::vector<Real>
 }
 
 std::vector<Real>
-  FluidStateSinglePhase::dDensity_dP(Real pressure, Real temperature) const
+FluidStateSinglePhase::dDensity_dP(Real pressure, Real temperature) const
 {
   Real dfluid_density = _fluid_property.dDensity_dP(pressure, temperature);
 

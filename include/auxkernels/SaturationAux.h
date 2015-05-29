@@ -5,14 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Auxillary kernel to calculate saturation for multiphase flow */
-/* in porous media.                                             */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #ifndef SATURATIONAUX_H
 #define SATURATIONAUX_H
 
@@ -26,7 +18,7 @@ class SaturationAux;
  * saturation of the other phase using the simple relationship
  * S_1 = 1 - S_2.
  *
- * As saturation is only required at the nodes, use a nodal 
+ * As saturation is only required at the nodes, use a nodal
  * auxvariable.
  */
 

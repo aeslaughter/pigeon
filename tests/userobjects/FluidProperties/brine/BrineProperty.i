@@ -1,12 +1,12 @@
 # #############################################################################
 # Test the FluidPropertiesBrine UserObject properties:
-# 
+#
 # * density - the density of water as a function of pressure and temperature.
-# 
+#
 # For density, the pressure is set to vary linearly from 1MPa at the left
 # end of the mesh to 20MPa at the right end. Temperature is varied from 50 C
 # to 200 C for each test. Salt mass fraction is constant.
-# 
+#
 # #############################################################################
 
 [UserObjects]

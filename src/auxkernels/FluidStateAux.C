@@ -35,7 +35,8 @@ FluidStateAux::FluidStateAux(const std::string & name,
     _component_index(getParam<unsigned int>("component_index"))
 {}
 
-Real FluidStateAux::computeValue()
+Real
+FluidStateAux::computeValue()
 {
   Real temperature, property;
 

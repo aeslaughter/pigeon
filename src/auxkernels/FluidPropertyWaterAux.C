@@ -31,7 +31,8 @@ FluidPropertyWaterAux::FluidPropertyWaterAux(const std::string & name,
     fluid_property_enum(getParam<MooseEnum>("fluid_property_enum"))
 {}
 
-Real FluidPropertyWaterAux::computeValue()
+Real
+FluidPropertyWaterAux::computeValue()
 {
   Real property;
 

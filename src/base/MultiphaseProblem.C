@@ -34,7 +34,7 @@ MultiphaseProblem::initialSetup()
   // the first argument to getVariable is threadID - i hope the following always works
   unsigned int tid = 0;
   MooseVariable & bounded = getVariable(tid, _bounded_var_name);
-  
+
   // some checks
   if (!bounded.isNodal())
     mooseError("The bounded variables must be nodal variables in MultiphaseProblem");

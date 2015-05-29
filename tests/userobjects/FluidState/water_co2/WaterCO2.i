@@ -1,12 +1,12 @@
 # #############################################################################
 # Test the FluidStateWaterCO2 UserObject properties:
-# 
+#
 # * liquidDensity - the density of liquid as a function of pressure and temperature
 # * gasDensity - the density of gas as a function of pressure and temperature
 # * liquidViscosity - the viscosity of liquid as as a function of pressure and temperature
 # * gasViscosity - the viscosity of gas as as a function of pressure and temperature
 # * massFractions - the mass fractions of each component in each phase
-# 
+#
 # #############################################################################
 
 [UserObjects]
@@ -34,7 +34,7 @@
     cp_max = 1e5
     p0 = 1e4
     execute_on = initial
-  [../] 
+  [../]
   [./FluidStateWaterCO2]
     type = FluidStateWaterCO2
     execute_on = initial

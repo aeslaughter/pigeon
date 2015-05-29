@@ -5,7 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-
 #ifndef MULTIPHASEPROBLEM_H
 #define MULTIPHASEPROBLEM_H
 
@@ -18,7 +17,7 @@ InputParameters validParams<MultiphaseProblem>();
 
  /**
   * Constrain the saturation solution to be 0 <= sat <= 1.0 during
-  * the nonlinear iteration process.  
+  * the nonlinear iteration process.
   */
 
 class MultiphaseProblem : public FEProblem

@@ -35,30 +35,31 @@ FluidStateBrineCO2::FluidStateBrineCO2(const std::string & name, InputParameters
 }
 
 unsigned int
-  FluidStateBrineCO2::numPhases() const
+FluidStateBrineCO2::numPhases() const
 {
   return 2;
 }
 
 unsigned int
-  FluidStateBrineCO2::numComponents() const
+FluidStateBrineCO2::numComponents() const
 {
   return 2;
 }
 
 bool
-   FluidStateBrineCO2::isIsothermal() const
+  FluidStateBrineCO2::isIsothermal() const
 {
    return _is_isothermal;
 }
 
-Real FluidStateBrineCO2::temperature() const
+Real
+FluidStateBrineCO2::temperature() const
 {
   return _fluid_temperature;
 }
 
 std::vector<std::string>
-  FluidStateBrineCO2::variable_names() const
+FluidStateBrineCO2::variable_names() const
 {
   std::vector<std::string> varnames;
   varnames.push_back("gas_pressure");
@@ -68,7 +69,7 @@ std::vector<std::string>
 }
 
 std::vector<std::string>
-  FluidStateBrineCO2::variable_types() const
+FluidStateBrineCO2::variable_types() const
 {
   std::vector<std::string> vartypes;
   vartypes.push_back("pressure");
@@ -78,7 +79,7 @@ std::vector<std::string>
 }
 
 std::vector<unsigned int>
-  FluidStateBrineCO2::variable_phase() const
+FluidStateBrineCO2::variable_phase() const
 {
   std::vector<unsigned int> varphases;
   varphases.push_back(1);
@@ -88,7 +89,7 @@ std::vector<unsigned int>
 }
 
 std::vector<Real>
-  FluidStateBrineCO2::density(Real pressure, Real temperature) const
+FluidStateBrineCO2::density(Real pressure, Real temperature) const
 {
   Real xmass = 0.1; //FIX
   Real brine_density = _brine_property.density(pressure, temperature, xmass);
@@ -102,7 +103,7 @@ std::vector<Real>
 }
 
 std::vector<Real>
-  FluidStateBrineCO2::viscosity(Real pressure, Real temperature) const
+FluidStateBrineCO2::viscosity(Real pressure, Real temperature) const
 {
   Real xmass = 0.1; //FIX
   Real brine_viscosity = _brine_property.viscosity(pressure, temperature, xmass);
@@ -116,7 +117,7 @@ std::vector<Real>
 }
 
 std::vector<std::vector<Real> >
-   FluidStateBrineCO2::massFractions(Real pressure, Real temperature) const
+FluidStateBrineCO2::massFractions(Real pressure, Real temperature) const
 {
   std::vector<std::vector<Real> > xmass;
   unsigned int numcomp = numComponents();
@@ -133,7 +134,7 @@ std::vector<std::vector<Real> >
 }
 
 std::vector<Real>
-   FluidStateBrineCO2::relativePermeability(Real liquid_saturation) const
+FluidStateBrineCO2::relativePermeability(Real liquid_saturation) const
 {
   std::vector<Real> relperm;
 
@@ -144,7 +145,7 @@ std::vector<Real>
 }
 
 std::vector<Real>
-   FluidStateBrineCO2::pressure(Real gas_pressure, Real liquid_saturation) const
+FluidStateBrineCO2::pressure(Real gas_pressure, Real liquid_saturation) const
 {
   std::vector<Real> pressures;
   Real capillary_pressure = _capillary_pressure.capillaryPressure(liquid_saturation);
@@ -167,7 +168,7 @@ FluidStateBrineCO2::dCapillaryPressure(Real liquid_saturation) const
 }
 
 std::vector<Real>
-   FluidStateBrineCO2::saturation(Real liquid_saturation) const
+FluidStateBrineCO2::saturation(Real liquid_saturation) const
 {
   std::vector<Real> saturations;
 
@@ -178,7 +179,7 @@ std::vector<Real>
 }
 
 std::vector<Real>
-   FluidStateBrineCO2::dDensity_dP(Real pressure, Real temperature) const
+FluidStateBrineCO2::dDensity_dP(Real pressure, Real temperature) const
 {
   Real xmass = 0.1; //FIX
 
@@ -194,7 +195,7 @@ std::vector<Real>
 }
 
 Real
-  FluidStateBrineCO2::henry(Real temperature) const
+FluidStateBrineCO2::henry(Real temperature) const
 {
   // TODO: implement brine salting out correlation
   // Check temperature to make sure that it isn't out of the region of validity

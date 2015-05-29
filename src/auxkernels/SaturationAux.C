@@ -24,7 +24,8 @@ SaturationAux::SaturationAux(const std::string & name,
     _liquid_saturation(coupledValue("liquid_saturation_variable"))
 {}
 
-Real SaturationAux::computeValue()
+Real
+SaturationAux::computeValue()
 {
   return _fluid_state.saturation(_liquid_saturation[_qp])[0];
 }

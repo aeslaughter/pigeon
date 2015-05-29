@@ -33,7 +33,7 @@ class FluidPropertiesBrine : public FluidProperties
   /**
    * Density of brine.
    * From Driesner, The system H2o-NaCl. Part II: Correlations for molar volume,
-   * enthalpy, and isobaric heat capacity from 0 to 1000 C, 1 to 500 bar, and 0 
+   * enthalpy, and isobaric heat capacity from 0 to 1000 C, 1 to 500 bar, and 0
    * to 1 Xnacl, Geochimica et Cosmochimica Acta 71, 4902-4919 (2007).
    *
    * @param pressure brine pressure (Pa)
@@ -44,7 +44,7 @@ class FluidPropertiesBrine : public FluidProperties
   Real density(Real pressure, Real temperature, Real xnacl) const;
 
   /**
-   * Viscosity of brine. 
+   * Viscosity of brine.
    * From Phillips et al, A technical databook for geothermal energy utilization,
    * LbL-12810 (1981).
    *
@@ -69,7 +69,7 @@ class FluidPropertiesBrine : public FluidProperties
   /**
    * Density of halite (solid NaCl)
    * From Driesner, The system H2o-NaCl. Part II: Correlations for molar volume,
-   * enthalpy, and isobaric heat capacity from 0 to 1000 C, 1 to 500 bar, and 0 
+   * enthalpy, and isobaric heat capacity from 0 to 1000 C, 1 to 500 bar, and 0
    * to 1 Xnacl, Geochimica et Cosmochimica Acta 71, 4902-4919 (2007).
    *
    * @param pressure pressure (Pa)
@@ -79,12 +79,12 @@ class FluidPropertiesBrine : public FluidProperties
   Real haliteDensity(Real pressure, Real temperature) const;
 
   /**
-   * Halite solubility 
+   * Halite solubility
    * Originally from Potter et al., A new method for determining the solubility
    * of salts in aqueous solutions at elevated temperatures, J. Res. U.S. Geol.
    * Surv., 5, 389-395 (1977). Equation describing halite solubility is repeated
-   * in Chou, Phase relations in the system NaCI-KCI-H20. III: Solubilities of 
-   * halite in vapor-saturated liquids above 445°C and redetermination of phase 
+   * in Chou, Phase relations in the system NaCI-KCI-H20. III: Solubilities of
+   * halite in vapor-saturated liquids above 445°C and redetermination of phase
    * equilibrium properties in the system NaCI-HzO to 1000°C and 1500 bars,
    * Geochimica et Cosmochimica Acta 51, 1965-1975 (1987).
    *
@@ -117,7 +117,7 @@ class FluidPropertiesBrine : public FluidProperties
    */
   Real dDensity_dP(Real pressure, Real temperature, Real xnacl) const;
 
- 
+
 
  protected:
 

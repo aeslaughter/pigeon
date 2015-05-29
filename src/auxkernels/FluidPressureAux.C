@@ -26,7 +26,8 @@ FluidPressureAux::FluidPressureAux(const std::string & name,
     _liquid_saturation(coupledValue("liquid_saturation_variable"))
 {}
 
-Real FluidPressureAux::computeValue()
+Real
+FluidPressureAux::computeValue()
 {
-    return _fluid_state.pressure(_primary_pressure[_qp], _liquid_saturation[_qp])[0];
+  return _fluid_state.pressure(_primary_pressure[_qp], _liquid_saturation[_qp])[0];
 }

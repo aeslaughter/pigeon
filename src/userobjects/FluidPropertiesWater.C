@@ -91,7 +91,7 @@ FluidPropertiesWater::FluidPropertiesWater(const std::string & name, InputParame
 }
 
 Real
-  FluidPropertiesWater::density(Real pressure, Real temperature) const
+FluidPropertiesWater::density(Real pressure, Real temperature) const
 
 {
   // Valid for 273.15 K <= T <= 1073.15 K, p <= 100 MPa
@@ -122,7 +122,7 @@ Real
 }
 
 Real
-  FluidPropertiesWater::viscosity(Real temperature, Real density) const
+FluidPropertiesWater::viscosity(Real temperature, Real density) const
 {
   Real t0[4], t1[6], d1[7];
 
@@ -171,7 +171,7 @@ Real
 }
 
 Real
-  FluidPropertiesWater::pSat(Real temperature) const
+FluidPropertiesWater::pSat(Real temperature) const
 {
   Real tk = temperature + _t_c2k;
 
@@ -198,7 +198,7 @@ Real
 }
 
 Real
-  FluidPropertiesWater::tSat(Real pressure) const
+FluidPropertiesWater::tSat(Real pressure) const
 {
   Real n[10] = {0.11670521452767e4, -0.72421316703206e6, -0.17073846940092e2, 0.12020824702470e5,
                 -0.32325550322333e7, 0.14915108613530e2, -0.48232657361591e4, 0.40511340542057e6,
@@ -224,7 +224,7 @@ Real
 }
 
 Real
-  FluidPropertiesWater::b23p(Real temperature) const
+FluidPropertiesWater::b23p(Real temperature) const
 {
   Real n[5] = {0.34805185628969e3, -0.11671859879975e1, 0.10192970039326e-2, 0.57254459862746e3,
                0.13918839778870e2};
@@ -235,7 +235,7 @@ Real
 }
 
 Real
-  FluidPropertiesWater::b23t(Real pressure) const
+FluidPropertiesWater::b23t(Real pressure) const
 {
   Real n[5] = {0.34805185628969e3, -0.11671859879975e1, 0.10192970039326e-2, 0.57254459862746e3,
                0.13918839778870e2};
@@ -244,7 +244,7 @@ Real
 }
 
 Real
-  FluidPropertiesWater::densityRegion1(Real pressure, Real temperature) const
+FluidPropertiesWater::densityRegion1(Real pressure, Real temperature) const
 {
   Real p_star1 = 16.53e6;
   Real t_star1 = 1386.;
@@ -265,7 +265,7 @@ Real
 }
 
 Real
-  FluidPropertiesWater::densityRegion2(Real pressure, Real temperature) const
+FluidPropertiesWater::densityRegion2(Real pressure, Real temperature) const
 {
   Real p_star2 = 1.e6;
   Real t_star2 = 540.;
@@ -288,7 +288,7 @@ Real
 }
 
 Real
-  FluidPropertiesWater::densityRegion3(Real pressure, Real temperature) const
+FluidPropertiesWater::densityRegion3(Real pressure, Real temperature) const
 {
   // Region 3 is subdivided into 26 subregions, each with a given
   // backwards equation to directly calculate density from pressure
@@ -299,7 +299,7 @@ Real
 }
 
 Real
-  FluidPropertiesWater::dDensity_dP(Real pressure, Real temperature) const
+FluidPropertiesWater::dDensity_dP(Real pressure, Real temperature) const
 {
   // Valid for 273.15 K <= T <= 1073.15 K, p <= 100 MPa
   //          1073.15 K <= T <= 2273.15 K, p <= 50 Mpa
@@ -330,7 +330,7 @@ Real
 
 
 Real
-  FluidPropertiesWater::dDensityRegion1_dP(Real pressure, Real temperature) const
+FluidPropertiesWater::dDensityRegion1_dP(Real pressure, Real temperature) const
 {
   Real p_star1 = 16.53e6;
   Real t_star1 = 1386.;
@@ -353,7 +353,7 @@ Real
 }
 
 Real
-  FluidPropertiesWater::dDensityRegion2_dP(Real pressure, Real temperature) const
+FluidPropertiesWater::dDensityRegion2_dP(Real pressure, Real temperature) const
 {
   Real p_star2 = 1.e6;
   Real t_star2 = 540.;
@@ -378,7 +378,7 @@ Real
 }
 
 Real
-  FluidPropertiesWater::dViscosity_dDensity(Real temperature, Real density) const
+FluidPropertiesWater::dViscosity_dDensity(Real temperature, Real density) const
 {
   Real t1[6], d1[7];
 
