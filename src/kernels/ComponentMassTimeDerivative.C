@@ -78,9 +78,10 @@ Real ComponentMassTimeDerivative::computeQpResidual()
   for (unsigned int n = 0; n < _num_phases; ++n)
   {
    mass += (*_component_mass_fraction[n])[_i] * (*_fluid_density[n])[_i] * (*_fluid_saturation[n])[_i];
-   mass_old += (*_component_mass_fraction_old[n])[_i] * (*_fluid_density_old[n])[_i] * (*_fluid_saturation_old[n])[_i];
+  mass_old += (*_component_mass_fraction_old[n])[_i] * (*_fluid_density_old[n])[_i] * (*_fluid_saturation_old[n])[_i];
  }
 
+ _console <<"i " << _i << "mass time " << _porosity[_qp] * (mass - mass_old)/_dt << std::endl;
   //TODO: allow for porosity change
   return _test[_i][_qp] * _porosity[_qp] * (mass - mass_old)/_dt;
 }

@@ -54,9 +54,9 @@ ComponentFlux::ComponentFlux(const std::string & name,
 
   for (unsigned int n = 0; n < _num_phases; ++n)
   {
-    _fluid_density[n] = &coupledValue("fluid_density_variables", n);
+    _fluid_density[n] = &coupledNodalValue("fluid_density_variables", n);
     _fluid_viscosity[n] = &coupledNodalValue("fluid_viscosity_variables", n);
-    _component_mass_fraction[n] = &coupledValue("component_mass_fraction_variables", n);
+    _component_mass_fraction[n] = &coupledNodalValue("component_mass_fraction_variables", n);
     _fluid_relperm[n] = &coupledNodalValue("relperm_variables", n);
   }
 }
@@ -100,7 +100,7 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
   for (unsigned int n = 0; n < _num_phases; ++n)
     for (_i = 0; _i < num_nodes; _i++)
     {
-      mobtmp = (*_fluid_relperm[n])[_i]  / (*_fluid_viscosity[n])[_i];
+      mobtmp = (*_fluid_relperm[n])[_i] * (*_fluid_density[n])[_i] / (*_fluid_viscosity[n])[_i];
       mobility[n].push_back(mobtmp);
     }
 
@@ -133,7 +133,8 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
     for (_i = 0; _i < _test.size(); _i++)
       for (_qp = 0; _qp < _qrule->n_points(); _qp++)
       {
-        qpresidual = _grad_test[_i][_qp] *  (*_component_mass_fraction[n])[_qp] * (_permeability[_qp] * _phase_flux_no_mobility[_qp][n]);
+        qpresidual = _grad_test[_i][_qp] *  (*_component_mass_fraction[n])[_i] *
+          (_permeability[_qp] * _phase_flux_no_mobility[_qp][n]);
         _local_re(_i) += _JxW[_qp] * _coord[_qp] * qpresidual;
       }
     local_re_phase[n] = _local_re;
@@ -270,11 +271,15 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
 
 
 // Check that mass is conserved
+Real msum = 0.;
 for (unsigned int n = 0; n < _num_phases; ++n)
+{
+  for (_i = 0; _i < _test.size(); _i++)
   {
-  Real tsum = 0.;
-  for (unsigned int nodenum = 0; nodenum < num_nodes; ++nodenum)
-    tsum += local_re_phase[n](nodenum);
+    msum += local_re_phase[n](_i);
+    _console << "n " << n << ", _i " << _i << ", mass" << local_re_phase[n](_i) << std::endl;
+
+  }
 }
 
   // Sum all of the contributions to the residual and jacobian of each phase,

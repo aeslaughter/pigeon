@@ -1,6 +1,7 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
+  ny = 1
   xmax = 100
   ymax = 100
 []
@@ -13,7 +14,7 @@
 []
 
 [AuxVariables]
-  active = 'xco2gas xco2liquid xh20liquid liquid_viscosity gas_density xh20gas liquid_density liquid_relperm gas_relperm gas_saturation gas_viscosity liquid_pressure'
+  active = 'xco2gas xco2liquid xh20liquid liquid_pressure liquid_viscosity gas_density xh20gas liquid_density liquid_relperm gas_relperm gas_saturation gas_viscosity'
   [./liquid_density]
   [../]
   [./liquid_viscosity]
@@ -102,9 +103,10 @@
     type = FluidStateAux
     variable = liquid_density
     state_property_enum = density
-    execute_on = 'LINEAR initial residual'
+    execute_on = 'LINEAR initial'
     fluid_state_uo = FluidState
     pressure_variable = liquid_pressure
+    liquid_saturation_variable = liquid_saturation
   [../]
   [./LiquidViscosityAux]
     type = FluidStateAux
@@ -184,7 +186,7 @@
     gravity = '0 9.8 0'
     liquid_saturation_variable = liquid_saturation
     diffusivity = 0.
-    permeability = '1e-12 0 0 0 1e-12 0 0 0 1e-12'
+    permeability = '1e-10 0 0 0 1e-10 0 0 0 1e-10'
     porosity = 0.25
   [../]
   [./FluidStateMaterial]
@@ -203,6 +205,8 @@
     fluid_density_variable = liquid_density
     phase_saturation_variable = liquid_saturation
     execute_on = '  timestep_end'
+    saturation_variable = liquid_saturation
+    density_variable = liquid_density
   [../]
   [./co2mass]
     type = ComponentMassPostprocessor
@@ -210,6 +214,8 @@
     component_mass_fraction_variable = xco2gas
     phase_saturation_variable = gas_saturation
     phase_index = 1
+    saturation_variable = gas_saturation
+    density_variable = gas_density
   [../]
 []
 
@@ -224,9 +230,9 @@
   [../]
   [./CapillaryPressure]
     type = CapillaryPressureVanGenuchten
-    p0 = 1e4
+    p0 = 0.1
     cp_max = 1e5
-    m = 0.5
+    m = 0.7
     sat_ls = 1.0
     sat_lr = 0.2
     execute_on = 'initial linear'
@@ -293,7 +299,7 @@
   [./LiquidSaturationIC]
     variable = liquid_saturation
     type = ConstantIC
-    value = 0.6
+    value = 0.9
   [../]
   [./PressureIC]
     function = PressureICFunction

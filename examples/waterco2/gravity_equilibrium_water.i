@@ -106,6 +106,7 @@
     type = ComponentMassPostprocessor
     fluid_density_variable = liquid_density
     phase_saturation_variable = liquid_saturation
+    density_variable = liquid_density
   [../]
 []
 

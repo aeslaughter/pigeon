@@ -27,6 +27,8 @@ protected:
   MaterialProperty<std::vector<Real> > & _phase_mass;
 
   unsigned int _phase_index;
+  VariableValue & _fluid_density;
+  VariableValue & _fluid_saturation;
 
 };
 
