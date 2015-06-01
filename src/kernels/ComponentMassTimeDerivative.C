@@ -79,7 +79,7 @@ Real ComponentMassTimeDerivative::computeQpResidual()
   {
    mass += (*_component_mass_fraction[n])[_i] * (*_fluid_density[n])[_i] * (*_fluid_saturation[n])[_i];
    mass_old += (*_component_mass_fraction_old[n])[_i] * (*_fluid_density_old[n])[_i] * (*_fluid_saturation_old[n])[_i];
-  }
+ }
 
   //TODO: allow for porosity change
   return _test[_i][_qp] * _porosity[_qp] * (mass - mass_old)/_dt;

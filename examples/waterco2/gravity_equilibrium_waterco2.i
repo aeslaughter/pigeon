@@ -1,7 +1,6 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  ny = 6
   xmax = 100
   ymax = 100
 []
@@ -9,12 +8,12 @@
 [Variables]
   [./liquid_saturation]
   [../]
-  [./liquid_pressure]
+  [./gas_pressure]
   [../]
 []
 
 [AuxVariables]
-  active = 'xco2gas xco2liquid xh20liquid liquid_viscosity gas_density xh20gas liquid_density liquid_relperm gas_relperm gas_saturation gas_viscosity gas_pressure'
+  active = 'xco2gas xco2liquid xh20liquid liquid_viscosity gas_density xh20gas liquid_density liquid_relperm gas_relperm gas_saturation gas_viscosity liquid_pressure'
   [./liquid_density]
   [../]
   [./liquid_viscosity]
@@ -22,8 +21,6 @@
   [./liquid_relperm]
   [../]
   [./gas_relperm]
-  [../]
-  [./gas_pressure]
   [../]
   [./gas_saturation]
   [../]
@@ -44,6 +41,8 @@
   [./xco2gas]
     initial_condition = 1
   [../]
+  [./liquid_pressure]
+  [../]
 []
 
 [Functions]
@@ -56,23 +55,25 @@
 [Kernels]
   [./H2OMassTime]
     type = ComponentMassTimeDerivative
-    variable = liquid_pressure
+    variable = gas_pressure
     primary_variable_type = pressure
     fluid_saturation_variables = 'liquid_saturation gas_saturation'
     fluid_density_variables = 'liquid_density gas_density'
     component_mass_fraction_variables = 'xh20liquid xh20gas'
     fluid_state_uo = FluidState
     fluid_pressure_variables = 'liquid_pressure gas_pressure'
+    phase_index = 1
   [../]
   [./H2OLiquidFlux]
     type = ComponentFlux
-    variable = liquid_pressure
+    variable = gas_pressure
     primary_variable_type = pressure
     fluid_state_uo = FluidState
     relperm_variables = 'liquid_relperm gas_relperm'
     fluid_density_variables = 'liquid_density gas_density'
     fluid_viscosity_variables = 'liquid_viscosity gas_viscosity'
     component_mass_fraction_variables = 'xh20liquid xh20gas'
+    phase_index = 1
   [../]
   [./CO2MassTime]
     type = ComponentMassTimeDerivative
@@ -101,7 +102,7 @@
     type = FluidStateAux
     variable = liquid_density
     state_property_enum = density
-    execute_on = 'LINEAR initial'
+    execute_on = 'LINEAR initial residual'
     fluid_state_uo = FluidState
     pressure_variable = liquid_pressure
   [../]
@@ -128,26 +129,16 @@
     liquid_saturation_variable = liquid_saturation
     phase_index = 1
     state_property_enum = density
-    execute_on = 'LINEAR initial'
+    execute_on = 'initial linear '
     fluid_state_uo = FluidState
     pressure_variable = gas_pressure
-  [../]
-  [./GasPressureAux]
-    type = FluidStateAux
-    variable = gas_pressure
-    liquid_saturation_variable = liquid_saturation
-    state_property_enum = pressure
-    execute_on = 'LINEAR initial'
-    fluid_state_uo = FluidState
-    pressure_variable = liquid_pressure
-    phase_index = 1
   [../]
   [./GasSaturationAux]
     type = FluidStateAux
     variable = gas_saturation
     liquid_saturation_variable = liquid_saturation
     state_property_enum = saturation
-    execute_on = 'LINEAR initial'
+    execute_on = 'initial linear'
     fluid_state_uo = FluidState
     pressure_variable = gas_pressure
     phase_index = 1
@@ -158,7 +149,7 @@
     liquid_saturation_variable = liquid_saturation
     phase_index = 1
     state_property_enum = viscosity
-    execute_on = 'LINEAR initial'
+    execute_on = 'LINEAR initial '
     fluid_state_uo = FluidState
     pressure_variable = gas_pressure
   [../]
@@ -168,7 +159,16 @@
     liquid_saturation_variable = liquid_saturation
     phase_index = 1
     state_property_enum = relperm
-    execute_on = 'LINEAR initial'
+    execute_on = 'LINEAR initial '
+    fluid_state_uo = FluidState
+    pressure_variable = gas_pressure
+  [../]
+  [./LiquidPressureAux]
+    type = FluidStateAux
+    variable = liquid_pressure
+    state_property_enum = pressure
+    liquid_saturation_variable = liquid_saturation
+    execute_on = 'initial linear'
     fluid_state_uo = FluidState
     pressure_variable = gas_pressure
   [../]
@@ -202,12 +202,14 @@
     type = ComponentMassPostprocessor
     fluid_density_variable = liquid_density
     phase_saturation_variable = liquid_saturation
+    execute_on = '  timestep_end'
   [../]
   [./co2mass]
     type = ComponentMassPostprocessor
     fluid_density_variable = gas_density
     component_mass_fraction_variable = xco2gas
     phase_saturation_variable = gas_saturation
+    phase_index = 1
   [../]
 []
 
@@ -295,7 +297,7 @@
   [../]
   [./PressureIC]
     function = PressureICFunction
-    variable = liquid_pressure
+    variable = gas_pressure
     type = FunctionIC
   [../]
 []

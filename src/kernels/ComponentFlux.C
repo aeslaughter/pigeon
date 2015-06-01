@@ -223,7 +223,6 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
     }
   }
 
-
   // Perform the upwinding over all phases
     for (unsigned int nodenum = 0; nodenum < num_nodes ; ++nodenum)
     {
@@ -269,6 +268,15 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
   }
 }
 
+
+// Check that mass is conserved
+for (unsigned int n = 0; n < _num_phases; ++n)
+  {
+  Real tsum = 0.;
+  for (unsigned int nodenum = 0; nodenum < num_nodes; ++nodenum)
+    tsum += local_re_phase[n](nodenum);
+}
+
   // Sum all of the contributions to the residual and jacobian of each phase,
   DenseVector<Number> local_re_sum;
   local_re_sum.resize(re.size());
@@ -282,7 +290,8 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
   {
     for (unsigned int nodenum = 0; nodenum < num_nodes; ++nodenum)
     {
-      local_re_sum(nodenum) += local_re_phase[n](nodenum);
+      if (compute_res)
+        local_re_sum(nodenum) += local_re_phase[n](nodenum);
       if (compute_jac)
         for (_j = 0; _j < _phi.size(); _j++)
           local_ke_sum(nodenum, _j) += local_ke_phase[n](nodenum, _j);

@@ -33,6 +33,7 @@ protected:
 private:
   MaterialProperty<RealVectorValue> & _gravity;
   MaterialProperty<std::vector<RealVectorValue> > & _phase_flux_no_mobility;
+  MaterialProperty<std::vector<Real> > & _phase_mass;
 
   VariableValue & _primary_saturation;
   VariableGradient & _grad_primary_saturation;

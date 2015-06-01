@@ -24,10 +24,9 @@ protected:
   virtual Real computeQpIntegral();
 
   MaterialProperty<Real> & _porosity;
+  MaterialProperty<std::vector<Real> > & _phase_mass;
 
-  VariableValue & _fluid_density;
-  VariableValue & _component_mass_fraction;
-  VariableValue & _phase_saturation;
+  unsigned int _phase_index;
 
 };
 

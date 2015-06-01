@@ -33,6 +33,7 @@ FluidStateMaterial::FluidStateMaterial(const std::string & name,
 
     // Declare vector of phase fluxes (without mobility)
     _phase_flux_no_mobility(declareProperty<std::vector<RealVectorValue> >("phase_flux_no_mobility")),
+    _phase_mass(declareProperty<std::vector<Real> >("phase_mass")),
 
     _primary_saturation(coupledValue("primary_saturation_variable")),
     _grad_primary_saturation(coupledGradient("primary_saturation_variable")),
@@ -65,10 +66,19 @@ FluidStateMaterial::computeQpProperties()
   xmass.push_back(0.);  // Salt mass fraction in gas
   xmass.push_back(1.);  // CO2 mass fraction in gas
 
+  Real density, saturation;
+
+  _phase_mass[_qp].resize(_num_phases);
+
+  for (unsigned int n = 0; n < _num_phases; ++n)
+  {
+    density = _fluid_state.density(_primary_pressure[_qp], temperature)[n];
+    saturation = _fluid_state.saturation(_primary_saturation[_qp])[n];
+    _phase_mass[_qp][n] = density * saturation;
+  }
 
   _phase_flux_no_mobility[_qp].resize(_num_phases);
   RealVectorValue grad_pressure;
-  Real density;
 
   for (unsigned int n = 0; n < _num_phases; ++n)
   {

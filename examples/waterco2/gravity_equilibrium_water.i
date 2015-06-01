@@ -19,12 +19,13 @@
   [../]
   [./liquid_viscosity]
   [../]
-  [./liquid_relperm]
-  [../]
   [./liquid_saturation]
     initial_condition = 1
   [../]
   [./xh20liquid]
+    initial_condition = 1
+  [../]
+  [./liquid_relperm]
     initial_condition = 1
   [../]
 []
@@ -51,12 +52,11 @@
     type = ComponentFlux
     variable = liquid_pressure
     primary_variable_type = pressure
-    fluid_pressure_variables = liquid_pressure
     fluid_state_uo = FluidState
-    relperm_variables = liquid_relperm
     fluid_density_variables = liquid_density
     fluid_viscosity_variables = liquid_viscosity
     component_mass_fraction_variables = xh20liquid
+    relperm_variables = liquid_relperm
   [../]
 []
 
@@ -76,15 +76,6 @@
     execute_on = 'LINEAR initial'
     fluid_state_uo = FluidState
     pressure_variable = liquid_pressure
-  [../]
-  [./LiquidRelPermAux]
-    type = FluidStateAux
-    variable = liquid_relperm
-    state_property_enum = relperm
-    execute_on = 'LINEAR initial'
-    fluid_state_uo = FluidState
-    pressure_variable = liquid_pressure
-    saturation_variable = liquid_saturation
   [../]
 []
 
