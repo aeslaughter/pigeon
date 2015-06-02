@@ -94,13 +94,12 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
   unsigned int num_nodes = _test.size();
   mobility.resize(_num_phases);
 
-  // The mobility calculated at the nodes for each phase. Note that the component mass fraction is not
-  // included yet. Instead, determine the flux of gas and liquid, and then scale by the mass fraction.
-  // Also, fluid density is used in the local_re calculations later.
+  // The mobility calculated at the nodes for each phase.
   for (unsigned int n = 0; n < _num_phases; ++n)
     for (_i = 0; _i < num_nodes; _i++)
     {
-      mobtmp = (*_fluid_relperm[n])[_i] * (*_fluid_density[n])[_i] / (*_fluid_viscosity[n])[_i];
+      mobtmp = (*_fluid_relperm[n])[_i] * (*_fluid_density[n])[_i] * (*_component_mass_fraction[n])[_i] /
+        (*_fluid_viscosity[n])[_i];
       mobility[n].push_back(mobtmp);
     }
 
@@ -133,8 +132,7 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
     for (_i = 0; _i < _test.size(); _i++)
       for (_qp = 0; _qp < _qrule->n_points(); _qp++)
       {
-        qpresidual = _grad_test[_i][_qp] *  (*_component_mass_fraction[n])[_i] *
-          (_permeability[_qp] * _phase_flux_no_mobility[_qp][n]);
+        qpresidual = _grad_test[_i][_qp] * (_permeability[_qp] * _phase_flux_no_mobility[_qp][n]);
         _local_re(_i) += _JxW[_qp] * _coord[_qp] * qpresidual;
       }
     local_re_phase[n] = _local_re;
@@ -239,6 +237,7 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
             dtotal_mass_out[_j] += local_ke_phase[n](nodenum, _j);
         }
         local_re_phase[n](nodenum) *= mobility[n][nodenum];
+//        _console << "n " << n << ", _i " << nodenum << ", mass out" << local_re_phase[n](nodenum) << std::endl;
         total_mass_out += local_re_phase[n](nodenum);
       }
       else
@@ -264,6 +263,8 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
             local_ke_phase[n](nodenum, _j) += local_re_phase[n](nodenum)*(dtotal_mass_out[_j]/total_in - dtotal_in[_j]*total_mass_out/total_in/total_in);
           }
         local_re_phase[n](nodenum) *= total_mass_out/total_in;
+//        _console << "n " << n << ", _i " << nodenum << ", mass in" << local_re_phase[n](nodenum) << std::endl;
+
       }
     }
   }
@@ -277,7 +278,7 @@ for (unsigned int n = 0; n < _num_phases; ++n)
   for (_i = 0; _i < _test.size(); _i++)
   {
     msum += local_re_phase[n](_i);
-    _console << "n " << n << ", _i " << _i << ", mass" << local_re_phase[n](_i) << std::endl;
+  //  _console << "n " << n << ", _i " << _i << ", mass" << local_re_phase[n](_i) << std::endl;
 
   }
 }

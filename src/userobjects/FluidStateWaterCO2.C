@@ -82,46 +82,55 @@ std::vector<unsigned int>
 FluidStateWaterCO2::variable_phase() const
 {
   std::vector<unsigned int> varphases;
-  varphases.push_back(1);
-  varphases.push_back(0);
+  varphases.push_back(1);  // gas phase
+  varphases.push_back(0);  // liquid phase
 
   return varphases;
 }
 
-std::vector<Real>
-FluidStateWaterCO2::density(Real pressure, Real temperature) const
+Real
+FluidStateWaterCO2::density(Real pressure, Real temperature, unsigned int phase_index) const
 {
-  Real water_density = _water_property.density(pressure, temperature);
-  Real co2_density = _co2_property.density(pressure, temperature);
+  Real fluid_density;
+
+  if (phase_index == 0)
+    fluid_density = _water_property.density(pressure, temperature);
+
+  else if (phase_index == 1)
+    fluid_density = _co2_property.density(pressure, temperature);
+
+  else
+    mooseError("phase_index is out of range in FluidStateWaterCO2::density");
 
   // Calculate the density of liquid with dissolved CO2.
   // TODO: move this to aux variable using FluidStateAux.
   Real xco2l = FluidStateWaterCO2::massFractions(pressure, temperature)[1][0];
-  Real liquid_density = 1.0 / (xco2l / _co2_property.partialDensity(temperature) +
-    (1.0 - xco2l) / water_density);
+  fluid_density = 1.0 / (xco2l / _co2_property.partialDensity(temperature) +
+    (1.0 - xco2l) / fluid_density);
 
-
-  std::vector<Real> densities;
-  densities.push_back(liquid_density);
-  densities.push_back(co2_density);
-
-  return densities;
+  return fluid_density;
 }
 
-std::vector<Real>
-FluidStateWaterCO2::viscosity(Real pressure, Real temperature) const
+Real
+FluidStateWaterCO2::viscosity(Real pressure, Real temperature, unsigned int phase_index) const
 {
+  Real fluid_viscosity;
+
   // TODO: Fix this so that density isn't calculated twice.
-  Real water_density = _water_property.density(pressure, temperature);
-  Real water_viscosity = _water_property.viscosity(temperature, water_density);
-  Real co2_viscosity = _co2_property.viscosity(pressure, temperature);
+  if (phase_index == 0)
+  {
+    Real water_density = _water_property.density(pressure, temperature);
+    fluid_viscosity = _water_property.viscosity(temperature, water_density);
+  }
+  else if (phase_index == 1)
+    fluid_viscosity = _co2_property.viscosity(pressure, temperature);
 
-  // Assuming that the liquid viscosity is water, and gas is CO2 - ie no CO2 in liquid, no vapour in gas
-  std::vector<Real> viscosities;
-  viscosities.push_back(water_viscosity);
-  viscosities.push_back(co2_viscosity);
+  else
+    mooseError("phase_index is out of range in FluidStateWaterCO2::viscosity");
 
-  return viscosities;
+  // TODO: effect of co2 in water on viscosity
+
+  return fluid_viscosity;
 }
 
 std::vector<std::vector<Real> >

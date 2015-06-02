@@ -22,9 +22,15 @@ FluidPropertiesBrine::FluidPropertiesBrine(const std::string & name, InputParame
   _water_property(getUserObject<FluidPropertiesWater>("water_property_uo"))
 {
   /// Reference constants used in to calculate thermophysical properties of water.
-  _Mh2o = 18.015e-3;
+  _Mh2o = _water_property.molarMass();
   _Mnacl = 58.443e-3;
   _t_c2k = 273.15;
+}
+
+Real
+FluidPropertiesBrine::molarMass() const
+{
+  return _Mnacl; //kg/mol
 }
 
 Real

@@ -24,6 +24,12 @@ FluidPropertiesMethane::FluidPropertiesMethane(const std::string & name, InputPa
 }
 
 Real
+FluidPropertiesMethane::molarMass() const
+{
+  return _Mch4;
+}
+
+Real
 FluidPropertiesMethane::density(Real pressure, Real temperature) const
 
 {

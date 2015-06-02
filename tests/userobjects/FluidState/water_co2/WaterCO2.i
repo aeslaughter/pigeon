@@ -78,7 +78,7 @@
     execute_on = initial
     pressure_variable = pressure
     phase_index = 0
-    liquid_saturation_variable = 0.5
+    saturation_variable = 0.5
   [../]
 []
 

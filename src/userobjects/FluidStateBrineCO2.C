@@ -88,32 +88,41 @@ FluidStateBrineCO2::variable_phase() const
   return varphases;
 }
 
-std::vector<Real>
-FluidStateBrineCO2::density(Real pressure, Real temperature) const
+Real
+FluidStateBrineCO2::density(Real pressure, Real temperature, unsigned int phase_index) const
 {
-  Real xmass = 0.1; //FIX
-  Real brine_density = _brine_property.density(pressure, temperature, xmass);
-  Real co2_density = _co2_property.density(pressure, temperature);
+  Real fluid_density;
 
-  std::vector<Real> densities;
-  densities.push_back(brine_density);
-  densities.push_back(co2_density);
+  if (phase_index == 0)
+  {
+    Real xmass = 0.1; //FIX
+    fluid_density = _brine_property.density(pressure, temperature, xmass);
+  }
+  else if (phase_index == 1)
+    fluid_density = _co2_property.density(pressure, temperature);
 
-  return densities;
+  else
+    mooseError("phase_index is out of range in FluidStateBrineCO2::density");
+
+  return fluid_density;
 }
 
-std::vector<Real>
-FluidStateBrineCO2::viscosity(Real pressure, Real temperature) const
+Real
+FluidStateBrineCO2::viscosity(Real pressure, Real temperature, unsigned int phase_index) const
 {
   Real xmass = 0.1; //FIX
-  Real brine_viscosity = _brine_property.viscosity(pressure, temperature, xmass);
-  Real co2_viscosity = _co2_property.viscosity(pressure, temperature);
+  Real fluid_viscosity;
 
-  std::vector<Real> viscosities;
-  viscosities.push_back(brine_viscosity);
-  viscosities.push_back(co2_viscosity);
+  if (phase_index == 0)
+    fluid_viscosity = _brine_property.viscosity(pressure, temperature, xmass);
 
-  return viscosities;
+  else if (phase_index == 1)
+    fluid_viscosity = _co2_property.viscosity(pressure, temperature);
+
+  else
+    mooseError("phase_index is out of range in FluidStateBrineCO2::viscosity");
+
+  return fluid_viscosity;
 }
 
 std::vector<std::vector<Real> >

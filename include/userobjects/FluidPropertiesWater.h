@@ -30,6 +30,12 @@ class FluidPropertiesWater : public FluidProperties
   FluidPropertiesWater(const std::string & name, InputParameters parameters);
 
   /**
+   * Water molar mass.
+   * @return molar mass (kg/mol)
+   */
+  Real molarMass() const;
+
+  /**
    * Density of water
    * From IAPWS IF97 Revised Release on the IAPWS Industrial
    * Formulation 1997 for the Thermodynamic Properties of Water
@@ -204,6 +210,8 @@ class FluidPropertiesWater : public FluidProperties
   Real _v_critical;
   /// Conversion of temperature from Celcius to Kelvin
   Real _t_c2k;
+  /// Molar mass of water
+  Real _Mh2o;
   /// Universal gas constant
   Real _R;
   // Constants

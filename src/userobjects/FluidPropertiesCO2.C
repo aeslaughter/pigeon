@@ -19,7 +19,13 @@ FluidPropertiesCO2::FluidPropertiesCO2(const std::string & name, InputParameters
   FluidProperties(name, parameters)
 {
   _t_c2k = 273.15;
-  _Mco2 = 44.0;
+  _Mco2 = 44.0e-3;
+}
+
+Real
+FluidPropertiesCO2::molarMass() const
+{
+  return _Mco2; //kg/mol
 }
 
 Real
@@ -101,5 +107,5 @@ FluidPropertiesCO2::partialDensity(Real temperature) const
 
   Real V = 37.51 - 9.585e-2 * temperature + 8.74e-4 * t2 - 5.044e-7 * t3;
 
-  return 1000.0 * _Mco2 / V;
+  return 1.e6 * _Mco2 / V;
 }

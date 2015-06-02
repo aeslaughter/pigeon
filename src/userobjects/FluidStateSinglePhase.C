@@ -82,28 +82,22 @@ FluidStateSinglePhase::variable_phase() const
   return varphases;
 }
 
-std::vector<Real>
-FluidStateSinglePhase::density(Real pressure, Real temperature) const
+Real
+FluidStateSinglePhase::density(Real pressure, Real temperature, unsigned int phase_index) const
 {
   Real fluid_density = _fluid_property.density(pressure, temperature);
 
-  std::vector<Real> densities;
-  densities.push_back(fluid_density);
-
-  return densities;
+  return fluid_density;
 }
 
-std::vector<Real>
-FluidStateSinglePhase::viscosity(Real pressure, Real temperature) const
+Real
+FluidStateSinglePhase::viscosity(Real pressure, Real temperature, unsigned int phase_index) const
 {
   // TODO: Fix this so that density isn't calculated twice.
   Real fluid_density = _fluid_property.density(pressure, temperature);
   Real fluid_viscosity = _fluid_property.viscosity(temperature, fluid_density);
 
-  std::vector<Real> viscosities;
-  viscosities.push_back(fluid_viscosity);
-
-  return viscosities;
+  return fluid_viscosity;
 }
 
 std::vector<std::vector<Real> >

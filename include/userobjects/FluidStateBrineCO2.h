@@ -72,20 +72,22 @@ class FluidStateBrineCO2 : public FluidState
   /**
    * Fluid density using FluidPropertiesBrine and FluidPropertiesCO2 UserObjects.
    *
-   * @param pressure liquid pressure (Pa)
-   * @param temperature liquid temperature (C)
-   * @return fluid density (gas and liquid) (kg/m^3)
+   * @param pressure phase pressure (Pa)
+   * @param temperature temperature (C)
+   * @param phase_index phase index
+   * @return fluid density (kg/m^3)
    */
-  virtual std::vector<Real> density(Real pressure, Real temperature) const;
+  Real density(Real pressure, Real temperature, unsigned int phase_index) const;
 
   /**
    * Fluid viscosity must be over-written in all derived classes.
    *
-   * @param pressure liquid pressure (Pa)
-   * @param temperature liquid temperature (C)
+   * @param pressure pressure (Pa)
+   * @param temperature temperature (C)
+   * @param phase_index phase index
    * @return liquid viscosity (Pa.s)
    */
-  virtual std::vector<Real> viscosity(Real pressure, Real temperature) const;
+  virtual Real viscosity(Real pressure, Real temperature, unsigned int phase_index) const;
 
   /**
    * Mass fractions for each component in each phase.

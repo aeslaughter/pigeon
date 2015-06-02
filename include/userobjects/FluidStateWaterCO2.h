@@ -81,11 +81,11 @@ class FluidStateWaterCO2 : public FluidState
   /**
    * Fluid density using FluidPropertiesWater and FluidPropertiesCO2 UserObjects.
    *
-   * @param pressure liquid pressure (Pa)
-   * @param temperature liquid temperature (C)
-   * @return fluid density (liquid and gas) (kg/m^3)
+   * @param pressure phase pressure (Pa)
+   * @param temperature temperature (C)
+   * @return fluid density (kg/m^3)
    */
-  virtual std::vector<Real> density(Real pressure, Real temperature) const;
+  virtual Real density(Real pressure, Real temperature, unsigned int phase_index) const;
 
   /**
    * Fluid viscosity using FluidPropertiesWater and FluidPropertiesCO2 UserObjects.
@@ -94,7 +94,7 @@ class FluidStateWaterCO2 : public FluidState
    * @param temperature liquid temperature (C)
    * @return fluid viscosity (liquid and gas) (Pa.s)
    */
-  virtual std::vector<Real> viscosity(Real pressure, Real temperature) const;
+  virtual Real viscosity(Real pressure, Real temperature, unsigned int phase_index) const;
 
   /**
    * Mass fractions for each component in each phase.

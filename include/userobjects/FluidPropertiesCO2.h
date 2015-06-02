@@ -22,6 +22,12 @@ class FluidPropertiesCO2 : public FluidProperties
   FluidPropertiesCO2(const std::string & name, InputParameters parameters);
 
   /**
+   * CO2 molar mass.
+   * @return molar mass (kg/mol)
+   */
+  Real molarMass() const;
+
+  /**
    * CO2 gas density as a function of  pressure and temperature.
    * @param pressure gas pressure (Pa)
    * @param temperature fluid temperature (C)
@@ -70,7 +76,7 @@ class FluidPropertiesCO2 : public FluidProperties
  protected:
   /// Conversion of temperature from Celcius to Kelvin
   Real _t_c2k;
-  /// Molar mass of pure CO2
+  /// Molar mass of CO2
   Real _Mco2;
 
 };

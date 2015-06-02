@@ -24,6 +24,7 @@ FluidPropertiesWater::FluidPropertiesWater(const std::string & name, InputParame
   _rho_critical = 322;
   _v_critical = 1.0 / _rho_critical;
   _t_c2k = 273.15;
+  _Mh2o = 18.015e-3;
   _R = 0.461526;
 
   /// Constants for region 1.
@@ -88,6 +89,12 @@ FluidPropertiesWater::FluidPropertiesWater(const std::string & name, InputParame
            -4.89837e-1, -2.57040e-1, 1.61913e-1, 2.57399e-1, -3.25372e-2, 6.98452e-2,
            8.72102e-3, -4.35673e-3, -5.93264e-4};
   _h1v.assign(h1varr, h1varr + 21);
+}
+
+Real
+FluidPropertiesWater::molarMass() const
+{
+  return _Mh2o; //kg/mol
 }
 
 Real

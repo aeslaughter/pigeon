@@ -23,6 +23,12 @@ class FluidPropertiesMethane : public FluidPropertiesIdealGas
   FluidPropertiesMethane(const std::string & name, InputParameters parameters);
 
   /**
+   * Methane molar mass.
+   * @return molar mass (kg/mol)
+   */
+  Real molarMass() const;
+
+  /**
    * CH4 gas density as a function of  pressure and temperature assuming an
    * ideal gas.
    *

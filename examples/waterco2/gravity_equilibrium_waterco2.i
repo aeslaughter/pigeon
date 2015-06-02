@@ -1,7 +1,7 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  ny = 1
+  ny = 10
   xmax = 100
   ymax = 100
 []
@@ -33,14 +33,16 @@
     initial_condition = 1
   [../]
   [./xh20liquid]
-    initial_condition = 1
+    initial_condition = 0.9
   [../]
   [./xh20gas]
+    initial_condition = 0.1
   [../]
   [./xco2liquid]
+    initial_condition = 0.1
   [../]
   [./xco2gas]
-    initial_condition = 1
+    initial_condition = 0.9
   [../]
   [./liquid_pressure]
   [../]
@@ -49,7 +51,7 @@
 [Functions]
   [./PressureICFunction]
     type = ParsedFunction
-    value = 1.49e6
+    value = 1.5e6
   [../]
 []
 
@@ -106,7 +108,7 @@
     execute_on = 'LINEAR initial'
     fluid_state_uo = FluidState
     pressure_variable = liquid_pressure
-    liquid_saturation_variable = liquid_saturation
+    saturation_variable = liquid_saturation
   [../]
   [./LiquidViscosityAux]
     type = FluidStateAux
@@ -123,12 +125,12 @@
     execute_on = 'LINEAR initial'
     fluid_state_uo = FluidState
     pressure_variable = liquid_pressure
-    liquid_saturation_variable = liquid_saturation
+    saturation_variable = liquid_saturation
   [../]
   [./GasDensityAux]
     type = FluidStateAux
     variable = gas_density
-    liquid_saturation_variable = liquid_saturation
+    saturation_variable = liquid_saturation
     phase_index = 1
     state_property_enum = density
     execute_on = 'initial linear '
@@ -138,7 +140,7 @@
   [./GasSaturationAux]
     type = FluidStateAux
     variable = gas_saturation
-    liquid_saturation_variable = liquid_saturation
+    saturation_variable = liquid_saturation
     state_property_enum = saturation
     execute_on = 'initial linear'
     fluid_state_uo = FluidState
@@ -148,7 +150,7 @@
   [./GasViscosityAux]
     type = FluidStateAux
     variable = gas_viscosity
-    liquid_saturation_variable = liquid_saturation
+    saturation_variable = liquid_saturation
     phase_index = 1
     state_property_enum = viscosity
     execute_on = 'LINEAR initial '
@@ -158,7 +160,7 @@
   [./GasRelPermAux]
     type = FluidStateAux
     variable = gas_relperm
-    liquid_saturation_variable = liquid_saturation
+    saturation_variable = liquid_saturation
     phase_index = 1
     state_property_enum = relperm
     execute_on = 'LINEAR initial '
@@ -169,7 +171,7 @@
     type = FluidStateAux
     variable = liquid_pressure
     state_property_enum = pressure
-    liquid_saturation_variable = liquid_saturation
+    saturation_variable = liquid_saturation
     execute_on = 'initial linear'
     fluid_state_uo = FluidState
     pressure_variable = gas_pressure
@@ -186,7 +188,7 @@
     gravity = '0 9.8 0'
     liquid_saturation_variable = liquid_saturation
     diffusivity = 0.
-    permeability = '1e-10 0 0 0 1e-10 0 0 0 1e-10'
+    permeability = '1e-13 0 0 0 1e-13 0 0 0 1e-13'
     porosity = 0.25
   [../]
   [./FluidStateMaterial]
@@ -219,6 +221,25 @@
   [../]
 []
 
+[VectorPostprocessors]
+  [./gas_pressure]
+    type = LineValueSampler
+    variable = gas_pressure
+    num_points = 10
+    start_point = '50 5 0'
+    end_point = '50 95 0'
+    sort_by = y
+  [../]
+  [./gas_sat]
+    type = LineValueSampler
+    variable = gas_saturation
+    num_points = 10
+    start_point = '50 5 0 '
+    end_point = '50 95 0'
+    sort_by = y
+  [../]
+[]
+
 [UserObjects]
   [./FluidPropertiesWater]
     type = FluidPropertiesWater
@@ -229,20 +250,12 @@
     execute_on = 'initial linear'
   [../]
   [./CapillaryPressure]
-    type = CapillaryPressureVanGenuchten
-    p0 = 0.1
-    cp_max = 1e5
-    m = 0.7
-    sat_ls = 1.0
-    sat_lr = 0.2
+    type = CapillaryPressureConstant
     execute_on = 'initial linear'
+    cp = 0
   [../]
   [./RelativePermeabilityVanGenuchten]
-    type = RelativePermeabilityVanGenuchten
-    sat_gr = 0.2
-    m = 0.5
-    sat_ls = 1
-    sat_lr = 0.2
+    type = RelativePermeabilityPerfectlyMobile
     execute_on = 'initial linear'
   [../]
   [./FluidState]
@@ -252,7 +265,7 @@
     water_property_uo = FluidPropertiesWater
     relative_permeability_uo = RelativePermeabilityVanGenuchten
     execute_on = 'initial linear'
-    fluid_temperature = 50
+    fluid_temperature = 100
     isothermal = true
   [../]
 []
@@ -271,7 +284,7 @@
 [Executioner]
   type = Transient
   solve_type = PJFNK
-  end_time = 1e6
+  end_time = 1e4
   nl_abs_tol = 1e-6
   nl_rel_tol = 1e-8
   [./TimeStepper]

@@ -74,12 +74,12 @@ class FluidState : public GeneralUserObject
   /**
    * Fluid density must be over-written in all derived classes.
    *
-   * @param pressure liquid pressure (Pa)
-   * @param temperature liquid temperature (C)
-   * @param xmass vector of component mass fractions (kg/kg)
-   * @return fluid density vector (element for each phase) (kg/m^3)
+   * @param pressure pressure (Pa)
+   * @param temperature  temperature (C)
+   * @param phase_index index of phase
+   * @return fluid density of phase (kg/m^3)
    */
-  virtual std::vector<Real> density(Real pressure, Real temperature) const = 0;
+  virtual Real density(Real pressure, Real temperature, unsigned int phase_index) const = 0;
 
   /**
    * Liquid viscosity must be over-written in all derived classes.
@@ -89,7 +89,7 @@ class FluidState : public GeneralUserObject
    * @param xmass vector of component mass fractions (kg/kg)
    * @return liquid viscosity (Pa.s)
    */
-  virtual std::vector<Real> viscosity(Real pressure, Real temperature) const = 0;
+  virtual Real viscosity(Real pressure, Real temperature, unsigned int phase_index) const = 0;
 
  /**
    * Mass fractions for each component in each phase.
@@ -108,15 +108,14 @@ class FluidState : public GeneralUserObject
    */
   virtual std::vector<Real> relativePermeability(Real liquid_saturation) const = 0;
 
-
   /**
    * Phase pressures
    *
    * @param pressure primary pressure (Pa)
-   * @param saturation liquid saturation (-)
+   * @param saturation primary saturation (-)
    * @return pressure phase pressure (Pa)
    */
-  virtual std::vector<Real> pressure(Real gas_pressure, Real liquid_saturation) const = 0;
+  virtual std::vector<Real> pressure(Real primary_pressure, Real primary_saturation) const = 0;
 
   /**
    * Derivative of capillary pressure for each phase with respect to the

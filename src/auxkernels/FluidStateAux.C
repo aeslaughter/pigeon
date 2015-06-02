@@ -12,9 +12,9 @@ InputParameters validParams<FluidStateAux>()
 {
   InputParameters params = validParams<AuxKernel>();
   params.addRequiredParam<UserObjectName>("fluid_state_uo", "Name of the User Object defining the fluid state");
-  params.addCoupledVar("pressure_variable", 1.e6,  "The pressure variable corresponding to the phase.");
+  params.addCoupledVar("pressure_variable", 1.e6,  "The pressure variable");
   params.addCoupledVar("temperature_variable", 50, "The temperature variable.");
-  params.addCoupledVar("liquid_saturation_variable", 1.0, "The saturation variable corresponding to the liquid phase.");
+  params.addCoupledVar("saturation_variable", 1.0, "The saturation variable");
   MooseEnum state_property_enum("density viscosity mass_fraction saturation pressure relperm henry");
   params.addRequiredParam<MooseEnum>("state_property_enum", state_property_enum, "The fluid property that this auxillary kernel is to calculate");
   params.addParam<unsigned int>("phase_index", 0, "The index of the phase this auxillary kernel acts on");
@@ -29,11 +29,12 @@ FluidStateAux::FluidStateAux(const std::string & name,
     _fluid_state(getUserObject<FluidState>("fluid_state_uo")),
     _pressure(coupledValue("pressure_variable")),
     _temperature(coupledValue("temperature_variable")),
-    _saturation(coupledValue("liquid_saturation_variable")),
+    _saturation(coupledValue("saturation_variable")),
     _state_property_enum(getParam<MooseEnum>("state_property_enum")),
     _phase_index(getParam<unsigned int>("phase_index")),
     _component_index(getParam<unsigned int>("component_index"))
-{}
+{
+}
 
 Real
 FluidStateAux::computeValue()
@@ -53,11 +54,11 @@ FluidStateAux::computeValue()
     if (_fluid_state.saturation(_saturation[_qp])[_phase_index] < eps)
       property = 0.;
     else
-      property = _fluid_state.density(_pressure[_qp], temperature)[_phase_index];
+      property = _fluid_state.density(_pressure[_qp], temperature, _phase_index);
   }
   if (_state_property_enum == "viscosity")
   {
-    property = _fluid_state.viscosity(_pressure[_qp], temperature)[_phase_index];
+    property = _fluid_state.viscosity(_pressure[_qp], temperature, _phase_index);
   }
   if (_state_property_enum == "saturation")
   {

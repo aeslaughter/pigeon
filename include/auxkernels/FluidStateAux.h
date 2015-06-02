@@ -35,11 +35,11 @@ private:
    */
   const FluidState & _fluid_state;
 
-  /// Brine phase pressure
+  /// Phase pressure
   VariableValue & _pressure;
-  /// Brine phase temperature
+  /// Temperature
   VariableValue & _temperature;
-  /// Brine phase saturation
+  /// Phase saturation
   VariableValue & _saturation;
   /// MooseEnum of fluid properties
   const MooseEnum & _state_property_enum;

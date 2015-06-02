@@ -31,6 +31,12 @@ class FluidPropertiesBrine : public FluidProperties
   FluidPropertiesBrine(const std::string & name, InputParameters parameters);
 
   /**
+   * NaCl molar mass.
+   * @return molar mass (kg/mol)
+   */
+  Real molarMass() const;
+
+  /**
    * Density of brine.
    * From Driesner, The system H2o-NaCl. Part II: Correlations for molar volume,
    * enthalpy, and isobaric heat capacity from 0 to 1000 C, 1 to 500 bar, and 0
