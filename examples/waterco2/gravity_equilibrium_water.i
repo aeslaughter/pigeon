@@ -7,9 +7,6 @@
 []
 
 [Variables]
-  active = 'liquid_pressure'
-  [./liquid_saturation]
-  [../]
   [./liquid_pressure]
   [../]
 []
@@ -83,7 +80,7 @@
   [./PorousMaterial]
     type = PorousMaterial
     block = 0
-    rel_perm_uo = RelativePermeabilityVanGenuchten
+    rel_perm_uo = RelativePermeability
     density = 2600.
     cap_pres_uo = CapillaryPressure
     gravity = '0 9.8 0'
@@ -104,38 +101,20 @@
 [Postprocessors]
   [./h20mass]
     type = ComponentMassPostprocessor
-    fluid_density_variable = liquid_density
-    phase_saturation_variable = liquid_saturation
-    density_variable = liquid_density
+    component_mass_fraction_variables = xh20liquid
+    density_variables = liquid_density
   [../]
 []
 
 [UserObjects]
-  active = 'FluidState RelativePermeabilityVanGenuchten FluidPropertiesWater CapillaryPressure'
   [./FluidPropertiesWater]
     type = FluidPropertiesWater
     execute_on = 'initial linear'
   [../]
-  [./FluidPropertiesCO2]
-    type = FluidPropertiesCO2
-    execute_on = 'initial linear'
-  [../]
   [./CapillaryPressure]
-    type = CapillaryPressureVanGenuchten
-    p0 = 1e3
-    cp_max = 1e4
-    m = 0.5
-    sat_ls = 1.0
-    sat_lr = 0.2
-    execute_on = 'initial linear'
-  [../]
-  [./RelativePermeabilityVanGenuchten]
-    type = RelativePermeabilityVanGenuchten
-    sat_gr = 0.25
-    m = 0.75
-    sat_ls = 1
-    sat_lr = 0.5
-    execute_on = 'initial linear'
+    type = CapillaryPressureConstant
+    execute_on = ' initial'
+    cp = 0
   [../]
   [./FluidState]
     type = FluidStateSinglePhase
@@ -143,6 +122,10 @@
     fluid_temperature = 50
     isothermal = true
     fluid_property_uo = FluidPropertiesWater
+  [../]
+  [./RelativePermeability]
+    type = RelativePermeabilityPerfectlyMobile
+    execute_on = 'initial '
   [../]
 []
 
@@ -166,8 +149,7 @@
   trans_ss_check = true
   [./TimeStepper]
     type = IterationAdaptiveDT
-    dt = 5
-    growth_factor = 1.1
+    dt = 100
   [../]
 []
 
@@ -186,12 +168,6 @@
 []
 
 [ICs]
-  active = 'PressureIC'
-  [./LiquidSaturationIC]
-    variable = liquid_saturation
-    type = ConstantIC
-    value = 0.7
-  [../]
   [./PressureIC]
     function = PressureICFunction
     variable = liquid_pressure

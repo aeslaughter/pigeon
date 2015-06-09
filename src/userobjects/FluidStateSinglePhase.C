@@ -86,6 +86,13 @@ std::vector<std::vector<Real> >
 FluidStateSinglePhase::thermophysicalProperties(Real pressure, Real temperature, Real saturation) const
 {
   std::vector<std::vector<Real> > fluid_properties;
+  fluid_properties.resize(numPhases());
+
+  Real fluid_density = _fluid_property.density(pressure, temperature);
+  Real fluid_viscosity = _fluid_property.viscosity(temperature, fluid_density);
+
+  fluid_properties[0].push_back(fluid_density);
+  fluid_properties[0].push_back(fluid_viscosity);
 
   return fluid_properties;
 }
