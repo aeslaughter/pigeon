@@ -11,25 +11,42 @@ template<>
 InputParameters validParams<ComponentMassPostprocessor>()
 {
   InputParameters params = validParams<ElementIntegralPostprocessor>();
-  params.addParam<unsigned int>("phase_index", 0, "The phase index of the fluid that this postprocessor acts on");
-  params.addCoupledVar("density_variable", "The density variable corresponding to the phase.");
-  params.addCoupledVar("saturation_variable", 1.0, "The saturation variable corresponding to the phase.");
+  params.addRequiredCoupledVar("density_variables", "The density variables corresponding to the phase.");
+  params.addCoupledVar("saturation_variables", 1.0, "The saturation variables corresponding to the phase.");
+  params.addRequiredCoupledVar("component_mass_fraction_variables", "The mass fraction of the component in this phase");
   return params;
 }
 
 ComponentMassPostprocessor::ComponentMassPostprocessor(const std::string & name, InputParameters parameters) :
     ElementIntegralPostprocessor(name, parameters),
-    _porosity(getMaterialProperty<Real>("porosity")),
-    _phase_mass(getMaterialProperty<std::vector<Real> >("phase_mass")),
-    _phase_index(getParam<unsigned int>("phase_index")),
-    _fluid_density(coupledValue("density_variable")),
-    _fluid_saturation(coupledValue("saturation_variable"))
+    _porosity(getMaterialProperty<Real>("porosity"))
+//    _phase_mass(getMaterialProperty<std::vector<Real> >("phase_mass")),
+//    _fluid_density(coupledValue("density_variable")),
+//    _fluid_saturation(coupledValue("saturation_variable")),
+//    _component_mass_fraction(coupledValue("component_mass_fraction_variable"))
 
-{}
+{
+  unsigned int n = coupledComponents("density_variables");
+
+  _fluid_density.resize(n);
+  _fluid_saturation.resize(n);
+  _component_mass_fraction.resize(n);
+
+  for (unsigned int i = 0; i < n; ++i)
+  {
+    _fluid_density[i] = &coupledValue("density_variables", i);
+    _fluid_saturation[i] = &coupledValue("saturation_variables", i);
+    _component_mass_fraction[i] = &coupledValue("component_mass_fraction_variables", i);
+  }
+}
 
 Real
 ComponentMassPostprocessor::computeQpIntegral()
 {
-//  return _porosity[_qp] * _phase_mass[_qp][_phase_index];
-return _porosity[_qp] * _fluid_saturation[_qp] * _fluid_density[_qp];
+Real mass = 0.;
+
+for (unsigned int i = 0; i < _fluid_density.size(); ++i)
+  mass += (*_component_mass_fraction[i])[_qp] * (*_fluid_saturation[i])[_qp] * (*_fluid_density[i])[_qp];
+
+return _porosity[_qp] * mass;
 }

@@ -18,9 +18,6 @@ InputParameters validParams<FluidStateMaterial>()
   params.addCoupledVar("temperature_variable", 50., "The temperature variable");
   params.addParam<unsigned int>("phase_index", 0, "The phase index of the primary pressure variable");
 
-  // Aux variable for gas pressure - must be elemental to couple into material. TODO: gradient of capillary presure uo
-  // to use directly in material
-  //params.addRequiredCoupledVar("gas_pressure_variable", "The gas pressure variable");
   return params;
 }
 
@@ -59,14 +56,12 @@ FluidStateMaterial::computeQpProperties()
   else
     temperature = _temperature[_qp];
 
-  // Vector of mass fractions of each component in each phase. TODO: fix this!
-  std::vector<Real> xmass;
-  xmass.push_back(1.0); // Salt mass fraction in liquid
-  xmass.push_back(0.);  // CO2 mass fraction in liquid
-  xmass.push_back(0.);  // Salt mass fraction in gas
-  xmass.push_back(1.);  // CO2 mass fraction in gas
 
   std::vector<Real> pressure, saturation, density;
+
+  // Write out properties
+  std::vector<std::vector<Real> > properties;
+  properties = _fluid_state.thermophysicalProperties(_primary_pressure[_qp], temperature, _primary_saturation[_qp]);
 
   // Compute pressure, saturation and density at the qp's
   pressure = _fluid_state.pressure(_primary_pressure[_qp], _primary_saturation[_qp]);

@@ -32,6 +32,8 @@ FluidStateWaterCO2::FluidStateWaterCO2(const std::string & name, InputParameters
   _is_isothermal(getParam<bool>("isothermal"))
 
 {
+  _Mh2o = _water_property.molarMass();
+  _Mco2 = _co2_property.molarMass();
 }
 
 unsigned int
@@ -88,25 +90,118 @@ FluidStateWaterCO2::variable_phase() const
   return varphases;
 }
 
+std::vector<std::vector<Real> >
+FluidStateWaterCO2::thermophysicalProperties(Real pressure, Real temperature, Real saturation) const
+{
+  std::vector<std::vector<Real> > fluid_properties;
+  fluid_properties.resize(numPhases());
+
+  // Fix this: make it general regarding pressure and saturation.
+  // At the moment, assumes gas pressure and liquid saturation
+
+  // Gas and liquid phase saturations
+  std::vector<Real> saturations = FluidStateWaterCO2::saturation(saturation);
+
+  // The vapour pressure of H2O
+  Real pv = _water_property.pSat(temperature);
+
+  // The partial pressure of the CO2 in the gas phase
+  Real co2_partial_pressure = pressure - pv;
+
+  // The mass fraction of CO2 in the liquid phase
+  Real xco2l = dissolved(co2_partial_pressure, temperature);
+
+  // The density and viscosity of the liquid phase water. If the saturation is zero,
+  // set the phase density to zero (keep viscosity non-zero as it appears in the denominator
+  // of the mobility.)
+  Real liquid_density, water_viscosity;
+
+  if (saturations[0] == 0.)
+  {
+    liquid_density = 0.;
+    water_viscosity = 1.; // Not used but set to a non-zero value
+  }
+  else
+  {
+    Real water_density = _water_property.density(pressure, temperature);
+    water_viscosity = _water_property.viscosity(temperature, water_density);
+    liquid_density = 1.0 / (xco2l / _co2_property.partialDensity(temperature) +
+      (1.0 - xco2l) / water_density);
+  }
+
+  // The density of the gas phase, and the mass fraction of CO2 in the gase phase. If the
+  // saturation is zero, set the phase density to zero (keep viscosity non-zero as it appears
+  // in the denominator of the mobility.)
+  Real gas_density, xco2g, co2_viscosity, vapour_viscosity;
+
+  if (saturations[1] == 0.)
+  {
+    gas_density = 0.;
+    xco2g = 0.;
+    co2_viscosity = 1.;  // Not used
+    vapour_viscosity = 1.;  // Not used
+  }
+  else
+  {
+    Real co2_density = _co2_property.density(co2_partial_pressure, temperature);
+    Real vapour_density = _water_property.density(pv, temperature);
+    gas_density = co2_density + vapour_density;
+    xco2g = co2_density / gas_density;
+    co2_viscosity = _co2_property.viscosity(co2_partial_pressure, temperature);
+    vapour_viscosity = _water_property.viscosity(temperature, vapour_density);
+  }
+
+  // Now update the vector of thermophysical properties.
+  // Liquid phase
+  fluid_properties[0].push_back(liquid_density);
+  fluid_properties[0].push_back(water_viscosity); // No effect due to dissolved co2
+  fluid_properties[0].push_back(1.0 - xco2l); // H2o mass fraction in liquid
+  fluid_properties[0].push_back(xco2l);
+
+  // Gas phsae
+  fluid_properties[1].push_back(gas_density);
+  fluid_properties[1].push_back(co2_viscosity); // No effect due to vapour
+  fluid_properties[1].push_back(1.0 - xco2g); // H2o mass fraction in gas
+  fluid_properties[1].push_back(xco2g);
+
+  return fluid_properties;
+}
+
 Real
 FluidStateWaterCO2::density(Real pressure, Real temperature, unsigned int phase_index) const
 {
   Real fluid_density;
+  // The vapour pressure of H2O
+  Real pv = _water_property.pSat(temperature);
+  // The partial pressure of the CO2 in the gas phase
+  Real co2_partial_pressure = pressure - pv;
 
-  if (phase_index == 0)
+  if (phase_index == 0) // Liquid phase
+  {
     fluid_density = _water_property.density(pressure, temperature);
 
-  else if (phase_index == 1)
-    fluid_density = _co2_property.density(pressure, temperature);
+    // The mass fraction of CO2 in the liquid phase
+    Real xco2l = dissolved(co2_partial_pressure, temperature);
+
+    // The liquid density increase due to dissolved co2
+    fluid_density = 1.0 / (xco2l / _co2_property.partialDensity(temperature) +
+      (1.0 - xco2l) / fluid_density);
+  }
+
+  else if (phase_index == 1) // Gas phase
+  {
+    // The density and viscosity of the gas phase water
+    Real vapour_density = _water_property.density(pv, temperature);
+
+    // The density and viscosity of the gas phase CO2
+    Real co2_density = _co2_property.density(co2_partial_pressure, temperature);
+
+    // The density of the gas is found from the sum of densities for each component
+    fluid_density = co2_density + vapour_density;
+  }
 
   else
     mooseError("phase_index is out of range in FluidStateWaterCO2::density");
-
-  // Calculate the density of liquid with dissolved CO2.
-  // TODO: move this to aux variable using FluidStateAux.
-  Real xco2l = FluidStateWaterCO2::massFractions(pressure, temperature)[1][0];
-  fluid_density = 1.0 / (xco2l / _co2_property.partialDensity(temperature) +
-    (1.0 - xco2l) / fluid_density);
 
   return fluid_density;
 }
@@ -142,9 +237,14 @@ FluidStateWaterCO2::massFractions(Real pressure, Real temperature) const
 
   xmass.resize(numcomp);
 
-  xmass[0].push_back(1.0); // H2O in liquid
+  // Calculate the dissolved mole fraction of CO2 in water
+  Real xco2lm = pressure / FluidStateWaterCO2::henry(temperature);
+  // The mass fraction is then
+  Real xco2l = xco2lm * _Mco2 / (xco2lm * _Mco2 + (1.0 - xco2lm) * _Mh2o);
+
+  xmass[0].push_back(1.0 - xco2l); // H2O in liquid
   xmass[0].push_back(0.0); // H2O in gas
-  xmass[1].push_back(0.0); // CO2 in liquid
+  xmass[1].push_back(xco2l); // CO2 in liquid
   xmass[1].push_back(1.0); // CO2 in gas
 
   return xmass;
@@ -225,4 +325,15 @@ FluidStateWaterCO2::henry(Real temperature) const
             std::pow(tr, -0.41) * std::exp(1.0 - tr);
 
   return _water_property.pSat(temperature) * std::exp(kh);
+}
+
+Real
+FluidStateWaterCO2::dissolved(Real pressure, Real temperature) const
+{
+  // Calculate the dissolved mole fraction of CO2 in water
+  Real xco2lm = pressure / FluidStateWaterCO2::henry(temperature);
+  // The mass fraction is then
+  Real xco2l = xco2lm * _Mco2 / (xco2lm * _Mco2 + (1.0 - xco2lm) * _Mh2o);
+
+  return xco2l;
 }

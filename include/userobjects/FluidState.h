@@ -72,6 +72,18 @@ class FluidState : public GeneralUserObject
   virtual std::vector<unsigned int> variable_phase() const = 0;
 
   /**
+   * Thermophysical properties calculated using the primary
+   * variables.
+   *
+   * @param pressure primary pressure (Pa)
+   * @param temperature primary temperature (C)
+   * @param saturation primary saturation (-)
+   * @return thermophysical properties
+   */
+  virtual std::vector<std::vector<Real> > thermophysicalProperties(Real pressure, Real temperature, Real saturation) const = 0;
+
+
+  /**
    * Fluid density must be over-written in all derived classes.
    *
    * @param pressure pressure (Pa)

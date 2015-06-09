@@ -82,6 +82,14 @@ FluidStateSinglePhase::variable_phase() const
   return varphases;
 }
 
+std::vector<std::vector<Real> >
+FluidStateSinglePhase::thermophysicalProperties(Real pressure, Real temperature, Real saturation) const
+{
+  std::vector<std::vector<Real> > fluid_properties;
+
+  return fluid_properties;
+}
+
 Real
 FluidStateSinglePhase::density(Real pressure, Real temperature, unsigned int phase_index) const
 {

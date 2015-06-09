@@ -70,6 +70,17 @@ class FluidStateBrineCO2 : public FluidState
   virtual std::vector<unsigned int> variable_phase() const;
 
   /**
+   * Thermophysical properties calculated using the primary
+   * variables.
+   *
+   * @param pressure primary pressure (Pa)
+   * @param temperature primary temperature (C)
+   * @param saturation primary saturation (-)
+   * @return thermophysical properties
+   */
+  virtual std::vector<std::vector<Real> > thermophysicalProperties(Real pressure, Real temperature, Real saturation) const;
+
+  /**
    * Fluid density using FluidPropertiesBrine and FluidPropertiesCO2 UserObjects.
    *
    * @param pressure phase pressure (Pa)

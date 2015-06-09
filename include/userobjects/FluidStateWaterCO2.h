@@ -69,7 +69,7 @@ class FluidStateWaterCO2 : public FluidState
 
 
   /**
-   * List of primary variable names
+   * List of primary variable types
    */
   virtual std::vector<std::string> variable_types() const;
 
@@ -77,6 +77,17 @@ class FluidStateWaterCO2 : public FluidState
    * List of phase index for each variable
    */
   virtual std::vector<unsigned int> variable_phase() const;
+
+  /**
+   * Thermophysical properties calculated using the primary
+   * variables.
+   *
+   * @param pressure primary pressure (Pa)
+   * @param temperature primary temperature (C)
+   * @param saturation primary saturation (-)
+   * @return thermophysical properties
+   */
+  virtual std::vector<std::vector<Real> > thermophysicalProperties(Real pressure, Real temperature, Real saturation) const;
 
   /**
    * Fluid density using FluidPropertiesWater and FluidPropertiesCO2 UserObjects.
@@ -161,6 +172,15 @@ class FluidStateWaterCO2 : public FluidState
    */
   virtual Real henry(Real temperature) const;
 
+  /**
+   * Mass fraction of dissolved CO2 in the liquid phase.
+   *
+   * @param pressure CO2 partial pressure (Pa)
+   * @param temperature temperature (C)
+   * @return dissolved mass fraction (-)
+   */
+  virtual Real dissolved(Real pressure, Real temperature) const;
+
  protected:
 
   /**
@@ -189,6 +209,8 @@ class FluidStateWaterCO2 : public FluidState
 
   Real _fluid_temperature;
   bool _is_isothermal;
+  Real _Mh2o;
+  Real _Mco2;
 
 };
 

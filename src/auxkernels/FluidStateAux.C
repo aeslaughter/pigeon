@@ -12,8 +12,8 @@ InputParameters validParams<FluidStateAux>()
 {
   InputParameters params = validParams<AuxKernel>();
   params.addRequiredParam<UserObjectName>("fluid_state_uo", "Name of the User Object defining the fluid state");
-  params.addCoupledVar("pressure_variable", 1.e6,  "The pressure variable");
-  params.addCoupledVar("temperature_variable", 50, "The temperature variable.");
+  params.addCoupledVar("pressure_variable",  "The pressure variable");
+  params.addCoupledVar("temperature_variable", 100, "The temperature variable.");
   params.addCoupledVar("saturation_variable", 1.0, "The saturation variable");
   MooseEnum state_property_enum("density viscosity mass_fraction saturation pressure relperm henry");
   params.addRequiredParam<MooseEnum>("state_property_enum", state_property_enum, "The fluid property that this auxillary kernel is to calculate");
@@ -47,18 +47,18 @@ FluidStateAux::computeValue()
   else
     temperature = _temperature[_qp];
 
+  // Thermophysical properties from Fluid State userObject
+  std::vector<std::vector<Real> > properties;
+
+  properties = _fluid_state.thermophysicalProperties(_pressure[_qp], temperature, _saturation[_qp]);
+
   if (_state_property_enum == "density")
   {
-    // If the saturation of this phase is zero, set density to zero.
-    Real eps = 1.e-10;
-    if (_fluid_state.saturation(_saturation[_qp])[_phase_index] < eps)
-      property = 0.;
-    else
-      property = _fluid_state.density(_pressure[_qp], temperature, _phase_index);
+      property = properties[_phase_index][0];
   }
   if (_state_property_enum == "viscosity")
   {
-    property = _fluid_state.viscosity(_pressure[_qp], temperature, _phase_index);
+    property = properties[_phase_index][1];
   }
   if (_state_property_enum == "saturation")
   {
@@ -74,7 +74,7 @@ FluidStateAux::computeValue()
   }
   if (_state_property_enum == "mass_fraction")
   {
-    property = _fluid_state.massFractions(_pressure[_qp], temperature)[_phase_index][_component_index];
+    property = properties[_phase_index][2 + _component_index];
   }
   if (_state_property_enum == "henry")
   {

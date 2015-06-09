@@ -39,10 +39,8 @@
     initial_condition = 0.1
   [../]
   [./xco2liquid]
-    initial_condition = 0.1
   [../]
   [./xco2gas]
-    initial_condition = 0.9
   [../]
   [./liquid_pressure]
   [../]
@@ -176,6 +174,46 @@
     fluid_state_uo = FluidState
     pressure_variable = gas_pressure
   [../]
+  [./Xco2l]
+    type = FluidStateAux
+    variable = xco2liquid
+    component_index = 1
+    saturation_variable = liquid_saturation
+    state_property_enum = mass_fraction
+    execute_on = 'LINEAR initial'
+    fluid_state_uo = FluidState
+    pressure_variable = gas_pressure
+  [../]
+  [./Xco2g]
+    type = FluidStateAux
+    variable = xco2gas
+    component_index = 1
+    saturation_variable = liquid_saturation
+    phase_index = 1
+    state_property_enum = mass_fraction
+    execute_on = 'LINEAR initial'
+    fluid_state_uo = FluidState
+    pressure_variable = gas_pressure
+  [../]
+  [./Xh20g]
+    type = FluidStateAux
+    variable = xh20gas
+    saturation_variable = liquid_saturation
+    phase_index = 1
+    state_property_enum = mass_fraction
+    execute_on = 'LINEAR initial'
+    fluid_state_uo = FluidState
+    pressure_variable = gas_pressure
+  [../]
+  [./Xh2ol]
+    type = FluidStateAux
+    variable = xh20liquid
+    saturation_variable = liquid_saturation
+    state_property_enum = mass_fraction
+    execute_on = 'LINEAR initial'
+    fluid_state_uo = FluidState
+    pressure_variable = gas_pressure
+  [../]
 []
 
 [Materials]
@@ -204,20 +242,28 @@
 [Postprocessors]
   [./h20mass]
     type = ComponentMassPostprocessor
-    fluid_density_variable = liquid_density
-    phase_saturation_variable = liquid_saturation
     execute_on = '  timestep_end'
-    saturation_variable = liquid_saturation
-    density_variable = liquid_density
+    saturation_variables = 'liquid_saturation gas_saturation'
+    density_variables = 'liquid_density gas_density'
+    component_mass_fraction_variables = 'xh20liquid xh20gas'
   [../]
   [./co2mass]
     type = ComponentMassPostprocessor
-    fluid_density_variable = gas_density
-    component_mass_fraction_variable = xco2gas
-    phase_saturation_variable = gas_saturation
-    phase_index = 1
-    saturation_variable = gas_saturation
-    density_variable = gas_density
+    saturation_variables = 'liquid_saturation gas_saturation'
+    component_mass_fraction_variables = 'xco2liquid  xco2gas'
+    density_variables = 'liquid_density gas_density'
+  [../]
+  [./co2massg]
+    type = ComponentMassPostprocessor
+    saturation_variables = gas_saturation
+    component_mass_fraction_variables = xco2gas
+    density_variables = gas_density
+  [../]
+  [./co2massl]
+    type = ComponentMassPostprocessor
+    saturation_variables = liquid_saturation
+    component_mass_fraction_variables = xco2liquid
+    density_variables = liquid_density
   [../]
 []
 
@@ -281,6 +327,11 @@
   [../]
 []
 
+[Problem]
+  type = MultiphaseProblem
+  saturation_variable = liquid_saturation
+[]
+
 [Executioner]
   type = Transient
   solve_type = PJFNK
@@ -289,8 +340,7 @@
   nl_rel_tol = 1e-8
   [./TimeStepper]
     type = IterationAdaptiveDT
-    dt = 5
-    growth_factor = 1.1
+    dt = 100
   [../]
 []
 
@@ -312,7 +362,7 @@
   [./LiquidSaturationIC]
     variable = liquid_saturation
     type = ConstantIC
-    value = 0.9
+    value = 0.7
   [../]
   [./PressureIC]
     function = PressureICFunction
