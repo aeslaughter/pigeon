@@ -2,6 +2,12 @@
 #include "Moose.h"
 #include "AppFactory.h"
 #include "ModulesApp.h"
+// Stuff Added for neutronic solve example
+#include "NeutronicDiffusion.h"
+#include "NeutronicRemoval.h"
+#include "NeutronicSource.h"
+#include "DiffusionNeutronicsMaterial.h"
+// End neutronic example headers
 
 template<>
 InputParameters validParams<MosquitoApp>()
@@ -44,6 +50,12 @@ extern "C" void MosquitoApp__registerObjects(Factory & factory) { MosquitoApp::r
 void
 MosquitoApp::registerObjects(Factory & factory)
 {
+  // Stuff Added for neutronic solve example
+  registerMaterial(DiffusionNeutronicsMaterial);
+  registerKernel(NeutronicDiffusion);
+  registerKernel(NeutronicRemoval);
+  registerKernel(NeutronicSource);
+  // End neutronic example kernels
 }
 
 // External entry point for dynamic syntax association
