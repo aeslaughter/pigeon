@@ -33,11 +33,11 @@ protected:
   void upwind(bool compute_res, bool compute_jac, unsigned int jvar);
 
   // Member reference to the porosity and permeability material properties
-  MaterialProperty<RealTensorValue> & _permeability;
-  MaterialProperty<RealVectorValue> & _gravity;
+  const MaterialProperty<RealTensorValue> & _permeability;
+  const MaterialProperty<RealVectorValue> & _gravity;
 
   // Member reference to phase flux (without mobility) material properties
-  MaterialProperty<std::vector<RealGradient> > & _phase_flux_no_mobility;
+  const MaterialProperty<std::vector<RealGradient> > & _phase_flux_no_mobility;
 
 private:
   VariableValue & _fluid_density;

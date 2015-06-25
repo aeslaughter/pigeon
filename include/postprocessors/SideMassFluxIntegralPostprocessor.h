@@ -23,8 +23,8 @@ public:
 protected:
   virtual Real computeQpIntegral();
 
-  MaterialProperty<RealTensorValue> & _permeability;
-  MaterialProperty<RealVectorValue> & _gravity;
+  const MaterialProperty<RealTensorValue> & _permeability;
+  const MaterialProperty<RealVectorValue> & _gravity;
 
   VariableValue & _fluid_density;
   VariableValue & _fluid_viscosity;

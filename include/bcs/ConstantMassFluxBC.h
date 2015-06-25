@@ -28,7 +28,7 @@ private:
   virtual Real computeQpJacobian();
 
   Real _value;
-  MaterialProperty<RealVectorValue> & _gravity;
+  const MaterialProperty<RealVectorValue> & _gravity;
   VariableValue & _fluid_density;
 
 };

@@ -31,7 +31,7 @@ protected:
   virtual void computeQpProperties();
 
 private:
-  MaterialProperty<RealVectorValue> & _gravity;
+  const MaterialProperty<RealVectorValue> & _gravity;
   MaterialProperty<std::vector<RealGradient> > & _phase_flux_no_mobility;
   MaterialProperty<std::vector<Real> > & _phase_mass;
 

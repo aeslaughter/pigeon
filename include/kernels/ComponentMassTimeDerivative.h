@@ -27,7 +27,7 @@ protected:
   virtual Real computeQpOffDiagJacobian(unsigned int jvar);
 
   // Member reference to the porosity material property
-  MaterialProperty<Real> & _porosity;
+  const MaterialProperty<Real> & _porosity;
 
 
 private:

@@ -23,7 +23,7 @@ public:
 protected:
   virtual Real computeQpIntegral();
 
-  MaterialProperty<Real> & _porosity;
+  const MaterialProperty<Real> & _porosity;
 //  MaterialProperty<std::vector<Real> > & _phase_mass;
 
   std::vector<VariableValue *> _fluid_density;
