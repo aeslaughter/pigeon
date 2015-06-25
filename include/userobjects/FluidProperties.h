@@ -5,14 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Fluid properties base clase for multiphase flow in porous    */
-/* media                                                        */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #ifndef FLUIDPROPERTIES_H
 #define FLUIDPROPERTIES_H
 
@@ -20,13 +12,13 @@
 
 class FluidProperties;
 
-
 template<>
 InputParameters validParams<FluidProperties>();
 
 /**
  * Base class for fluid properties for multiphase flow in porous media.
  */
+
 class FluidProperties : public GeneralUserObject
 {
  public:
@@ -36,23 +28,45 @@ class FluidProperties : public GeneralUserObject
   void execute();
   void finalize();
 
-  /**
-   * Fluid density must be over-written in all derived classes.
-   *
-   * @param pressure fluid pressure (Pa)
-   * @param temperature fluid temperature (C)
-   * @return fluid density (kg/m^3)
-   */
-//virtual Real density(Real pressure, Real temperature) const = 0;
+/**
+ * Fluid density must be over-written in all derived classes.
+ *
+ * @param pressure fluid pressure (Pa)
+ * @param temperature fluid temperature (C)
+ * @return fluid density (kg/m^3)
+ */
+virtual Real density(Real pressure, Real temperature) const;
+virtual Real density(Real pressure, Real temperature, Real xmass) const;
 
-  /**
-   * Fluid viscosity must be over-written in all derived classes.
-   *
-   * @param pressure fluid pressure (Pa)
-   * @param temperature fluid temperature (C)
-   * @return fluid viscosity (Pa.s)
-   */
-//virtual Real viscosity(Real pressure, Real temperature) const = 0;
+/**
+ * Fluid viscosity must be over-written in all derived classes.
+ *
+ * @param pressure fluid pressure (Pa)
+ * @param temperature fluid temperature (C)
+ * @return fluid viscosity (Pa.s)
+ */
+virtual Real viscosity(Real pressure, Real temperature) const;
+virtual Real viscosity(Real pressure, Real temperature, Real xmass) const;
+
+/**
+ * The derivative of fluid density with respect to pressure must be over-written
+ *  in all derived classes.
+ *
+ * @param pressure fluid pressure (Pa)
+ * @param temperature fluid temperature (C)
+ * @return derivative of fluid density with respect to pressure
+ */
+virtual Real dDensity_dP(Real pressure, Real temperature) const;
+
+/**
+ * The derivative of fluid density with respect to temperature must be over-written
+ *  in all derived classes.
+ *
+ * @param pressure fluid pressure (Pa)
+ * @param temperature fluid temperature (C)
+ * @return derivative of fluid density with respect to temperature
+ */
+virtual Real dDensity_dT(Real pressure, Real temperature) const;
 };
 
 #endif // FLUIDPROPERTIES_H

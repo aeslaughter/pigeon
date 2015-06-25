@@ -13,7 +13,7 @@ InputParameters validParams<FluidPressureAux>()
   InputParameters params = validParams<AuxKernel>();
   params.addRequiredCoupledVar("primary_pressure_variable", "The primary nonlinear pressure variable.");
   params.addRequiredCoupledVar("liquid_saturation_variable", "The liquid saturation variable.");
-  params.addRequiredParam<UserObjectName>("fluid_state_uo", "The fluid state UserObject");
+  params.addRequiredParam<UserObjectName>("capillary_pressure_uo", "The capillary pressure userobject");
   return params;
 }
 
@@ -21,7 +21,7 @@ FluidPressureAux::FluidPressureAux(const std::string & name,
                        InputParameters parameters) :
     AuxKernel(name, parameters),
 
-    _fluid_state(getUserObject<FluidState>("fluid_state_uo")),
+    _capillary_pressure(getUserObject<CapillaryPressure>("capillary_pressure_uo")),
     _primary_pressure(coupledValue("primary_pressure_variable")),
     _liquid_saturation(coupledValue("liquid_saturation_variable"))
 {}
@@ -29,5 +29,5 @@ FluidPressureAux::FluidPressureAux(const std::string & name,
 Real
 FluidPressureAux::computeValue()
 {
-  return _fluid_state.pressure(_primary_pressure[_qp], _liquid_saturation[_qp])[0];
+  return _primary_pressure[_qp] + _capillary_pressure.capillaryPressure(_liquid_saturation[_qp]);
 }

@@ -50,6 +50,11 @@ RelativePermeabilityVanGenuchten::relativePermLiq(Real sat_liq) const
   }
 
   Real sat_eff = (sat_liq - _sat_lr)/(_sat_ls - _sat_lr);
+
+  // Bound s_internal to [0,1]
+  if (sat_eff < 0.) { sat_eff = 0.;}
+  if (sat_eff > 1.) { sat_eff = 1.;}
+
   Real krel = std::pow(sat_eff, 0.5)*std::pow(1.0 - std::pow(1.0 - std::pow(sat_eff, 1.0/_m), _m), 2.0);
 
   // Bound just in case
@@ -83,6 +88,11 @@ RelativePermeabilityVanGenuchten::relativePermGas(Real sat_liq) const
   if (_sat_gr > 0.0) {
 
   Real sat_eff = (sat_liq - _sat_lr)/(1.0 - _sat_lr - _sat_gr);
+
+  // Bound s_internal to [0,1]
+  if (sat_eff < 0.) { sat_eff = 0.;}
+  if (sat_eff > 1.) { sat_eff = 1.;}
+
   krel = std::pow(1.0 - sat_eff, 2.0) * (1.0 - std::pow(sat_eff, 2.0));
 
   // Bound just in case

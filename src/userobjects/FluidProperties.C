@@ -30,3 +30,45 @@ FluidProperties::execute()
 void
 FluidProperties::finalize()
 {}
+
+Real
+FluidProperties::density(Real pressure, Real temperature) const
+{
+  mooseError("FluidProperties::density(Real pressure, Real temperature) unimplemented in derived fluid properties class");
+  return 0.;
+}
+
+Real
+FluidProperties::density(Real pressure, Real temperature, Real xmass) const
+{
+  mooseError("FluidProperties::density(Real pressure, Real temperature, Real xmass) unimplemented in derived fluid properties class");
+  return 0.;
+}
+
+Real
+FluidProperties::viscosity(Real pressure, Real temperature) const
+{
+  mooseError("FluidProperties::viscosity(Real pressure, Real temperature) unimplemented in derived fluid properties class");
+  return 0.;
+}
+
+Real
+FluidProperties::viscosity(Real pressure, Real temperature, Real xmass) const
+{
+  mooseError("FluidProperties::viscosity(Real pressure, Real temperature, Real xmass) unimplemented in derived fluid properties class");
+  return 0.;
+}
+
+Real
+FluidProperties::dDensity_dP(Real pressure, Real temperature) const
+{
+  mooseError("FluidProperties::dDensity_dP(Real pressure, Real temperature) unimplemented in derived fluid properties class");
+  return 0.;
+}
+
+Real
+FluidProperties::dDensity_dT(Real pressure, Real temperature) const
+{
+  mooseError("FluidProperties::dDensity_dT(Real pressure, Real temperature) unimplemented in derived fluid properties class");
+  return 0.;
+}

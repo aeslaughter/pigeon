@@ -5,19 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* van Genuchten capillary pressure for multiphase flow in      */
-/* porous media.                                                */
-/*                                                              */
-/* Based on                                                     */
-/* van Genuchten, M. Th., A closed for equation for             */
-/* predicting the hydraulic conductivity of unsaturated soils,  */
-/* Soil Sci. Soc., 44, 892-898 (1980).                          */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #ifndef CAPILLARYPRESSUREVANGENUCHTEN_H
 #define CAPILLARYPRESSUREVANGENUCHTEN_H
 
@@ -25,6 +12,13 @@
 
 class CapillaryPressureVanGenuchten;
 
+ /**
+  * van Genuchten capillary pressure for multiphase flow in porous media.
+  *
+  * Based on van Genuchten, M. Th., A closed for equation for
+  * predicting the hydraulic conductivity of unsaturated soils,
+  * Soil Sci. Soc., 44, 892-898 (1980).
+  */
 
 template<>
 InputParameters validParams<CapillaryPressureVanGenuchten>();

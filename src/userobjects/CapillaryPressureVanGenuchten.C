@@ -52,7 +52,7 @@ CapillaryPressureVanGenuchten::capillaryPressure(Real sat_liq) const
      { cp = - _cp_max; } // If sat_eff <= _sat_lr, Pc = cp_max.
 
   else // else use Van Genuchten formulation
-     { cp = -1.0 * _p0 * std::pow(std::pow(sat_eff,-1.0/_m) - 1.0, 1.0 - _m); }
+     { cp = - _p0 * std::pow(std::pow(sat_eff, -1.0/_m) - 1.0, 1.0 - _m); }
 
   // Constrain the capillary pressure cp so that - _cp_max <= cp <= 0
   if (cp < -_cp_max) { cp = -_cp_max;}
@@ -70,7 +70,7 @@ CapillaryPressureVanGenuchten::dCapillaryPressure(Real sat_liq) const
   if (sat_liq <= _sat_lr)
     dcp = 0.0;
   else
-    dcp = _p0 * (1.0 - _m) * std::pow(std::pow(sat_eff, -1.0/_m) - 1.0, -_m) * std::pow(sat_eff, -1.0-1.0/_m) / (_sat_ls - _sat_lr);
+    dcp = _p0 * (1.0 - _m) * std::pow(std::pow(sat_eff, -1.0/_m) - 1.0, -_m) * std::pow(sat_eff, -1.0-1.0/_m) / (_m * (_sat_ls - _sat_lr));
 
   return dcp;
 }

@@ -11,7 +11,7 @@ template<>
 InputParameters validParams<FluidPropertiesIdealGas>()
 {
   InputParameters params = validParams<FluidProperties>();
-  params.addClassDescription("Thermophysical fluid properties of gas phase CO2.");
+  params.addClassDescription("Thermophysical fluid properties of an ideal gas.");
   return params;
 }
 
