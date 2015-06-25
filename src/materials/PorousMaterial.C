@@ -19,7 +19,7 @@ InputParameters validParams<PorousMaterial>()
   params.addRequiredParam<Real>("diffusivity", "Diffusivity (m^2/s");
   params.addRequiredParam<UserObjectName>("rel_perm_uo", "Name of the User Object defining the relative permeability model");
   params.addRequiredParam<UserObjectName>("cap_pres_uo", "Name of the User Object defining the capillary pressure model");
-  params.addRequiredCoupledVar("liquid_saturation_variable","The liquid saturation variable");
+  params.addRequiredCoupledVar("liquid_saturation_variable", "The liquid saturation variable");
   return params;
 }
 

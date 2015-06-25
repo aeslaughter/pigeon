@@ -31,13 +31,13 @@ protected:
 
 
 private:
-  std::vector<VariableValue *> _fluid_density;
-  std::vector<VariableValue *> _fluid_density_old;
-  std::vector<VariableValue *> _fluid_saturation;
-  std::vector<VariableValue *> _fluid_saturation_old;
-  std::vector<VariableValue *> _component_mass_fraction;
-  std::vector<VariableValue *> _component_mass_fraction_old;
-  std::vector<VariableValue *> _fluid_pressure;
+  VariableValue & _fluid_density;
+  VariableValue & _fluid_density_old;
+  VariableValue & _fluid_saturation;
+  VariableValue & _fluid_saturation_old;
+  VariableValue & _component_mass_fraction;
+  VariableValue & _component_mass_fraction_old;
+  VariableValue & _fluid_pressure;
   const MooseEnum & _primary_variable_type;
   VariableValue & _temperature;
 
@@ -46,7 +46,6 @@ private:
    * value for the fluid state User Object.
    */
   const FluidState & _fluid_state;
-  unsigned int _num_phases;
   unsigned int _phase_index;
 };
 

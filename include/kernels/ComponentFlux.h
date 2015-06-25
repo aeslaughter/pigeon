@@ -9,7 +9,6 @@
 #define COMPONENTFLUX_H
 
 #include "Kernel.h"
-#include "FluidState.h"
 
 class ComponentFlux;
 
@@ -27,6 +26,7 @@ protected:
   virtual Real computeQpOffDiagJacobian(unsigned int jvar);
   virtual void computeResidual();
   virtual void computeJacobian();
+  virtual void computeOffDiagJacobian();
   /**
    * Function to do upwinding for both the Residual and Jacobian
    */
@@ -37,20 +37,16 @@ protected:
   MaterialProperty<RealVectorValue> & _gravity;
 
   // Member reference to phase flux (without mobility) material properties
-  MaterialProperty<std::vector<RealVectorValue> > & _phase_flux_no_mobility;
+  MaterialProperty<std::vector<RealGradient> > & _phase_flux_no_mobility;
 
 private:
-  std::vector<VariableValue *> _fluid_density;
-  std::vector<VariableValue *> _fluid_viscosity;
-  std::vector<VariableValue *> _component_mass_fraction;
-  std::vector<VariableValue *> _fluid_relperm;
+  VariableValue & _fluid_density;
+  VariableValue & _fluid_viscosity;
+  VariableValue & _component_mass_fraction;
+  VariableValue & _fluid_relperm;
   const MooseEnum & _primary_variable_type;
 
-  /**
-   * This is the member reference that will hold the User Object
-   * value for the fluid state User Object.
-   */
-  const FluidState & _fluid_state;
+
   unsigned int _fluid_pressure_var;
   unsigned int _num_phases;
   unsigned int _phase_index;

@@ -11,14 +11,14 @@ template<>
 InputParameters validParams<ComponentFlux>()
 {
   InputParameters params = validParams<Kernel>();
-  params.addRequiredCoupledVar("fluid_density_variables", "The list of fluid density auxiallary variables for each phase.");
-  params.addRequiredCoupledVar("fluid_viscosity_variables", "The list of fluid viscosity auxillary variables for each phase.");
-  params.addRequiredCoupledVar("component_mass_fraction_variables", "The list of mass fraction of the kernels component in each phase.");
-  params.addRequiredCoupledVar("relperm_variables", "The list of relative permeability auxillary variables for each phase.");
+  params.addRequiredCoupledVar("fluid_density_variable", "The fluid density auxiallary variable for this phase.");
+  params.addRequiredCoupledVar("fluid_viscosity_variable", "The  fluid viscosity auxillary variable for this phase.");
+  params.addRequiredCoupledVar("component_mass_fraction_variable", "The mass fraction of the kernels component in this phase.");
+  params.addRequiredCoupledVar("fluid_relperm_variable", "The relative permeability auxillary variable for this phase.");
   MooseEnum primary_variable_type("pressure saturation mass_fraction");
   params.addRequiredParam<MooseEnum>("primary_variable_type", primary_variable_type, "The type of primary variable for this kernel (e.g. pressure, saturation or component mass fraction");
-  params.addRequiredParam<UserObjectName>("fluid_state_uo", "Name of the User Object defining the fluid state");
-  params.addParam<unsigned int>("phase_index", 0, "The index of the primary variable this kernel acts on");
+  //params.addRequiredParam<UserObjectName>("fluid_state_uo", "Name of the User Object defining the fluid state");
+  params.addParam<unsigned int>("phase_index", 0, "The index of the phase this kernel acts on");
   return params;
 }
 
@@ -27,43 +27,21 @@ ComponentFlux::ComponentFlux(const std::string & name,
   Kernel(name, parameters),
   _permeability(getMaterialProperty<RealTensorValue>("permeability")),
   _gravity(getMaterialProperty<RealVectorValue>("gravity")),
-  _phase_flux_no_mobility(getMaterialProperty<std::vector<RealVectorValue> >("phase_flux_no_mobility")),
+  _phase_flux_no_mobility(getMaterialProperty<std::vector<RealGradient> >("phase_flux_no_mobility")),
+  _fluid_density(coupledNodalValue("fluid_density_variable")),
+  _fluid_viscosity(coupledNodalValue("fluid_viscosity_variable")),
+  _component_mass_fraction(coupledNodalValue("component_mass_fraction_variable")),
+  _fluid_relperm(coupledNodalValue("fluid_relperm_variable")),
   _primary_variable_type(getParam<MooseEnum>("primary_variable_type")),
-  _fluid_state(getUserObject<FluidState>("fluid_state_uo")),
+  //_fluid_state(getUserObject<FluidState>("fluid_state_uo")),
   _phase_index(getParam<unsigned int>("phase_index"))
 
 {
-  // The number of phases in the given fluid state model
-  _num_phases = _fluid_state.numPhases();
-
-  // Check that the required number of auxillary variables have been provided
-  if (coupledComponents("fluid_density_variables") != _num_phases)
-    mooseError("The number of phase densities provided in the ComponentFlux kernel is not equal to the number of phases in the FluidState UserObject");
-  if (coupledComponents("fluid_viscosity_variables") != _num_phases)
-    mooseError("The number of phase viscosities provided in the ComponentFlux kernel is not equal to the number of phases in the FluidState UserObject");
-  if (coupledComponents("relperm_variables") != _num_phases)
-    mooseError("The number of phase relative permeabilities provided in the ComponentFlux kernel is not equal to the number of phases in the FluidState UserObject");
-  if (coupledComponents("component_mass_fraction_variables") != _num_phases)
-    mooseError("The number of phase components provided in the ComponentFlux kernel is not equal to the number of phases in the FluidState UserObject");
-
-  // Filling the vectors with VariableValue pointers
-  _fluid_density.resize(_num_phases);
-  _fluid_viscosity.resize(_num_phases);
-  _component_mass_fraction.resize(_num_phases);
-  _fluid_relperm.resize(_num_phases);
-
-  for (unsigned int n = 0; n < _num_phases; ++n)
-  {
-    _fluid_density[n] = &coupledNodalValue("fluid_density_variables", n);
-    _fluid_viscosity[n] = &coupledNodalValue("fluid_viscosity_variables", n);
-    _component_mass_fraction[n] = &coupledNodalValue("component_mass_fraction_variables", n);
-    _fluid_relperm[n] = &coupledNodalValue("relperm_variables", n);
-  }
 }
 
 Real ComponentFlux::computeQpResidual()
 {
-  return 0.; // Not used in the upwinding code.
+  return _grad_test[_i][_qp] * (_permeability[_qp] * _phase_flux_no_mobility[_qp][_phase_index]);
 }
 
 void ComponentFlux::computeResidual()
@@ -73,7 +51,18 @@ void ComponentFlux::computeResidual()
 
 Real ComponentFlux::computeQpJacobian()
 {
-  return 0.0; // Not used in the upwinding code.
+  Real qpjacobian;
+
+  if (_primary_variable_type == "pressure") //TODO: other primary variable types
+    qpjacobian = _grad_test[_i][_qp] *  _component_mass_fraction[_qp] * (_permeability[_qp] * _fluid_density[_qp] * _grad_phi[_j][_qp]);
+
+  if (_primary_variable_type == "saturation")
+    qpjacobian = 0.; //TODO Grad pressure depends on saturation through capillary pressure
+
+  if (_primary_variable_type == "mass_fraction")
+    qpjacobian = 0.; //TODO dependence of
+
+  return qpjacobian;
 }
 
 void ComponentFlux::computeJacobian()
@@ -83,83 +72,54 @@ void ComponentFlux::computeJacobian()
 
 Real ComponentFlux::computeQpOffDiagJacobian(unsigned int jvar)
 {
-  return 0.;
+  return 0.0; // Not used in the upwinding code.
+}
+
+void ComponentFlux::computeOffDiagJacobian()
+{
+   upwind(false, true, _var.number());
 }
 
 void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar)
 {
-  std::vector<std::vector<Real> > mobility;
-  Real mobtmp;
-
   unsigned int num_nodes = _test.size();
-  mobility.resize(_num_phases);
+  std::vector<Real> mobility;
+  mobility.resize(num_nodes);
 
-  // The mobility calculated at the nodes for each phase.
-  for (unsigned int n = 0; n < _num_phases; ++n)
-    for (_i = 0; _i < num_nodes; _i++)
-    {
-      mobtmp = (*_fluid_relperm[n])[_i] * (*_fluid_density[n])[_i] * (*_component_mass_fraction[n])[_i] /
-        (*_fluid_viscosity[n])[_i];
-      mobility[n].push_back(mobtmp);
-    }
+  // The mobility calculated at the nodes
+  for (unsigned int n = 0; n < num_nodes; n++)
+  {
+    mobility[n] = _fluid_relperm[n] * _fluid_density[n] * _component_mass_fraction[n] /
+      _fluid_viscosity[n];
+  }
 
   // Compute the residual and jacobian without the mobility terms. Even if we are computing the jacobian
   // we still need this in order to see which nodes are upwind and which are downwind.
   DenseVector<Number> & re = _assembly.residualBlock(_var.number());
   _local_re.resize(re.size());
+  _local_re.zero();
 
   DenseMatrix<Number> & ke = _assembly.jacobianBlock(_var.number(), jvar);
-  _local_ke.resize(ke.m(), ke.n());
-
-
-  // Vector of _local_re's and _local_ke's for each phase.
-  std::vector<DenseVector<Number> > local_re_phase;
-  local_re_phase.resize(_num_phases);
-
-  std::vector<DenseMatrix<Number> > local_ke_phase;
-  local_ke_phase.resize(_num_phases);
 
   Real qpresidual;
   Real qpjacobian;
 
-  // Loop over each phase and form the _local_re contribution to the residual without the mobility term, but
+  // Form the _local_re contribution to the residual without the mobility term, but
   // with the density (used to zero contribution where saturation is zero)
-  // Note that computeQpResidual is not called, instead the residual is calculated at each qp
-  for (unsigned int n = 0; n < _num_phases; ++n)
-  {
-    // Set the local_re = 0 initially for each phase
-    _local_re.zero();
+ for (_i = 0; _i < _test.size(); _i++)
+   for (_qp = 0; _qp < _qrule->n_points(); _qp++)
+     _local_re(_i) += _JxW[_qp] * _coord[_qp] * computeQpResidual();
+
+ if (compute_jac)
+ {
+    _local_ke.resize(ke.m(), ke.n());
+    _local_ke.zero();
+
     for (_i = 0; _i < _test.size(); _i++)
-      for (_qp = 0; _qp < _qrule->n_points(); _qp++)
-      {
-        qpresidual = _grad_test[_i][_qp] * (_permeability[_qp] * _phase_flux_no_mobility[_qp][n]);
-        _local_re(_i) += _JxW[_qp] * _coord[_qp] * qpresidual;
-      }
-    local_re_phase[n] = _local_re;
-
-    if (compute_jac)
-    {
-      _local_ke.zero();
-
-      for (_i = 0; _i < _test.size(); _i++)
-        for (_j = 0; _j < _phi.size(); _j++)
-          for (_qp = 0; _qp < _qrule->n_points(); _qp++)
-          {
-            if (_primary_variable_type == "pressure") //TODO: other primary variable types
-              qpjacobian = _grad_test[_i][_qp] *  (*_component_mass_fraction[n])[_qp] * (_permeability[_qp] * (*_fluid_density[n])[_qp] * _grad_phi[_j][_qp]);
-
-            if (_primary_variable_type == "saturation")
-              qpjacobian = 0.; //TODO Grad pressure depends on saturation through capillary pressure
-
-            if (_primary_variable_type == "mass_fraction")
-              qpjacobian = 0.; //TODO dependence of
-            _local_ke(_i, _j) += _JxW[_qp] * _coord[_qp] * qpjacobian;
-          }
-      local_ke_phase[n] = _local_ke;
-    }
+      for (_j = 0; _j < _phi.size(); _j++)
+        for (_qp = 0; _qp < _qrule->n_points(); _qp++)
+          _local_ke(_i, _j) += _JxW[_qp] * _coord[_qp] * computeQpJacobian();
   }
-
-
 
   // Now perform the upwinding by multiplying the residuals at the
   // upstream nodes by their mobilities
@@ -184,10 +144,6 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
   // flowing out of node i must be the sum of the masses flowing
   // into the other nodes.
 
-
-  for (unsigned int n = 0; n < _num_phases; ++n)
-  {
-
   // FIRST:
   // this is a dirty way of getting around precision loss problems
   // and problems at steadystate where upwinding oscillates from
@@ -195,7 +151,7 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
   bool reached_steady = true;
   for (unsigned int nodenum = 0; nodenum < num_nodes ; ++nodenum)
   {
-    if (local_re_phase[n](nodenum) >= 1E-20)
+    if (_local_re(nodenum) >= 1E-20)
     {
       reached_steady = false;
       break;
@@ -215,6 +171,7 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
   {
     dtotal_mass_out.resize(num_nodes);
     dtotal_in.resize(num_nodes);
+
     for (unsigned int nodenum = 0; nodenum < num_nodes ; ++nodenum)
     {
       dtotal_mass_out[nodenum] = 0;
@@ -225,27 +182,26 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
   // Perform the upwinding over all phases
     for (unsigned int nodenum = 0; nodenum < num_nodes ; ++nodenum)
     {
-      if (local_re_phase[n](nodenum) >= 0 || reached_steady) // upstream node
+      if (_local_re(nodenum) >= 0 || reached_steady) // upstream node
       {
         if (compute_jac)
         {
+          Real dDensity_dP = 0; //_fluid_state.dDensity_dP(1.5e6, 100.)[n]; //TODO: Fix this!
           for (_j = 0; _j < _phi.size(); _j++)
-            local_ke_phase[n](nodenum, _j) *= mobility[n][nodenum];
-// FIX THIS
-//        _local_ke(nodenum, nodenum) += _dmobility_dv[nodenum][dvar]*_local_re(nodenum);
+            _local_ke(nodenum, _j) *= mobility[nodenum];
+            _local_ke(nodenum, nodenum) += dDensity_dP * _local_re(nodenum);
           for (_j = 0; _j < _phi.size(); _j++)
-            dtotal_mass_out[_j] += local_ke_phase[n](nodenum, _j);
+            dtotal_mass_out[_j] += _local_ke(nodenum, _j);
         }
-        local_re_phase[n](nodenum) *= mobility[n][nodenum];
-//        _console << "n " << n << ", _i " << nodenum << ", mass out" << local_re_phase[n](nodenum) << std::endl;
-        total_mass_out += local_re_phase[n](nodenum);
+        _local_re(nodenum) *= mobility[nodenum];
+        total_mass_out += _local_re(nodenum);
       }
       else
       {
-        total_in -= local_re_phase[n](nodenum); // note the -= means the result is positive
+        total_in -= _local_re(nodenum); // note the -= means the result is positive
         if (compute_jac)
           for (_j = 0; _j < _phi.size(); _j++)
-            dtotal_in[_j] -= local_ke_phase[n](nodenum, _j);
+            dtotal_in[_j] -= _local_ke(nodenum, _j);
       }
     }
 
@@ -254,72 +210,35 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
   {
     for (unsigned int nodenum = 0; nodenum < num_nodes; ++nodenum)
     {
-      if (local_re_phase[n](nodenum) < 0)
+      if (_local_re(nodenum) < 0)
       {
         if (compute_jac)
           for (_j = 0; _j < _phi.size(); _j++)
           {
-            local_ke_phase[n](nodenum, _j) *= total_mass_out/total_in;
-            local_ke_phase[n](nodenum, _j) += local_re_phase[n](nodenum)*(dtotal_mass_out[_j]/total_in - dtotal_in[_j]*total_mass_out/total_in/total_in);
+            _local_ke(nodenum, _j) *= total_mass_out/total_in;
+            _local_ke(nodenum, _j) += _local_re(nodenum)*(dtotal_mass_out[_j]/total_in - dtotal_in[_j]*total_mass_out/total_in/total_in);
           }
-        local_re_phase[n](nodenum) *= total_mass_out/total_in;
-//        _console << "n " << n << ", _i " << nodenum << ", mass in" << local_re_phase[n](nodenum) << std::endl;
-
+        _local_re(nodenum) *= total_mass_out/total_in;
       }
-    }
-  }
-}
-
-
-// Check that mass is conserved
-Real msum = 0.;
-for (unsigned int n = 0; n < _num_phases; ++n)
-{
-  for (_i = 0; _i < _test.size(); _i++)
-  {
-    msum += local_re_phase[n](_i);
-  //  _console << "n " << n << ", _i " << _i << ", mass" << local_re_phase[n](_i) << std::endl;
-
-  }
-}
-
-  // Sum all of the contributions to the residual and jacobian of each phase,
-  DenseVector<Number> local_re_sum;
-  local_re_sum.resize(re.size());
-  local_re_sum.zero();
-
-  DenseMatrix<Number> local_ke_sum;
-  local_ke_sum.resize(ke.m(), ke.n());
-  local_ke_sum.zero();
-
-  for (unsigned int n = 0; n < _num_phases; ++n)
-  {
-    for (unsigned int nodenum = 0; nodenum < num_nodes; ++nodenum)
-    {
-      if (compute_res)
-        local_re_sum(nodenum) += local_re_phase[n](nodenum);
-      if (compute_jac)
-        for (_j = 0; _j < _phi.size(); _j++)
-          local_ke_sum(nodenum, _j) += local_ke_phase[n](nodenum, _j);
     }
   }
 
   // Add results to the Residual or Jacobian
   if (compute_res)
   {
-      re += local_re_sum;
+    re += _local_re;
 
     if (_has_save_in)
     {
       Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
       for (unsigned int i = 0; i < _save_in.size(); i++)
-        _save_in[i]->sys().solution().add_vector(local_re_sum, _save_in[i]->dofIndices());
+        _save_in[i]->sys().solution().add_vector(_local_re, _save_in[i]->dofIndices());
     }
   }
 
   if (compute_jac)
   {
-    ke += local_ke_sum;
+    ke += _local_ke;
 
 //  if (_has_diag_save_in && dvar == _pvar)
     {
@@ -333,5 +252,4 @@ for (unsigned int n = 0; n < _num_phases; ++n)
         _diag_save_in[i]->sys().solution().add_vector(diag, _diag_save_in[i]->dofIndices());
     }
   }
-
 }

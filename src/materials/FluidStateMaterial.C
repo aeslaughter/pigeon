@@ -13,8 +13,8 @@ InputParameters validParams<FluidStateMaterial>()
   InputParameters params = validParams<Material>();
 
   params.addRequiredParam<UserObjectName>("fluid_state_uo", "Name of the User Object defining the fluid state model");
-  params.addRequiredCoupledVar("primary_saturation_variable","The primary saturation variable");
-  params.addRequiredCoupledVar("primary_pressure_variable","The primary pressure variable");
+  params.addRequiredCoupledVar("primary_saturation_variable", "The primary saturation variable");
+  params.addRequiredCoupledVar("primary_pressure_variable", "The primary pressure variable");
   params.addCoupledVar("temperature_variable", 50., "The temperature variable");
   params.addParam<unsigned int>("phase_index", 0, "The phase index of the primary pressure variable");
 
@@ -29,7 +29,7 @@ FluidStateMaterial::FluidStateMaterial(const std::string & name,
     _gravity(getMaterialProperty<RealVectorValue>("gravity")),
 
     // Declare vector of phase fluxes (without mobility)
-    _phase_flux_no_mobility(declareProperty<std::vector<RealVectorValue> >("phase_flux_no_mobility")),
+    _phase_flux_no_mobility(declareProperty<std::vector<RealGradient> >("phase_flux_no_mobility")),
     _phase_mass(declareProperty<std::vector<Real> >("phase_mass")),
 
     _primary_saturation(coupledValue("primary_saturation_variable")),

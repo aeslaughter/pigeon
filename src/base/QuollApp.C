@@ -6,6 +6,8 @@
 // Kernels
 #include "ComponentMassTimeDerivative.h"
 #include "ComponentFlux.h"
+#include "LumpedMassChange.h"
+#include "FullyUpwindFlux.h"
 
 // Initial conditions
 // #include "PerturbationIC.h"
@@ -30,12 +32,15 @@
 // Materials
 #include "PorousMaterial.h"
 #include "FluidStateMaterial.h"
+#include "tmpMaterial.h"
+#include "SimpleFluidStateMaterial.h"
 
 // User object
 // Relative permeability
 #include "RelativePermeabilityVanGenuchten.h"
 #include "RelativePermeabilityCorey.h"
 #include "RelativePermeabilityPerfectlyMobile.h"
+#include "SimpleRelPermVG.h"
 // Capillary pressure
 #include "CapillaryPressureVanGenuchten.h"
 #include "CapillaryPressureConstant.h"
@@ -101,6 +106,8 @@ QuollApp::registerObjects(Factory & factory)
    // Register the custom convection and Darcy kernels defined for this problem
    registerKernel(ComponentMassTimeDerivative);
    registerKernel(ComponentFlux);
+   registerKernel(LumpedMassChange);
+   registerKernel(FullyUpwindFlux);
 
    // Register the pertubation initial condition to seed the instability
 // registerInitialCondition(PerturbationIC);
@@ -126,6 +133,8 @@ QuollApp::registerObjects(Factory & factory)
    // Register the materials
    registerMaterial(PorousMaterial);
    registerMaterial(FluidStateMaterial);
+   registerMaterial(tmpMaterial);
+   registerMaterial(SimpleFluidStateMaterial);
 
    // Register user objects for relative permeability and capillary pressure
    registerUserObject(RelativePermeabilityVanGenuchten);
@@ -133,6 +142,7 @@ QuollApp::registerObjects(Factory & factory)
    registerUserObject(RelativePermeabilityPerfectlyMobile);
    registerUserObject(CapillaryPressureVanGenuchten);
    registerUserObject(CapillaryPressureConstant);
+   registerUserObject(SimpleRelPermVG);
 
    // Register user object for fluid properties
    registerUserObject(FluidPropertiesCO2);
