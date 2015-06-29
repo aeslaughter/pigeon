@@ -1,0 +1,51 @@
+#include "DolphinApp.h"
+#include "Moose.h"
+#include "AppFactory.h"
+
+template<>
+InputParameters validParams<DolphinApp>()
+{
+  InputParameters params = validParams<MooseApp>();
+
+  params.set<bool>("use_legacy_uo_initialization") = false;
+  params.set<bool>("use_legacy_uo_aux_computation") = false;
+  return params;
+}
+
+DolphinApp::DolphinApp(const std::string & name, InputParameters parameters) :
+    MooseApp(name, parameters)
+{
+  srand(processor_id());
+
+  Moose::registerObjects(_factory);
+  DolphinApp::registerObjects(_factory);
+
+  Moose::associateSyntax(_syntax, _action_factory);
+  DolphinApp::associateSyntax(_syntax, _action_factory);
+}
+
+DolphinApp::~DolphinApp()
+{
+}
+
+// External entry point for dynamic application loading
+extern "C" void DolphinApp__registerApps() { DolphinApp::registerApps(); }
+void
+DolphinApp::registerApps()
+{
+  registerApp(DolphinApp);
+}
+
+// External entry point for dynamic object registration
+extern "C" void DolphinApp__registerObjects(Factory & factory) { DolphinApp::registerObjects(factory); }
+void
+DolphinApp::registerObjects(Factory & factory)
+{
+}
+
+// External entry point for dynamic syntax association
+extern "C" void DolphinApp__associateSyntax(Syntax & syntax, ActionFactory & action_factory) { DolphinApp::associateSyntax(syntax, action_factory); }
+void
+DolphinApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
+{
+}
