@@ -39,21 +39,19 @@
     type = ComponentMassTimeDerivative
     variable = liquid_pressure
     primary_variable_type = pressure
-    fluid_saturation_variables = liquid_saturation
-    fluid_density_variables = liquid_density
-    component_mass_fraction_variables = xh20liquid
     fluid_state_uo = FluidState
-    fluid_pressure_variables = liquid_pressure
+    fluid_density_variable = liquid_density
+    fluid_saturation_variable = liquid_saturation
+    fluid_pressure_variable = liquid_pressure
   [../]
   [./H2OLiquidFlux]
     type = ComponentFlux
     variable = liquid_pressure
     primary_variable_type = pressure
-    fluid_state_uo = FluidState
-    fluid_density_variables = liquid_density
-    fluid_viscosity_variables = liquid_viscosity
-    component_mass_fraction_variables = xh20liquid
-    relperm_variables = liquid_relperm
+    fluid_viscosity_variable = liquid_viscosity
+    fluid_density_variable = liquid_density
+    component_mass_fraction_variable = xh20liquid
+    fluid_relperm_variable = liquid_relperm
   [../]
 []
 

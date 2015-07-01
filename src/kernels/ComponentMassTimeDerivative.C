@@ -37,8 +37,9 @@ ComponentMassTimeDerivative::ComponentMassTimeDerivative(const std::string & nam
     _primary_variable_type(getParam<MooseEnum>("primary_variable_type")),
     _temperature(coupledValue("temperature_variable")),
     _fluid_state(getUserObject<FluidState>("fluid_state_uo")),
-    _phase_index(getParam<unsigned int>("phase_index"))
-
+    _phase_index(getParam<unsigned int>("phase_index")),
+    _pressure_var(coupled("fluid_pressure_variable")),
+    _saturation_var(coupled("fluid_saturation_variable"))
 {
 }
 
@@ -50,15 +51,12 @@ Real ComponentMassTimeDerivative::computeQpResidual()
 
    mass += _component_mass_fraction[_i] * _fluid_density[_i] * _fluid_saturation[_i];
    mass_old += _component_mass_fraction_old[_i] * _fluid_density_old[_i] * _fluid_saturation_old[_i];
-
-  // _console << "mass " << mass << std::endl;
   //TODO: allow for porosity change
   return _test[_i][_qp] * _porosity[_qp] * (mass - mass_old)/_dt;
 }
 
 Real ComponentMassTimeDerivative::computeQpJacobian() // TODO: Jacobians need further work!
 {
-  // No off-diagonal mass entries in jacobian
   if (_i != _j)
     return 0.0;
 
@@ -84,5 +82,27 @@ Real ComponentMassTimeDerivative::computeQpJacobian() // TODO: Jacobians need fu
 
 Real ComponentMassTimeDerivative::computeQpOffDiagJacobian(unsigned int jvar)
 {
-  return 0.0;
+  if (_i != _j)
+    return 0.0;
+
+  Real qpoffdiagjacobian;
+
+    if (_primary_variable_type == "saturation")
+      if (jvar == _pressure_var)
+      {
+        Real dDensity_dP = _fluid_state.dDensity_dP(_fluid_pressure[_i], _temperature[_i])[_phase_index];
+        qpoffdiagjacobian = _component_mass_fraction[_i] * _fluid_saturation[_i] * dDensity_dP;
+      }
+
+    if (_primary_variable_type == "pressure")
+      if (jvar == _saturation_var)
+        qpoffdiagjacobian =  _component_mass_fraction[_i] * _fluid_density[_i];
+
+    if (_primary_variable_type == "mass_fraction")
+    {
+      //TODO: properly implement this
+      qpoffdiagjacobian = _fluid_density[_i] * _fluid_saturation[_i];
+    }
+
+  return _test[_i][_qp] * _porosity[_i] * qpoffdiagjacobian / _dt;
 }

@@ -31,6 +31,8 @@ FluidStateMaterial::FluidStateMaterial(const std::string & name,
     // Declare vector of phase fluxes (without mobility)
     _phase_flux_no_mobility(declareProperty<std::vector<RealGradient> >("phase_flux_no_mobility")),
     _phase_mass(declareProperty<std::vector<Real> >("phase_mass")),
+    _dphase_flux_no_mobility_dp(declareProperty<std::vector<RealVectorValue> >("dphase_flux_no_mobility_dp")),
+    _dphase_flux_no_mobility_ds(declareProperty<std::vector<RealVectorValue> >("dphase_flux_no_mobility_ds")),
 
     _primary_saturation(coupledValue("primary_saturation_variable")),
     _grad_primary_saturation(coupledGradient("primary_saturation_variable")),
@@ -77,6 +79,8 @@ FluidStateMaterial::computeQpProperties()
   }
 
   _phase_flux_no_mobility[_qp].resize(_num_phases);
+  _dphase_flux_no_mobility_dp[_qp].resize(_num_phases);
+
   RealVectorValue grad_pressure;
 
   for (unsigned int n = 0; n < _num_phases; ++n)
@@ -93,6 +97,9 @@ FluidStateMaterial::computeQpProperties()
       _grad_primary_saturation[_qp];
 
       _phase_flux_no_mobility[_qp][n] = (grad_pressure + density[n] * _gravity[_qp]);
+
+      _dphase_flux_no_mobility_dp[_qp][n] = - _fluid_state.dDensity_dP(_primary_pressure[_qp], temperature)[n] * _gravity[_qp];
+
     }
   }
 }

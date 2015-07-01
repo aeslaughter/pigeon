@@ -34,6 +34,9 @@ private:
   const MaterialProperty<RealVectorValue> & _gravity;
   MaterialProperty<std::vector<RealGradient> > & _phase_flux_no_mobility;
   MaterialProperty<std::vector<Real> > & _phase_mass;
+  MaterialProperty<std::vector<RealVectorValue> > & _dphase_flux_no_mobility_dp;
+  MaterialProperty<std::vector<RealVectorValue> > & _dphase_flux_no_mobility_ds;
+
 
   VariableValue & _primary_saturation;
   VariableGradient & _grad_primary_saturation;

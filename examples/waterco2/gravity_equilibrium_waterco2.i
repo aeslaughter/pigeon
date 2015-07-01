@@ -1,7 +1,7 @@
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  ny = 10
+  ny = 20
   xmax = 100
   ymax = 100
 []
@@ -58,43 +58,41 @@
     type = ComponentMassTimeDerivative
     variable = gas_pressure
     primary_variable_type = pressure
-    fluid_saturation_variables = 'liquid_saturation gas_saturation'
-    fluid_density_variables = 'liquid_density gas_density'
-    component_mass_fraction_variables = 'xh20liquid xh20gas'
     fluid_state_uo = FluidState
-    fluid_pressure_variables = 'liquid_pressure gas_pressure'
-    phase_index = 1
+    fluid_density_variable = liquid_density
+    fluid_saturation_variable = liquid_saturation
+    fluid_pressure_variable = liquid_pressure
   [../]
   [./H2OLiquidFlux]
     type = ComponentFlux
     variable = gas_pressure
     primary_variable_type = pressure
     fluid_state_uo = FluidState
-    relperm_variables = 'liquid_relperm gas_relperm'
-    fluid_density_variables = 'liquid_density gas_density'
-    fluid_viscosity_variables = 'liquid_viscosity gas_viscosity'
-    component_mass_fraction_variables = 'xh20liquid xh20gas'
-    phase_index = 1
+    fluid_viscosity_variable = liquid_viscosity
+    fluid_density_variable = liquid_density
+    component_mass_fraction_variable = 1
+    fluid_relperm_variable = liquid_relperm
   [../]
   [./CO2MassTime]
     type = ComponentMassTimeDerivative
     variable = liquid_saturation
     primary_variable_type = saturation
-    fluid_saturation_variables = 'liquid_saturation gas_saturation'
-    fluid_density_variables = 'liquid_density gas_density'
-    component_mass_fraction_variables = 'xco2liquid xco2gas'
     fluid_state_uo = FluidState
-    fluid_pressure_variables = 'liquid_pressure gas_pressure'
+    phase_index = 1
+    fluid_density_variable = gas_density
+    fluid_saturation_variable = gas_saturation
+    fluid_pressure_variable = gas_pressure
   [../]
   [./CO2MassFlux]
     type = ComponentFlux
     variable = liquid_saturation
     fluid_state_uo = FluidState
-    relperm_variables = 'liquid_relperm gas_relperm'
     primary_variable_type = saturation
-    fluid_density_variables = 'liquid_density gas_density'
-    component_mass_fraction_variables = 'xco2liquid xco2gas'
-    fluid_viscosity_variables = 'liquid_viscosity gas_viscosity'
+    fluid_viscosity_variable = gas_viscosity
+    phase_index = 1
+    fluid_density_variable = gas_density
+    component_mass_fraction_variable = 1
+    fluid_relperm_variable = gas_relperm
   [../]
 []
 
@@ -226,7 +224,7 @@
     gravity = '0 9.8 0'
     liquid_saturation_variable = liquid_saturation
     diffusivity = 0.
-    permeability = '1e-13 0 0 0 1e-13 0 0 0 1e-13'
+    permeability = '1e-12 0 0 0 1e-12 0 0 0 1e-12'
     porosity = 0.25
   [../]
   [./FluidStateMaterial]
@@ -236,6 +234,7 @@
     phase_index = 1
     primary_pressure_variable = gas_pressure
     primary_saturation_variable = liquid_saturation
+    temperature_variable = 100
   [../]
 []
 
@@ -296,23 +295,31 @@
     execute_on = 'initial linear'
   [../]
   [./CapillaryPressure]
-    type = CapillaryPressureConstant
+    type = CapillaryPressureVanGenuchten
     execute_on = 'initial linear'
-    cp = 0
+    p0 = 1e4
+    cp_max = 1e6
+    m = 0.8
+    sat_ls = 1
+    sat_lr = 0.2
   [../]
   [./RelativePermeabilityVanGenuchten]
-    type = RelativePermeabilityPerfectlyMobile
+    type = RelativePermeabilityVanGenuchten
     execute_on = 'initial linear'
+    sat_gr = 0.2
+    m = 0.8
+    sat_ls = 1
+    sat_lr = 0.2
   [../]
   [./FluidState]
-    type = FluidStateWaterCO2
+    type = FluidStateMultiphase
     capillary_pressure_uo = CapillaryPressure
-    co2_property_uo = FluidPropertiesCO2
-    water_property_uo = FluidPropertiesWater
     relative_permeability_uo = RelativePermeabilityVanGenuchten
     execute_on = 'initial linear'
     fluid_temperature = 100
     isothermal = true
+    gas_property_uo = FluidPropertiesCO2
+    liquid_property_uo = FluidPropertiesWater
   [../]
 []
 
@@ -321,6 +328,8 @@
   [./fdp]
     type = FDP
     full = true
+    petsc_options_iname = '-ksp_type -pc_type'
+    petsc_options_value = 'bcgs bjacobi'
   [../]
   [./smp]
     type = SMP
@@ -334,10 +343,12 @@
 
 [Executioner]
   type = Transient
-  solve_type = PJFNK
-  end_time = 1e4
-  nl_abs_tol = 1e-6
+  solve_type = NEWTON
+  end_time = 3e6
+  nl_abs_tol = 1e-10
   nl_rel_tol = 1e-8
+  l_tol = 1e-08
+  dtmax = 2e5
   [./TimeStepper]
     type = IterationAdaptiveDT
     dt = 100

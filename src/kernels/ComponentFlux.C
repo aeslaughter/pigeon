@@ -11,13 +11,16 @@ template<>
 InputParameters validParams<ComponentFlux>()
 {
   InputParameters params = validParams<Kernel>();
+  params.addRequiredCoupledVar("fluid_pressure_variable", "The fluid pressure variable for this phase");
+  params.addRequiredCoupledVar("fluid_saturation_variable", "The fluid saturation variable for this phase");
+  params.addCoupledVar("temperature_variable", 50, "The temperature variable.");
   params.addRequiredCoupledVar("fluid_density_variable", "The fluid density auxiallary variable for this phase.");
   params.addRequiredCoupledVar("fluid_viscosity_variable", "The  fluid viscosity auxillary variable for this phase.");
   params.addRequiredCoupledVar("component_mass_fraction_variable", "The mass fraction of the kernels component in this phase.");
   params.addRequiredCoupledVar("fluid_relperm_variable", "The relative permeability auxillary variable for this phase.");
   MooseEnum primary_variable_type("pressure saturation mass_fraction");
   params.addRequiredParam<MooseEnum>("primary_variable_type", primary_variable_type, "The type of primary variable for this kernel (e.g. pressure, saturation or component mass fraction");
-  //params.addRequiredParam<UserObjectName>("fluid_state_uo", "Name of the User Object defining the fluid state");
+  params.addRequiredParam<UserObjectName>("fluid_state_uo", "Name of the User Object defining the fluid state");
   params.addParam<unsigned int>("phase_index", 0, "The index of the phase this kernel acts on");
   return params;
 }
@@ -28,13 +31,19 @@ ComponentFlux::ComponentFlux(const std::string & name,
   _permeability(getMaterialProperty<RealTensorValue>("permeability")),
   _gravity(getMaterialProperty<RealVectorValue>("gravity")),
   _phase_flux_no_mobility(getMaterialProperty<std::vector<RealGradient> >("phase_flux_no_mobility")),
+  _dphase_flux_no_mobility_dp(getMaterialProperty<std::vector<RealVectorValue> >("dphase_flux_no_mobility_dp")),
+  _fluid_pressure(coupledValue("fluid_pressure_variable")),
+  _fluid_saturation(coupledValue("fluid_saturation_variable")),
+  _temperature(coupledValue("temperature_variable")),
   _fluid_density(coupledNodalValue("fluid_density_variable")),
   _fluid_viscosity(coupledNodalValue("fluid_viscosity_variable")),
   _component_mass_fraction(coupledNodalValue("component_mass_fraction_variable")),
   _fluid_relperm(coupledNodalValue("fluid_relperm_variable")),
   _primary_variable_type(getParam<MooseEnum>("primary_variable_type")),
-  //_fluid_state(getUserObject<FluidState>("fluid_state_uo")),
-  _phase_index(getParam<unsigned int>("phase_index"))
+  _fluid_state(getUserObject<FluidState>("fluid_state_uo")),
+  _phase_index(getParam<unsigned int>("phase_index")),
+  _pressure_var(coupled("fluid_pressure_variable")),
+  _saturation_var(coupled("fluid_saturation_variable"))
 
 {
 }
@@ -53,14 +62,14 @@ Real ComponentFlux::computeQpJacobian()
 {
   Real qpjacobian;
 
-  if (_primary_variable_type == "pressure") //TODO: other primary variable types
-    qpjacobian = _grad_test[_i][_qp] *  _component_mass_fraction[_qp] * (_permeability[_qp] * _fluid_density[_qp] * _grad_phi[_j][_qp]);
+  if (_primary_variable_type == "pressure")
+    qpjacobian = _grad_test[_i][_qp] * (_permeability[_qp] * (_grad_phi[_j][_qp] + _dphase_flux_no_mobility_dp[_qp][_phase_index]));
 
   if (_primary_variable_type == "saturation")
     qpjacobian = 0.; //TODO Grad pressure depends on saturation through capillary pressure
 
   if (_primary_variable_type == "mass_fraction")
-    qpjacobian = 0.; //TODO dependence of
+    qpjacobian = 0.; //TODO
 
   return qpjacobian;
 }
@@ -72,12 +81,12 @@ void ComponentFlux::computeJacobian()
 
 Real ComponentFlux::computeQpOffDiagJacobian(unsigned int jvar)
 {
-  return 0.0; // Not used in the upwinding code.
+  return 0.0;
 }
 
-void ComponentFlux::computeOffDiagJacobian()
+void ComponentFlux::computeOffDiagJacobian(unsigned int jvar)
 {
-   upwind(false, true, _var.number());
+   upwind(false, true, jvar);
 }
 
 void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar)
@@ -89,8 +98,7 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
   // The mobility calculated at the nodes
   for (unsigned int n = 0; n < num_nodes; n++)
   {
-    mobility[n] = _fluid_relperm[n] * _fluid_density[n] * _component_mass_fraction[n] /
-      _fluid_viscosity[n];
+    mobility[n] = _fluid_relperm[n] *  _fluid_density[n] * _component_mass_fraction[n] / _fluid_viscosity[n];
   }
 
   // Compute the residual and jacobian without the mobility terms. Even if we are computing the jacobian
@@ -115,10 +123,16 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
     _local_ke.resize(ke.m(), ke.n());
     _local_ke.zero();
 
-    for (_i = 0; _i < _test.size(); _i++)
-      for (_j = 0; _j < _phi.size(); _j++)
-        for (_qp = 0; _qp < _qrule->n_points(); _qp++)
-          _local_ke(_i, _j) += _JxW[_qp] * _coord[_qp] * computeQpJacobian();
+    if (jvar == _var.number())
+      for (_i = 0; _i < _test.size(); _i++)
+        for (_j = 0; _j < _phi.size(); _j++)
+          for (_qp = 0; _qp < _qrule->n_points(); _qp++)
+            _local_ke(_i, _j) += _JxW[_qp] * _coord[_qp] * computeQpJacobian();
+   else
+     for (_i = 0; _i < _test.size(); _i++)
+       for (_j = 0; _j < _phi.size(); _j++)
+         for (_qp = 0; _qp < _qrule->n_points(); _qp++)
+           _local_ke(_i, _j) += _JxW[_qp] * _coord[_qp] * computeQpOffDiagJacobian(jvar);
   }
 
   // Now perform the upwinding by multiplying the residuals at the
@@ -149,9 +163,9 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
   // and problems at steadystate where upwinding oscillates from
   // node-to-node causing nonconvergence.
   bool reached_steady = true;
-  for (unsigned int nodenum = 0; nodenum < num_nodes ; ++nodenum)
+  for (unsigned int n = 0; n < num_nodes ; ++n)
   {
-    if (_local_re(nodenum) >= 1E-20)
+    if (_local_re(n) >= 1E-20)
     {
       reached_steady = false;
       break;
@@ -172,53 +186,60 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
     dtotal_mass_out.resize(num_nodes);
     dtotal_in.resize(num_nodes);
 
-    for (unsigned int nodenum = 0; nodenum < num_nodes ; ++nodenum)
+    for (unsigned int n = 0; n < num_nodes ; ++n)
     {
-      dtotal_mass_out[nodenum] = 0;
-      dtotal_in[nodenum] = 0;
+      dtotal_mass_out[n] = 0;
+      dtotal_in[n] = 0;
     }
   }
 
-  // Perform the upwinding over all phases
-    for (unsigned int nodenum = 0; nodenum < num_nodes ; ++nodenum)
+  // Perform the upwinding
+    for (unsigned int n = 0; n < num_nodes ; ++n)
     {
-      if (_local_re(nodenum) >= 0 || reached_steady) // upstream node
+      if (_local_re(n) >= 0 || reached_steady) // upstream node
       {
         if (compute_jac)
         {
-          Real dDensity_dP = 0; //_fluid_state.dDensity_dP(1.5e6, 100.)[n]; //TODO: Fix this!
+          Real dmobility;
+
+          if (_primary_variable_type == "pressure")
+          {
+            Real ddensity_dp = _fluid_state.dDensity_dP(_fluid_pressure[n], _temperature[n])[_phase_index];
+            dmobility = _fluid_relperm[n] * _component_mass_fraction[n] * ddensity_dp / _fluid_viscosity[n];
+          }
+
           for (_j = 0; _j < _phi.size(); _j++)
-            _local_ke(nodenum, _j) *= mobility[nodenum];
-            _local_ke(nodenum, nodenum) += dDensity_dP * _local_re(nodenum);
+            _local_ke(n, _j) *= mobility[n];
+            _local_ke(n, n) += dmobility * _local_re(n);
           for (_j = 0; _j < _phi.size(); _j++)
-            dtotal_mass_out[_j] += _local_ke(nodenum, _j);
+            dtotal_mass_out[_j] += _local_ke(n, _j);
         }
-        _local_re(nodenum) *= mobility[nodenum];
-        total_mass_out += _local_re(nodenum);
+        _local_re(n) *= mobility[n];
+        total_mass_out += _local_re(n);
       }
       else
       {
-        total_in -= _local_re(nodenum); // note the -= means the result is positive
+        total_in -= _local_re(n); // note the -= means the result is positive
         if (compute_jac)
           for (_j = 0; _j < _phi.size(); _j++)
-            dtotal_in[_j] -= _local_ke(nodenum, _j);
+            dtotal_in[_j] -= _local_ke(n, _j);
       }
     }
 
   // Conserve mass over all phases by proportioning the total_mass_out mass to the inflow nodes, weighted by their _local_re values
   if (!reached_steady)
   {
-    for (unsigned int nodenum = 0; nodenum < num_nodes; ++nodenum)
+    for (unsigned int n = 0; n < num_nodes; ++n)
     {
-      if (_local_re(nodenum) < 0)
+      if (_local_re(n) < 0)
       {
         if (compute_jac)
           for (_j = 0; _j < _phi.size(); _j++)
           {
-            _local_ke(nodenum, _j) *= total_mass_out/total_in;
-            _local_ke(nodenum, _j) += _local_re(nodenum)*(dtotal_mass_out[_j]/total_in - dtotal_in[_j]*total_mass_out/total_in/total_in);
+            _local_ke(n, _j) *= total_mass_out / total_in;
+            _local_ke(n, _j) += _local_re(n) * (dtotal_mass_out[_j] / total_in - dtotal_in[_j] * total_mass_out / total_in / total_in);
           }
-        _local_re(nodenum) *= total_mass_out/total_in;
+        _local_re(n) *= total_mass_out / total_in;
       }
     }
   }
@@ -240,7 +261,7 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
   {
     ke += _local_ke;
 
-//  if (_has_diag_save_in && dvar == _pvar)
+    if (_has_diag_save_in && jvar == _var.number())
     {
       unsigned int rows = ke.m();
       DenseVector<Number> diag(rows);

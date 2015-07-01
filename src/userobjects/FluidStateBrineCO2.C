@@ -168,8 +168,8 @@ FluidStateBrineCO2::pressure(Real gas_pressure, Real liquid_saturation) const
   std::vector<Real> pressures;
   Real capillary_pressure = _capillary_pressure.capillaryPressure(liquid_saturation);
 
-  pressures.push_back(gas_pressure);
   pressures.push_back(gas_pressure - capillary_pressure);
+  pressures.push_back(gas_pressure);
 
   return pressures;
 }

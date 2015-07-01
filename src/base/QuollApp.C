@@ -55,6 +55,7 @@
 #include "FluidStateSinglePhase.h"
 #include "FluidStateBrineCO2.h"
 #include "FluidStateWaterCO2.h"
+#include "FluidStateMultiphase.h"
 
 // Postprocessors
 #include "ComponentMassPostprocessor.h"
@@ -153,6 +154,7 @@ QuollApp::registerObjects(Factory & factory)
 
    // Register user objects for fluid states
    registerUserObject(FluidStateSinglePhase);
+   registerUserObject(FluidStateMultiphase);
    registerUserObject(FluidStateBrineCO2);
    registerUserObject(FluidStateWaterCO2);
 

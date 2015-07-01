@@ -47,6 +47,8 @@ private:
    */
   const FluidState & _fluid_state;
   unsigned int _phase_index;
+  unsigned int _pressure_var;
+  unsigned int _saturation_var;
 };
 
 #endif //COMPONENTMASSTIMEDERIVATIVE_H
