@@ -34,9 +34,9 @@ ComponentMassPostprocessor::ComponentMassPostprocessor(const std::string & name,
 
   for (unsigned int i = 0; i < n; ++i)
   {
-    _fluid_density[i] = &coupledValue("density_variables", i);
-    _fluid_saturation[i] = &coupledValue("saturation_variables", i);
-    _component_mass_fraction[i] = &coupledValue("component_mass_fraction_variables", i);
+    _fluid_density[i] = &coupledNodalValue("density_variables", i);
+    _fluid_saturation[i] = &coupledNodalValue("saturation_variables", i);
+    _component_mass_fraction[i] = &coupledNodalValue("component_mass_fraction_variables", i);
   }
 }
 
