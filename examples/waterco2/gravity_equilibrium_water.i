@@ -52,6 +52,9 @@
     fluid_density_variable = liquid_density
     component_mass_fraction_variable = xh20liquid
     fluid_relperm_variable = liquid_relperm
+    fluid_saturation_variable = liquid_saturation
+    fluid_pressure_variable = liquid_pressure
+    fluid_state_uo = FluidState
   [../]
 []
 
