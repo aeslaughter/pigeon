@@ -12,9 +12,6 @@ InputParameters validParams<FluidStateAux>()
 {
   InputParameters params = validParams<AuxKernel>();
   params.addRequiredParam<UserObjectName>("fluid_state_uo", "Name of the User Object defining the fluid state");
-  params.addCoupledVar("pressure_variable",  "The pressure variable");
-  params.addCoupledVar("temperature_variable", 100, "The temperature variable.");
-  params.addCoupledVar("saturation_variable", 1.0, "The saturation variable");
   MooseEnum state_property_enum("density viscosity mass_fraction saturation pressure relperm henry");
   params.addRequiredParam<MooseEnum>("state_property_enum", state_property_enum, "The fluid property that this auxillary kernel is to calculate");
   params.addParam<unsigned int>("phase_index", 0, "The index of the phase this auxillary kernel acts on");
@@ -27,9 +24,6 @@ FluidStateAux::FluidStateAux(const std::string & name,
     AuxKernel(name, parameters),
 
     _fluid_state(getUserObject<FluidState>("fluid_state_uo")),
-    _pressure(coupledValue("pressure_variable")),
-    _temperature(coupledValue("temperature_variable")),
-    _saturation(coupledValue("saturation_variable")),
     _state_property_enum(getParam<MooseEnum>("state_property_enum")),
     _phase_index(getParam<unsigned int>("phase_index")),
     _component_index(getParam<unsigned int>("component_index"))
@@ -39,47 +33,42 @@ FluidStateAux::FluidStateAux(const std::string & name,
 Real
 FluidStateAux::computeValue()
 {
-  Real temperature, property;
-
-  // If the simulation is isothermal, take the temperature from the FluidState UserObject.
-  if (_fluid_state.isIsothermal())
-    temperature = _fluid_state.temperature();
-  else
-    temperature = _temperature[_qp];
-
-  // Thermophysical properties from Fluid State userObject
-  std::vector<std::vector<Real> > properties;
-
-  properties = _fluid_state.thermophysicalProperties(_pressure[_qp], temperature, _saturation[_qp]);
+  Real property;
+  unsigned int node_num = _current_node->id();
 
   if (_state_property_enum == "density")
   {
-      property = properties[_phase_index][0];
+      property = _fluid_state.getDensity(node_num, _phase_index);
   }
+
   if (_state_property_enum == "viscosity")
   {
-    property = properties[_phase_index][1];
+    property = _fluid_state.getViscosity(node_num, _phase_index);
   }
+
   if (_state_property_enum == "saturation")
   {
-    property = _fluid_state.saturation(_saturation[_qp])[_phase_index];
+    property = _fluid_state.getSaturation(node_num, _phase_index);
   }
   if (_state_property_enum == "pressure")
   {
-    property = _fluid_state.pressure(_pressure[_qp], _saturation[_qp])[_phase_index];
+    property = _fluid_state.getPressure(node_num, _phase_index);
   }
   if (_state_property_enum == "relperm")
   {
-    property = _fluid_state.relativePermeability(_saturation[_qp])[_phase_index];
+    property = _fluid_state.getRelativePermeability(node_num, _phase_index);
   }
+
   if (_state_property_enum == "mass_fraction")
   {
-    property = properties[_phase_index][2 + _component_index];
+    property = _fluid_state.getMassFraction(node_num, _phase_index, _component_index);
   }
+    /*
   if (_state_property_enum == "henry")
   {
     property = _fluid_state.henry(temperature);
   }
+*/
 
   return property;
 }

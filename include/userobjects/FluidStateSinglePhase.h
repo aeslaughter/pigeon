@@ -73,18 +73,6 @@ class FluidStateSinglePhase : public FluidState
   virtual std::vector<unsigned int> variable_phase() const;
 
   /**
-   * Thermophysical properties calculated using the primary
-   * variables.
-   *
-   * @param pressure primary pressure (Pa)
-   * @param temperature primary temperature (C)
-   * @param saturation primary saturation (-)
-   * @return thermophysical properties
-   */
-  virtual std::vector<std::vector<Real> > thermophysicalProperties(Real pressure, Real temperature, Real saturation) const;
-
-
-  /**
    * Fluid density
    *
    * @param pressure phase pressure (Pa)
@@ -169,17 +157,89 @@ class FluidStateSinglePhase : public FluidState
    */
   virtual Real henry(Real temperature) const {return 0.;};
 
+  /**
+   * Loop over all nodes and calculate the required thermophysical
+   * properties.
+   */
+  virtual void execute();
+
+  /**
+   * Return pressure for each phase at each node.
+   *
+   * @param node_num node number
+   * @param phase_index index of phase
+   * @return phase pressure at the node (Pa)
+   */
+  virtual Real getPressure(unsigned int node_num, unsigned int phase_index) const;
+  /**
+   * Return saturation for each phase at each node.
+   *
+   * @param node_num node number
+   * @param phase_index index of phase
+   * @return phase saturation at the node (-)
+   */
+  virtual Real getSaturation(unsigned int node_num, unsigned int phase_index) const;
+
+  /**
+   * Return density for each phase at each node.
+   *
+   * @param node_num node number
+   * @param phase_index index of phase
+   * @return phase density at the node (kg/m^3)
+   */
+  virtual Real getDensity(unsigned int node_num, unsigned int phase_index) const;
+
+  /**
+   * Return viscosity for each phase at each node.
+   *
+   * @param node_num node number
+   * @param phase_index index of phase
+   * @return phase viscosity at the node (Pa/s)
+   */
+  virtual Real getViscosity(unsigned int node_num, unsigned int phase_index) const;
+
+  /**
+   * Return relative permeability for each phase at each node.
+   *
+   * @param node_num node number
+   * @param phase_index index of phase
+   * @return relative permeability at the node (-)
+   */
+  virtual Real getRelativePermeability(unsigned int node_num, unsigned int phase_index) const;
+
+  /**
+   * Return mass fraction for each component in each phase at each node.
+   *
+   * @param node_num node number
+   * @param phase_index index of phase
+   * @param component_index index of the component
+   * @return component mass fraction at the node (-)
+   */
+  virtual Real getMassFraction(unsigned int node_num, unsigned int phase_index, unsigned int component_index) const;
+
  protected:
 
   /**
    * This is the member reference that will hold the User Object
    * value for the fluid properties.
    */
-  const FluidPropertiesWater & _fluid_property;
+  const FluidProperties & _fluid_property;
+
+  /// Primary pressure variable
+  VariableValue & _pressure;
+  /// Primary temperature variable
+  VariableValue & _temperature;
+  /// Primary saturation variable
+  VariableValue & _saturation;
 
   Real _fluid_temperature;
   unsigned int _num_components;
   bool _is_isothermal;
+
+  /// Fluid state properties class to hold thermophysical properties at
+  /// each node
+  std::vector<FluidStateProperties> _fsp;
+
 
 };
 

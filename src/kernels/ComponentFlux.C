@@ -81,7 +81,19 @@ void ComponentFlux::computeJacobian()
 
 Real ComponentFlux::computeQpOffDiagJacobian(unsigned int jvar)
 {
-  return 0.0;
+  Real qpoffdiagjacobian;
+
+  if (_primary_variable_type == "saturation")
+    if (jvar == _pressure_var)
+      qpoffdiagjacobian = _grad_test[_i][_qp] * (_permeability[_qp] * (_grad_phi[_j][_qp] + _dphase_flux_no_mobility_dp[_qp][_phase_index]));
+
+  if (_primary_variable_type == "pressure")
+    qpoffdiagjacobian = 0.; //TODO Grad pressure depends on saturation through capillary pressure
+
+  if (_primary_variable_type == "mass_fraction")
+    qpoffdiagjacobian = 0.; //TODO
+
+  return qpoffdiagjacobian;
 }
 
 void ComponentFlux::computeOffDiagJacobian(unsigned int jvar)
@@ -96,7 +108,7 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
   mobility.resize(num_nodes);
 
   // The mobility calculated at the nodes
-  for (unsigned int n = 0; n < num_nodes; n++)
+  for (unsigned int n = 0; n < num_nodes; ++n)
   {
     mobility[n] = _fluid_relperm[n] *  _fluid_density[n] * _component_mass_fraction[n] / _fluid_viscosity[n];
   }
@@ -207,6 +219,8 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
             Real ddensity_dp = _fluid_state.dDensity_dP(_fluid_pressure[n], _temperature[n])[_phase_index];
             dmobility = _fluid_relperm[n] * _component_mass_fraction[n] * ddensity_dp / _fluid_viscosity[n];
           }
+          if (_primary_variable_type == "saturation")
+            dmobility = 0.;
 
           for (_j = 0; _j < _phi.size(); _j++)
             _local_ke(n, _j) *= mobility[n];

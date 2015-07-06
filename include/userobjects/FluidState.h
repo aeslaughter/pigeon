@@ -8,7 +8,7 @@
 #ifndef FLUIDSTATE_H
 #define FLUIDSTATE_H
 
-#include "GeneralUserObject.h"
+#include "NodalUserObject.h"
 
 class FluidState;
 
@@ -19,14 +19,39 @@ InputParameters validParams<FluidState>();
 /**
  * Base class for fluid state for multiphase flow in porous media.
  */
-class FluidState : public GeneralUserObject
+class FluidState : public NodalUserObject
 {
  public:
   FluidState(const std::string & name, InputParameters parameters);
 
-  void initialize();
-  void execute();
-  void finalize();
+  class FluidStateProperties
+  {
+  public:
+    std::vector<Real> pressure;
+    std::vector<Real> saturation;
+    std::vector<Real> density;
+    std::vector<Real> viscosity;
+    std::vector<Real> relperm;
+    std::vector<std::vector<Real> > mass_fraction;
+  };
+
+
+  virtual void initialize();
+  virtual void execute();
+  virtual void finalize();
+  virtual void threadJoin(const UserObject & uo);
+
+  virtual Real getPressure(unsigned int node_num, unsigned int phase_index) const = 0;
+
+  virtual Real getSaturation(unsigned int node_num, unsigned int phase_index) const = 0;
+
+  virtual Real getDensity(unsigned int node_num, unsigned int phase_index) const = 0;
+
+  virtual Real getViscosity(unsigned int node_num, unsigned int phase_index) const = 0;
+
+  virtual Real getRelativePermeability(unsigned int node_num, unsigned int phase_index) const = 0;
+
+  virtual Real getMassFraction(unsigned int node_num, unsigned int phase_index, unsigned int component_index) const = 0;
 
   /**
    * Number of fluid phases
@@ -70,18 +95,6 @@ class FluidState : public GeneralUserObject
    * List of phase index for each variable
    */
   virtual std::vector<unsigned int> variable_phase() const = 0;
-
-  /**
-   * Thermophysical properties calculated using the primary
-   * variables.
-   *
-   * @param pressure primary pressure (Pa)
-   * @param temperature primary temperature (C)
-   * @param saturation primary saturation (-)
-   * @return thermophysical properties
-   */
-  virtual std::vector<std::vector<Real> > thermophysicalProperties(Real pressure, Real temperature, Real saturation) const = 0;
-
 
   /**
    * Fluid density must be over-written in all derived classes.

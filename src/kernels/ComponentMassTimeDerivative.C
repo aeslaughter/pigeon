@@ -34,6 +34,7 @@ ComponentMassTimeDerivative::ComponentMassTimeDerivative(const std::string & nam
     _component_mass_fraction(coupledNodalValue("component_mass_fraction_variable")),
     _component_mass_fraction_old(coupledNodalValueOld("component_mass_fraction_variable")),
     _fluid_pressure(coupledNodalValue("fluid_pressure_variable")),
+    _fluid_pressure_old(coupledNodalValueOld("fluid_pressure_variable")),
     _primary_variable_type(getParam<MooseEnum>("primary_variable_type")),
     _temperature(coupledValue("temperature_variable")),
     _fluid_state(getUserObject<FluidState>("fluid_state_uo")),
@@ -44,18 +45,21 @@ ComponentMassTimeDerivative::ComponentMassTimeDerivative(const std::string & nam
 }
 
 // Note that this kernel lumps the mass terms to the nodes, so that there is no mass at the qp's.
-Real ComponentMassTimeDerivative::computeQpResidual()
+Real
+ComponentMassTimeDerivative::computeQpResidual()
 {
   Real mass = 0.;
   Real mass_old = 0.;
 
    mass += _component_mass_fraction[_i] * _fluid_density[_i] * _fluid_saturation[_i];
    mass_old += _component_mass_fraction_old[_i] * _fluid_density_old[_i] * _fluid_saturation_old[_i];
+
   //TODO: allow for porosity change
   return _test[_i][_qp] * _porosity[_qp] * (mass - mass_old)/_dt;
 }
 
-Real ComponentMassTimeDerivative::computeQpJacobian() // TODO: Jacobians need further work!
+Real
+ComponentMassTimeDerivative::computeQpJacobian() // TODO: Jacobians need further work!
 {
   if (_i != _j)
     return 0.0;
@@ -77,10 +81,11 @@ Real ComponentMassTimeDerivative::computeQpJacobian() // TODO: Jacobians need fu
       qpjacobian = _fluid_density[_i] * _fluid_saturation[_i];
     }
 
-  return _test[_i][_qp] * _porosity[_i] * qpjacobian / _dt;
+  return _test[_i][_qp] * _porosity[_qp] * qpjacobian / _dt;
 }
 
-Real ComponentMassTimeDerivative::computeQpOffDiagJacobian(unsigned int jvar)
+Real
+ComponentMassTimeDerivative::computeQpOffDiagJacobian(unsigned int jvar)
 {
   if (_i != _j)
     return 0.0;

@@ -5,34 +5,35 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-#ifndef FLUIDSTATEWATERCO2_H
-#define FLUIDSTATEWATERCO2_H
+#ifndef FLUIDSTATETWOPHASE_H
+#define FLUIDSTATETWOPHASE_H
 
 #include "FluidProperties.h"
-#include "FluidPropertiesWater.h"
-#include "FluidPropertiesCO2.h"
 #include "FluidState.h"
 #include "RelativePermeability.h"
 #include "CapillaryPressure.h"
 
-class FluidStateWaterCO2;
+class FluidStateTwoPhase;
 
 /**
+ * Fluid state for two-phase flow.
  * Default primary variables are gas pressure and liquid saturation.
- * Default components are H2O and CO2.
+ * Thermophysical properties are calculated at the nodes. This UserObject
+ * must be exectued on linear in the input file.
  *
- * In all vectors, the first element is for liquid, the second for gas
- * In matrices, the first row is for H2O, the second for CO2.
+ * In all 1D vectors, the first element is for liquid, the second for gas
+ * In 2D arrays, the rows are for each component, and the colums are for the
+ * phases.
  */
 
 
 template<>
 InputParameters validParams<FluidState>();
 
-class FluidStateWaterCO2 : public FluidState
+class FluidStateTwoPhase : public FluidState
 {
  public:
-  FluidStateWaterCO2(const std::string & name, InputParameters parameters);
+  FluidStateTwoPhase(const std::string & name, InputParameters parameters);
 
   /**
    * Number of fluid phases
@@ -79,7 +80,7 @@ class FluidStateWaterCO2 : public FluidState
   virtual std::vector<unsigned int> variable_phase() const;
 
   /**
-   * Fluid density using FluidPropertiesWater and FluidPropertiesCO2 UserObjects.
+   * Fluid density for each phase
    *
    * @param pressure phase pressure (Pa)
    * @param temperature temperature (C)
@@ -88,7 +89,7 @@ class FluidStateWaterCO2 : public FluidState
   virtual Real density(Real pressure, Real temperature, unsigned int phase_index) const;
 
   /**
-   * Fluid viscosity using FluidPropertiesWater and FluidPropertiesCO2 UserObjects.
+   * Fluid viscosity for each phase
    *
    * @param pressure liquid pressure (Pa)
    * @param temperature liquid temperature (C)
@@ -132,7 +133,7 @@ class FluidStateWaterCO2 : public FluidState
   virtual std::vector<Real> dCapillaryPressure(Real liquid_saturation) const;
 
   /**
-   * Saturation of gas phase
+   * Saturation of each phase
    *
    * @param saturation liquid saturation (-)
    * @return saturation gas phase saturation (-)
@@ -150,10 +151,7 @@ class FluidStateWaterCO2 : public FluidState
   virtual std::vector<Real> dDensity_dP(Real pressure, Real temperature) const;
 
   /**
-   * General formulation for Henry's constant for gas solubility in
-   * water. Eq. (3) from Guidelines on the Henry's constant and vapour
-   * liquid distribution constant for gases in H20 and D20 at high
-   * temperatures, IAPWS (2004).
+   * Henry's law set to zero for immiscible fluids
    *
    * @param temperature water temperature (C)
    * @param fitting constants for each gas
@@ -162,7 +160,8 @@ class FluidStateWaterCO2 : public FluidState
   virtual Real henry(Real temperature) const;
 
   /**
-   * Mass fraction of dissolved CO2 in the liquid phase.
+   * Mass fraction of dissolved gas in the liquid phase.
+   * Set to zero for immiscible fluids
    *
    * @param pressure CO2 partial pressure (Pa)
    * @param temperature temperature (C)
@@ -234,15 +233,15 @@ class FluidStateWaterCO2 : public FluidState
 
   /**
    * This is the member reference that will hold the User Object
-   * value for brine properties.
+   * value for liquid properties.
    */
-  const FluidPropertiesWater & _water_property;
+  const FluidProperties & _liquid_property;
 
   /**
    * This is the member reference that will hold the User Object
-   * value for CO2 properties.
+   * value for gas properties.
    */
-  const FluidPropertiesCO2 & _co2_property;
+  const FluidProperties & _gas_property;
 
   /**
    * This is the member reference that will hold the User Object
@@ -265,8 +264,6 @@ class FluidStateWaterCO2 : public FluidState
 
   Real _fluid_temperature;
   bool _is_isothermal;
-  Real _Mh2o;
-  Real _Mco2;
 
   /// Fluid state properties class to hold thermophysical properties at
   /// each node
@@ -274,4 +271,4 @@ class FluidStateWaterCO2 : public FluidState
 
 };
 
-#endif // FLUIDSTATEWATERCO2_H
+#endif // FLUIDSTATETWOPHASE_H

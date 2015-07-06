@@ -16,6 +16,9 @@ InputParameters validParams<FluidStateWaterCO2>()
   params.addRequiredParam<UserObjectName>("co2_property_uo", "Name of the User Object defining the CO2 properties");
   params.addRequiredParam<UserObjectName>("relative_permeability_uo", "Name of the User Object defining the relative permeabilities");
   params.addRequiredParam<UserObjectName>("capillary_pressure_uo", "Name of the User Object defining the capillary pressure");
+  params.addCoupledVar("pressure_variable",  "The primary pressure variable");
+  params.addCoupledVar("temperature_variable", 100, "The primary temperature variable.");
+  params.addCoupledVar("saturation_variable", 1.0, "The primary saturation variable");
   params.addParam<Real>("fluid_temperature", 20.0, "Isothermal fluid temperature");
   params.addParam<bool>("isothermal", false, "Is the simulations isothermal?");
   return params;
@@ -28,12 +31,18 @@ FluidStateWaterCO2::FluidStateWaterCO2(const std::string & name, InputParameters
   _co2_property(getUserObject<FluidPropertiesCO2>("co2_property_uo")),
   _relative_permeability(getUserObject<RelativePermeability>("relative_permeability_uo")),
   _capillary_pressure(getUserObject<CapillaryPressure>("capillary_pressure_uo")),
+  _pressure(coupledNodalValue("pressure_variable")),
+  _temperature(coupledNodalValue("temperature_variable")),
+  _saturation(coupledNodalValue("saturation_variable")),
   _fluid_temperature(getParam<Real>("fluid_temperature")),
   _is_isothermal(getParam<bool>("isothermal"))
 
 {
   _Mh2o = _water_property.molarMass();
   _Mco2 = _co2_property.molarMass();
+
+  //  _fluid_properties.resize(_subproblem.mesh().nNodes());
+  _fsp.resize(_mesh.nNodes());
 }
 
 unsigned int
@@ -90,6 +99,135 @@ FluidStateWaterCO2::variable_phase() const
   return varphases;
 }
 
+void
+FluidStateWaterCO2::execute()
+{
+  // Current node
+  unsigned int node = _current_node->id();
+
+  // Assign the fluid properties
+  // Pressure and saturation first
+  _fsp[node].pressure = pressure(_pressure[_qp], _saturation[_qp]);
+  _fsp[node].saturation = saturation(_saturation[_qp]);
+
+  // Fix this: make it general regarding pressure and saturation.
+  // At the moment, assumes gas pressure and liquid saturation
+
+  // The vapour pressure of H2O
+  Real pv = _water_property.pSat(_temperature[_qp]);
+
+  // The partial pressure of the CO2 in the gas phase
+  Real co2_partial_pressure = _pressure[_qp] - pv;
+
+  // The mass fraction of CO2 in the liquid phase
+  Real xco2l = dissolved(co2_partial_pressure, _temperature[_qp]);
+
+  // The density and viscosity of the liquid phase water. If the saturation is zero,
+  // set the phase density to zero (keep viscosity non-zero as it appears in the denominator
+  // of the mobility.)
+  Real liquid_density, water_viscosity;
+
+  if (_fsp[node].saturation[0] == 0.)
+  {
+    liquid_density = 0.;
+    water_viscosity = 1.; // Not used but set to a non-zero value
+  }
+  else
+  {
+    Real water_density = _water_property.density(_fsp[node].pressure[0], _temperature[_qp]);
+    water_viscosity = _water_property.viscosity(_temperature[_qp], water_density);
+    liquid_density = 1.0 / (xco2l / _co2_property.partialDensity(_temperature[_qp]) +
+      (1.0 - xco2l) / water_density);
+  }
+
+  // The density of the gas phase, and the mass fraction of CO2 in the gase phase. If the
+  // saturation is zero, set the phase density to zero (keep viscosity non-zero as it appears
+  // in the denominator of the mobility.)
+  Real gas_density, xco2g, co2_viscosity, vapour_viscosity;
+
+  if (_fsp[node].saturation[1] == 0.)
+  {
+    gas_density = 0.;
+    xco2g = 0.;
+    co2_viscosity = 1.;  // Not used
+    vapour_viscosity = 1.;  // Not used
+  }
+  else
+  {
+    Real co2_density = _co2_property.density(co2_partial_pressure, _temperature[_qp]);
+    Real vapour_density = _water_property.density(pv, _temperature[_qp]);
+    gas_density = co2_density + vapour_density;
+    xco2g = co2_density / gas_density;
+    co2_viscosity = _co2_property.viscosity(co2_partial_pressure, _temperature[_qp]);
+    vapour_viscosity = _water_property.viscosity(_temperature[_qp], vapour_density);
+  }
+
+  // Store the density of each phase
+  std::vector<Real> densities;
+
+  densities.push_back(liquid_density);
+  densities.push_back(gas_density);
+  _fsp[node].density = densities;
+
+  // Store the viscosity of each phase
+  std::vector<Real> viscosities;
+  viscosities.push_back(water_viscosity);
+  viscosities.push_back(co2_viscosity);
+  _fsp[node].viscosity = viscosities;
+
+  // Store the relative permeability of each phase
+  _fsp[node].relperm = relativePermeability(_fsp[node].saturation[0]);
+
+  // Store the mass fraction of each component in each phase
+  std::vector<std::vector<Real> > xmass;
+  xmass.resize(numComponents());
+
+  xmass[0].push_back(1.0 - xco2l); // H20 in liquid
+  xmass[0].push_back(1.0 - xco2g); // H20 in gas
+  xmass[1].push_back(xco2l); // CO2 in liqiud
+  xmass[1].push_back(xco2g); // CO2 in gas
+
+  _fsp[node].mass_fraction = xmass;
+
+}
+
+Real
+FluidStateWaterCO2::getPressure(unsigned int node_num, unsigned int phase_index) const
+{
+  return _fsp[node_num].pressure[phase_index];
+}
+
+Real
+FluidStateWaterCO2::getSaturation(unsigned int node_num, unsigned int phase_index) const
+{
+  return _fsp[node_num].saturation[phase_index];
+}
+
+Real
+FluidStateWaterCO2::getDensity(unsigned int node_num, unsigned int phase_index) const
+{
+  return _fsp[node_num].density[phase_index];
+}
+
+Real
+FluidStateWaterCO2::getViscosity(unsigned int node_num, unsigned int phase_index) const
+{
+  return _fsp[node_num].viscosity[phase_index];
+}
+
+Real
+FluidStateWaterCO2::getRelativePermeability(unsigned int node_num, unsigned int phase_index) const
+{
+  return _fsp[node_num].relperm[phase_index];
+}
+
+Real
+FluidStateWaterCO2::getMassFraction(unsigned int node_num, unsigned int phase_index, unsigned int component_index) const
+{
+  return _fsp[node_num].mass_fraction[component_index][phase_index];
+}
+
+/*
 std::vector<std::vector<Real> >
 FluidStateWaterCO2::thermophysicalProperties(Real pressure, Real temperature, Real saturation) const
 {
@@ -166,6 +304,7 @@ FluidStateWaterCO2::thermophysicalProperties(Real pressure, Real temperature, Re
 
   return fluid_properties;
 }
+*/
 
 Real
 FluidStateWaterCO2::density(Real pressure, Real temperature, unsigned int phase_index) const

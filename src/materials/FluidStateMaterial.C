@@ -61,10 +61,6 @@ FluidStateMaterial::computeQpProperties()
 
   std::vector<Real> pressure, saturation, density;
 
-  // Write out properties
-  std::vector<std::vector<Real> > properties;
-  properties = _fluid_state.thermophysicalProperties(_primary_pressure[_qp], temperature, _primary_saturation[_qp]);
-
   // Compute pressure, saturation and density at the qp's
   pressure = _fluid_state.pressure(_primary_pressure[_qp], _primary_saturation[_qp]);
   saturation = _fluid_state.saturation(_primary_saturation[_qp]);

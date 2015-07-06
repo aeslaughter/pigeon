@@ -38,6 +38,7 @@ private:
   VariableValue & _component_mass_fraction;
   VariableValue & _component_mass_fraction_old;
   VariableValue & _fluid_pressure;
+  VariableValue & _fluid_pressure_old;
   const MooseEnum & _primary_variable_type;
   VariableValue & _temperature;
 

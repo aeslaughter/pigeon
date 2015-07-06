@@ -10,14 +10,15 @@
 template<>
 InputParameters validParams<FluidState>()
 {
-  InputParameters params = validParams<GeneralUserObject>();
+  InputParameters params = validParams<NodalUserObject>();
   params.addClassDescription("Fluid state base class.  Override properties in your class");
   return params;
 }
 
 FluidState::FluidState(const std::string & name, InputParameters parameters) :
-  GeneralUserObject(name, parameters)
-{}
+  NodalUserObject(name, parameters)
+{
+}
 
 void
 FluidState::initialize()
@@ -29,4 +30,8 @@ FluidState::execute()
 
 void
 FluidState::finalize()
+{}
+
+void
+FluidState::threadJoin(const UserObject & uo)
 {}

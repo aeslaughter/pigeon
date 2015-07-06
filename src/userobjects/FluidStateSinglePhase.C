@@ -11,8 +11,11 @@ template<>
 InputParameters validParams<FluidStateSinglePhase>()
 {
   InputParameters params = validParams<FluidState>();
-  params.addClassDescription("Thermophysical fluid state of water (H20) and CO2.");
-  params.addRequiredParam<UserObjectName>("fluid_property_uo", "Name of the User Object defining the water properties");
+  params.addClassDescription("Thermophysical fluid state of single phase fluid");
+  params.addRequiredParam<UserObjectName>("fluid_property_uo", "Name of the User Object defining the fluid properties");
+  params.addCoupledVar("pressure_variable",  "The primary pressure variable");
+  params.addCoupledVar("temperature_variable", 100, "The primary temperature variable.");
+  params.addCoupledVar("saturation_variable", 1.0, "The primary saturation variable");
   params.addParam<Real>("fluid_temperature", 20.0, "Isothermal fluid temperature");
   params.addParam<unsigned int>("num_components", 1, "The number of components in the fluid");
   params.addParam<bool>("isothermal", false, "Is the simulations isothermal?");
@@ -23,11 +26,16 @@ FluidStateSinglePhase::FluidStateSinglePhase(const std::string & name, InputPara
   FluidState(name, parameters),
 
   _fluid_property(getUserObject<FluidPropertiesWater>("fluid_property_uo")),
+  _pressure(coupledNodalValue("pressure_variable")),
+  _temperature(coupledNodalValue("temperature_variable")),
+  _saturation(coupledNodalValue("saturation_variable")),
   _fluid_temperature(getParam<Real>("fluid_temperature")),
   _num_components(getParam<unsigned int>("num_components")),
   _is_isothermal(getParam<bool>("isothermal"))
 
 {
+  //  _fluid_properties.resize(_subproblem.mesh().nNodes());
+    _fsp.resize(_mesh.nNodes());
 }
 
 unsigned int
@@ -82,19 +90,76 @@ FluidStateSinglePhase::variable_phase() const
   return varphases;
 }
 
-std::vector<std::vector<Real> >
-FluidStateSinglePhase::thermophysicalProperties(Real pressure, Real temperature, Real saturation) const
+void
+FluidStateSinglePhase::execute()
 {
-  std::vector<std::vector<Real> > fluid_properties;
-  fluid_properties.resize(numPhases());
+  // Current node
+  unsigned int node = _current_node->id();
 
-  Real fluid_density = _fluid_property.density(pressure, temperature);
-  Real fluid_viscosity = _fluid_property.viscosity(temperature, fluid_density);
+  // Assign the fluid properties
+  // Pressure and saturation first
+  _fsp[node].pressure = pressure(_pressure[_qp], _saturation[_qp]);
+  _fsp[node].saturation = saturation(_saturation[_qp]);
 
-  fluid_properties[0].push_back(fluid_density);
-  fluid_properties[0].push_back(fluid_viscosity);
+  // Density of fluid
+  std::vector<Real> densities;
 
-  return fluid_properties;
+  densities.push_back(_fluid_property.density(_fsp[node].pressure[0], _temperature[_qp]));
+  _fsp[node].density = densities;
+
+  // Viscosity of fluid
+  std::vector<Real> viscosities;
+  // Water viscosity uses water density in calculation. TODO Fix this for generality
+  viscosities.push_back(_fluid_property.viscosity(_temperature[_qp], _fsp[node].density[0]));
+  _fsp[node].viscosity = viscosities;
+
+  // Relative permeability of the phase is equal to 1.0 by definition
+  _fsp[node].relperm = relativePermeability(_fsp[node].saturation[0]);
+
+  // Mass fraction of each component in the fluid
+  std::vector<std::vector<Real> > xmass;
+  xmass.resize(numComponents());
+
+  xmass[0].push_back(1.0); // Only component in liquid
+
+  _fsp[node].mass_fraction = xmass;
+
+}
+
+Real
+FluidStateSinglePhase::getPressure(unsigned int node_num, unsigned int phase_index) const
+{
+  return _fsp[node_num].pressure[phase_index];
+}
+
+Real
+FluidStateSinglePhase::getSaturation(unsigned int node_num, unsigned int phase_index) const
+{
+  return _fsp[node_num].saturation[phase_index];
+}
+
+Real
+FluidStateSinglePhase::getDensity(unsigned int node_num, unsigned int phase_index) const
+{
+  return _fsp[node_num].density[phase_index];
+}
+
+Real
+FluidStateSinglePhase::getViscosity(unsigned int node_num, unsigned int phase_index) const
+{
+  return _fsp[node_num].viscosity[phase_index];
+}
+
+Real
+FluidStateSinglePhase::getRelativePermeability(unsigned int node_num, unsigned int phase_index) const
+{
+  return _fsp[node_num].relperm[phase_index];
+}
+
+Real
+FluidStateSinglePhase::getMassFraction(unsigned int node_num, unsigned int phase_index, unsigned int component_index) const
+{
+  return _fsp[node_num].mass_fraction[component_index][phase_index];
 }
 
 Real

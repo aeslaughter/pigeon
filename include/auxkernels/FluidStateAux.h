@@ -35,12 +35,6 @@ private:
    */
   const FluidState & _fluid_state;
 
-  /// Phase pressure
-  VariableValue & _pressure;
-  /// Temperature
-  VariableValue & _temperature;
-  /// Phase saturation
-  VariableValue & _saturation;
   /// MooseEnum of fluid properties
   const MooseEnum & _state_property_enum;
   /// Phase index

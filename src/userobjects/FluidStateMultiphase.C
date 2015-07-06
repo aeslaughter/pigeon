@@ -91,6 +91,7 @@ FluidStateMultiphase::variable_phase() const
 std::vector<std::vector<Real> >
 FluidStateMultiphase::thermophysicalProperties(Real pressure, Real temperature, Real saturation) const
 {
+  //_console << "thermophysicalProperties called" << std::endl;
   std::vector<std::vector<Real> > fluid_properties;
   fluid_properties.resize(numPhases());
 
