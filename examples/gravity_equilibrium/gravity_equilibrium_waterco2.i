@@ -228,6 +228,7 @@
     primary_pressure_variable = gas_pressure
     primary_saturation_variable = liquid_saturation
     temperature_variable = 100
+    fluid_density_variables = 'liquid_density gas_density'
   [../]
 []
 

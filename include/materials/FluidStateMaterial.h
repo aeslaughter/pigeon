@@ -43,6 +43,7 @@ private:
   VariableValue & _primary_pressure;
   VariableGradient & _grad_primary_pressure;
   VariableValue & _temperature;
+  std::vector<VariableValue *> _density;
   unsigned int _num_phases;
   unsigned int _phase_index;
 

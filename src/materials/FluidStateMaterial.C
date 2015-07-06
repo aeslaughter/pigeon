@@ -16,6 +16,7 @@ InputParameters validParams<FluidStateMaterial>()
   params.addRequiredCoupledVar("primary_saturation_variable", "The primary saturation variable");
   params.addRequiredCoupledVar("primary_pressure_variable", "The primary pressure variable");
   params.addCoupledVar("temperature_variable", 50., "The temperature variable");
+  params.addRequiredCoupledVar("fluid_density_variables", "The density of each fluid phase");
   params.addParam<unsigned int>("phase_index", 0, "The phase index of the primary pressure variable");
 
   return params;
@@ -45,6 +46,10 @@ FluidStateMaterial::FluidStateMaterial(const std::string & name,
 {
   // The number of phases in the given fluid state model
   _num_phases = _fluid_state.numPhases();
+
+  // Check that the required number of auxillary variables have been provided
+  if (coupledComponents("fluid_density_variables") != _num_phases)
+    mooseError("The number of phase densities provided in FluidStateMaterial is not equal to the number of phases in the FluidState UserObject");
 }
 
 void
@@ -59,19 +64,19 @@ FluidStateMaterial::computeQpProperties()
     temperature = _temperature[_qp];
 
 
-  std::vector<Real> pressure, saturation, density;
+  std::vector<Real> pressure, saturation;
 
   // Compute pressure, saturation and density at the qp's
   pressure = _fluid_state.pressure(_primary_pressure[_qp], _primary_saturation[_qp]);
   saturation = _fluid_state.saturation(_primary_saturation[_qp]);
 
   _phase_mass[_qp].resize(_num_phases);
-  density.resize(_num_phases);
+  _density.resize(_num_phases);
 
   for (unsigned int n = 0; n < _num_phases; ++n)
   {
-    density[n] = _fluid_state.density(pressure[n], temperature, n);
-    _phase_mass[_qp][n] = density[n] * saturation[n];
+    _density[n] = &coupledValue("fluid_density_variables", n);
+    _phase_mass[_qp][n] = (*_density[n])[_qp] * saturation[n];
   }
 
   _phase_flux_no_mobility[_qp].resize(_num_phases);
@@ -92,7 +97,7 @@ FluidStateMaterial::computeQpProperties()
       grad_pressure = _grad_primary_pressure[_qp] - _fluid_state.dCapillaryPressure(_primary_saturation[_qp])[n] *
       _grad_primary_saturation[_qp];
 
-      _phase_flux_no_mobility[_qp][n] = (grad_pressure - density[n] * _gravity[_qp]);
+      _phase_flux_no_mobility[_qp][n] = (grad_pressure - (*_density[n])[_qp] * _gravity[_qp]);
 
       _dphase_flux_no_mobility_dp[_qp][n] = - _fluid_state.dDensity_dP(_primary_pressure[_qp], temperature)[n] * _gravity[_qp];
 

@@ -94,6 +94,7 @@
     primary_pressure_variable = liquid_pressure
     primary_saturation_variable = liquid_saturation
     fluid_state_uo = FluidState
+    fluid_density_variables = liquid_density
   [../]
 []
 

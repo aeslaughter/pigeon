@@ -20,10 +20,6 @@ InputParameters validParams<ComponentMassPostprocessor>()
 ComponentMassPostprocessor::ComponentMassPostprocessor(const std::string & name, InputParameters parameters) :
     ElementIntegralPostprocessor(name, parameters),
     _porosity(getMaterialProperty<Real>("porosity"))
-//    _phase_mass(getMaterialProperty<std::vector<Real> >("phase_mass")),
-//    _fluid_density(coupledValue("density_variable")),
-//    _fluid_saturation(coupledValue("saturation_variable")),
-//    _component_mass_fraction(coupledValue("component_mass_fraction_variable"))
 
 {
   unsigned int n = coupledComponents("density_variables");
