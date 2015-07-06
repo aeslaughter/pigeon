@@ -16,7 +16,6 @@ InputParameters validParams<FluidStateSinglePhase>()
   params.addCoupledVar("pressure_variable",  "The primary pressure variable");
   params.addCoupledVar("temperature_variable", 100, "The primary temperature variable.");
   params.addCoupledVar("saturation_variable", 1.0, "The primary saturation variable");
-  params.addParam<Real>("fluid_temperature", 20.0, "Isothermal fluid temperature");
   params.addParam<unsigned int>("num_components", 1, "The number of components in the fluid");
   params.addParam<bool>("isothermal", false, "Is the simulations isothermal?");
   return params;
@@ -29,7 +28,6 @@ FluidStateSinglePhase::FluidStateSinglePhase(const std::string & name, InputPara
   _pressure(coupledNodalValue("pressure_variable")),
   _temperature(coupledNodalValue("temperature_variable")),
   _saturation(coupledNodalValue("saturation_variable")),
-  _fluid_temperature(getParam<Real>("fluid_temperature")),
   _num_components(getParam<unsigned int>("num_components")),
   _is_isothermal(getParam<bool>("isothermal"))
 
@@ -59,7 +57,8 @@ FluidStateSinglePhase::isIsothermal() const
 Real
 FluidStateSinglePhase::temperature() const
 {
-  return _fluid_temperature;
+  // For isothermal simulations
+  return _temperature[0];
 }
 
 std::vector<std::string>
@@ -96,12 +95,13 @@ FluidStateSinglePhase::execute()
   // Current node
   unsigned int node = _current_node->id();
 
-  // Assign the fluid properties
-  // Pressure and saturation first
+  // Store the phase pressures
   _fsp[node].pressure = pressure(_pressure[_qp], _saturation[_qp]);
+
+  // Store the phase saturations
   _fsp[node].saturation = saturation(_saturation[_qp]);
 
-  // Density of fluid
+  // Density of phases
   std::vector<Real> densities;
 
   densities.push_back(_fluid_property.density(_fsp[node].pressure[0], _temperature[_qp]));

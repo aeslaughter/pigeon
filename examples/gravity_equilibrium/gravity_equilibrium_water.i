@@ -118,7 +118,6 @@
   [./FluidState]
     type = FluidStateSinglePhase
     execute_on = 'initial linear'
-    fluid_temperature = 50
     isothermal = true
     fluid_property_uo = FluidPropertiesWater
     pressure_variable = liquid_pressure

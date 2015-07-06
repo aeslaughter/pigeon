@@ -246,7 +246,6 @@ class FluidStateBrineCO2 : public FluidState
   /// Primary saturation variable
   VariableValue & _saturation;
 
-  Real _fluid_temperature;
   bool _is_isothermal;
 
   /// Fluid state properties class to hold thermophysical properties at

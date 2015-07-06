@@ -232,7 +232,6 @@ class FluidStateSinglePhase : public FluidState
   /// Primary saturation variable
   VariableValue & _saturation;
 
-  Real _fluid_temperature;
   unsigned int _num_components;
   bool _is_isothermal;
 

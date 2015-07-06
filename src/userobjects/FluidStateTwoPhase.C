@@ -19,7 +19,6 @@ InputParameters validParams<FluidStateTwoPhase>()
   params.addCoupledVar("pressure_variable",  "The primary pressure variable");
   params.addCoupledVar("temperature_variable", 100, "The primary temperature variable.");
   params.addCoupledVar("saturation_variable", 1.0, "The primary saturation variable");
-  params.addParam<Real>("fluid_temperature", 20.0, "Isothermal fluid temperature");
   params.addParam<bool>("isothermal", false, "Is the simulations isothermal?");
   return params;
 }
@@ -34,7 +33,6 @@ FluidStateTwoPhase::FluidStateTwoPhase(const std::string & name, InputParameters
   _pressure(coupledNodalValue("pressure_variable")),
   _temperature(coupledNodalValue("temperature_variable")),
   _saturation(coupledNodalValue("saturation_variable")),
-  _fluid_temperature(getParam<Real>("fluid_temperature")),
   _is_isothermal(getParam<bool>("isothermal"))
 
 {
@@ -63,7 +61,8 @@ FluidStateTwoPhase::isIsothermal() const
 Real
 FluidStateTwoPhase::temperature() const
 {
-  return _fluid_temperature;
+  // For isothermal simulations
+  return _temperature[0];
 }
 
 std::vector<std::string>

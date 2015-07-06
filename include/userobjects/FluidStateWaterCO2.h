@@ -263,7 +263,6 @@ class FluidStateWaterCO2 : public FluidState
   /// Primary saturation variable
   VariableValue & _saturation;
 
-  Real _fluid_temperature;
   bool _is_isothermal;
   Real _Mh2o;
   Real _Mco2;
