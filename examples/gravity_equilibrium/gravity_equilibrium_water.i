@@ -82,7 +82,7 @@
     rel_perm_uo = RelativePermeability
     density = 2600.
     cap_pres_uo = CapillaryPressure
-    gravity = '0 9.8 0'
+    gravity = '0 -9.8 0'
     liquid_saturation_variable = 1
     diffusivity = 0.
     permeability = '1e-12 0 0 0 1e-12 0 0 0 1e-12'

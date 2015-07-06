@@ -92,7 +92,7 @@ FluidStateMaterial::computeQpProperties()
       grad_pressure = _grad_primary_pressure[_qp] - _fluid_state.dCapillaryPressure(_primary_saturation[_qp])[n] *
       _grad_primary_saturation[_qp];
 
-      _phase_flux_no_mobility[_qp][n] = (grad_pressure + density[n] * _gravity[_qp]);
+      _phase_flux_no_mobility[_qp][n] = (grad_pressure - density[n] * _gravity[_qp]);
 
       _dphase_flux_no_mobility_dp[_qp][n] = - _fluid_state.dDensity_dP(_primary_pressure[_qp], temperature)[n] * _gravity[_qp];
 

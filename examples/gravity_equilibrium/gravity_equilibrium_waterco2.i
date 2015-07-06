@@ -8,6 +8,7 @@
 
 [Variables]
   [./liquid_saturation]
+    scaling = 10
   [../]
   [./gas_pressure]
   [../]
@@ -213,7 +214,7 @@
     rel_perm_uo = RelativePermeabilityVanGenuchten
     density = 2600.
     cap_pres_uo = CapillaryPressure
-    gravity = '0 9.8 0'
+    gravity = '0 -9.8 0'
     liquid_saturation_variable = liquid_saturation
     diffusivity = 0.
     permeability = '1e-12 0 0 0 1e-12 0 0 0 1e-12'
@@ -292,8 +293,8 @@
   [./fdp]
     type = FDP
     full = true
-    petsc_options_iname = '-ksp_type -pc_type'
-    petsc_options_value = 'bcgs bjacobi'
+    petsc_options_iname = '-ksp_type -pc_type -sub_pc_type'
+    petsc_options_value = 'gmres asm lu'
   [../]
   [./smp]
     type = SMP
@@ -303,11 +304,12 @@
 [Executioner]
   type = Transient
   solve_type = NEWTON
-  end_time = 3e6
+  end_time = 2e7
   nl_abs_tol = 1e-10
   nl_rel_tol = 1e-8
   l_tol = 1e-12
-  dtmax = 2e5
+  dtmax = 1e7
+  trans_ss_check = true
   [./TimeStepper]
     type = IterationAdaptiveDT
     dt = 100
