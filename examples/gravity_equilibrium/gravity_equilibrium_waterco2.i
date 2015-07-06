@@ -113,8 +113,6 @@
     state_property_enum = density
     execute_on = 'linear initial'
     fluid_state_uo = FluidState
-    pressure_variable = liquid_pressure
-    saturation_variable = liquid_saturation
   [../]
   [./LiquidViscosityAux]
     type = FluidStateAux
@@ -122,7 +120,6 @@
     state_property_enum = viscosity
     execute_on = 'linear initial'
     fluid_state_uo = FluidState
-    pressure_variable = liquid_pressure
   [../]
   [./LiquidRelPermAux]
     type = FluidStateAux
@@ -130,97 +127,82 @@
     state_property_enum = relperm
     execute_on = 'linear initial'
     fluid_state_uo = FluidState
-    pressure_variable = liquid_pressure
-    saturation_variable = liquid_saturation
   [../]
   [./GasDensityAux]
     type = FluidStateAux
     variable = gas_density
-    saturation_variable = liquid_saturation
     phase_index = 1
     state_property_enum = density
-    execute_on = 'initial linear '
+    execute_on = 'initial linear'
     fluid_state_uo = FluidState
-    pressure_variable = gas_pressure
   [../]
   [./GasSaturationAux]
     type = FluidStateAux
     variable = gas_saturation
-    saturation_variable = liquid_saturation
     state_property_enum = saturation
     execute_on = 'initial linear'
-    fluid_state_uo = FluidState
-    pressure_variable = gas_pressure
     phase_index = 1
+    fluid_state_uo = FluidState
   [../]
   [./GasViscosityAux]
     type = FluidStateAux
     variable = gas_viscosity
-    saturation_variable = liquid_saturation
     phase_index = 1
     state_property_enum = viscosity
     execute_on = 'linear initial'
     fluid_state_uo = FluidState
-    pressure_variable = gas_pressure
   [../]
   [./GasRelPermAux]
     type = FluidStateAux
     variable = gas_relperm
-    saturation_variable = liquid_saturation
     phase_index = 1
     state_property_enum = relperm
     execute_on = 'linear initial'
     fluid_state_uo = FluidState
-    pressure_variable = gas_pressure
   [../]
   [./LiquidPressureAux]
     type = FluidStateAux
     variable = liquid_pressure
     state_property_enum = pressure
-    saturation_variable = liquid_saturation
     execute_on = 'initial linear'
     fluid_state_uo = FluidState
-    pressure_variable = gas_pressure
   [../]
   [./Xco2l]
     type = FluidStateAux
     variable = xco2liquid
     component_index = 1
+    phase_index = 0
     saturation_variable = liquid_saturation
     state_property_enum = mass_fraction
     execute_on = 'linear initial'
     fluid_state_uo = FluidState
-    pressure_variable = gas_pressure
   [../]
   [./Xco2g]
     type = FluidStateAux
     variable = xco2gas
     component_index = 1
-    saturation_variable = liquid_saturation
     phase_index = 1
     state_property_enum = mass_fraction
     execute_on = 'linear initial'
     fluid_state_uo = FluidState
-    pressure_variable = gas_pressure
   [../]
   [./Xh2og]
     type = FluidStateAux
     variable = xh2ogas
-    saturation_variable = liquid_saturation
+    component_index = 0
     phase_index = 1
     state_property_enum = mass_fraction
     execute_on = 'linear initial'
     fluid_state_uo = FluidState
-    pressure_variable = gas_pressure
   [../]
   [./Xh2ol]
     type = FluidStateAux
     variable = xh2oliquid
-    saturation_variable = liquid_saturation
+    component_index = 0
+    phase_index = 0
     state_property_enum = mass_fraction
     execute_on = 'linear initial'
     fluid_state_uo = FluidState
-    pressure_variable = gas_pressure
   [../]
 []
 
@@ -291,7 +273,7 @@
     sat_lr = 0.3
   [../]
   [./FluidState]
-    type = FluidStateMultiphase
+    type = FluidStateTwoPhase
     capillary_pressure_uo = CapillaryPressure
     relative_permeability_uo = RelativePermeabilityVanGenuchten
     execute_on = 'initial linear'
@@ -299,6 +281,9 @@
     isothermal = true
     gas_property_uo = FluidPropertiesCO2
     liquid_property_uo = FluidPropertiesWater
+    pressure_variable = gas_pressure
+    temperature_variable = 50
+    saturation_variable = liquid_saturation
   [../]
 []
 

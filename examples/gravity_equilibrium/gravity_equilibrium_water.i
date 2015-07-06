@@ -63,17 +63,15 @@
     type = FluidStateAux
     variable = liquid_density
     state_property_enum = density
-    execute_on = 'LINEAR initial'
+    execute_on = 'linear initial'
     fluid_state_uo = FluidState
-    pressure_variable = liquid_pressure
   [../]
   [./LiquidViscosityAux]
     type = FluidStateAux
     variable = liquid_viscosity
     state_property_enum = viscosity
-    execute_on = 'LINEAR initial'
+    execute_on = 'linear initial'
     fluid_state_uo = FluidState
-    pressure_variable = liquid_pressure
   [../]
 []
 
@@ -110,11 +108,11 @@
 [UserObjects]
   [./FluidPropertiesWater]
     type = FluidPropertiesWater
-    execute_on = 'initial linear'
+    execute_on = 'initial'
   [../]
   [./CapillaryPressure]
     type = CapillaryPressureConstant
-    execute_on = ' initial'
+    execute_on = 'initial'
     cp = 0
   [../]
   [./FluidState]
@@ -123,10 +121,13 @@
     fluid_temperature = 50
     isothermal = true
     fluid_property_uo = FluidPropertiesWater
+    pressure_variable = liquid_pressure
+    temperature_variable = 50
+    saturation_variable = liquid_saturation
   [../]
   [./RelativePermeability]
     type = RelativePermeabilityPerfectlyMobile
-    execute_on = 'initial '
+    execute_on = 'initial'
   [../]
 []
 
@@ -138,6 +139,7 @@
   [../]
   [./smp]
     type = SMP
+    full = true
   [../]
 []
 
@@ -175,4 +177,3 @@
     type = FunctionIC
   [../]
 []
-
