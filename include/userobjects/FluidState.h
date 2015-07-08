@@ -41,16 +41,58 @@ class FluidState : public NodalUserObject
   virtual void finalize();
   virtual void threadJoin(const UserObject & uo);
 
+  /**
+   * Return pressure for each phase at each node.
+   *
+   * @param node_num node number
+   * @param phase_index index of phase
+   * @return phase pressure at the node (Pa)
+   */
   virtual Real getPressure(unsigned int node_num, unsigned int phase_index) const = 0;
-
+  /**
+   * Return saturation for each phase at each node.
+   *
+   * @param node_num node number
+   * @param phase_index index of phase
+   * @return phase saturation at the node (-)
+   */
   virtual Real getSaturation(unsigned int node_num, unsigned int phase_index) const = 0;
 
+  /**
+   * Return density for each phase at each node.
+   *
+   * @param node_num node number
+   * @param phase_index index of phase
+   * @return phase density at the node (kg/m^3)
+   */
   virtual Real getDensity(unsigned int node_num, unsigned int phase_index) const = 0;
 
+  /**
+   * Return viscosity for each phase at each node.
+   *
+   * @param node_num node number
+   * @param phase_index index of phase
+   * @return phase viscosity at the node (Pa/s)
+   */
   virtual Real getViscosity(unsigned int node_num, unsigned int phase_index) const = 0;
 
+  /**
+   * Return relative permeability for each phase at each node.
+   *
+   * @param node_num node number
+   * @param phase_index index of phase
+   * @return relative permeability at the node (-)
+   */
   virtual Real getRelativePermeability(unsigned int node_num, unsigned int phase_index) const = 0;
 
+  /**
+   * Return mass fraction for each component in each phase at each node.
+   *
+   * @param node_num node number
+   * @param phase_index index of phase
+   * @param component_index index of the component
+   * @return component mass fraction at the node (-)
+   */
   virtual Real getMassFraction(unsigned int node_num, unsigned int phase_index, unsigned int component_index) const = 0;
 
   /**

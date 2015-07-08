@@ -217,6 +217,7 @@ class FluidStateSinglePhase : public FluidState
    */
   virtual Real getMassFraction(unsigned int node_num, unsigned int phase_index, unsigned int component_index) const;
 
+
  protected:
 
   /**
@@ -238,6 +239,7 @@ class FluidStateSinglePhase : public FluidState
   /// Fluid state properties class to hold thermophysical properties at
   /// each node
   std::vector<FluidStateProperties> _fsp;
+
 
 
 };

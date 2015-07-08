@@ -48,9 +48,17 @@ class CapillaryPressure : public GeneralUserObject
   /**
    * Derivative of capillary pressure with respect to the liquid saturation.
    * @param sat_liq liquid saturation
-   * @return derivativer of capillary pressure with respect to liquid saturation
+   * @return derivative of capillary pressure with respect to liquid saturation
    */
   virtual Real dCapillaryPressure(Real sat_liq) const = 0;
+
+  /**
+   * Second derivative of capillary pressure with respect to the liquid saturation.
+   * @param sat_liq liquid saturation
+   * @return second derivative of capillary pressure with respect to liquid saturation
+   */
+  virtual Real d2CapillaryPressure(Real sat_liq) const = 0;
+
 
 };
 

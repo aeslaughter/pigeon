@@ -13,6 +13,9 @@ InputParameters validParams<CapillaryPressureAux>()
   InputParameters params = validParams<AuxKernel>();
   params.addRequiredParam<UserObjectName>("capillary_pressure_uo", "Name of the User Object defining the capillary pressure function");
   params.addRequiredCoupledVar("liquid_saturation_variable", "The liquid saturation variable.");
+  MooseEnum property_enum("capillary_pressure dcapillary_pressure d2capillary_pressure");
+  params.addRequiredParam<MooseEnum>("property_enum", property_enum, "The capillary pressure that this auxillary kernel is to calculate");
+
   return params;
 }
 
@@ -21,11 +24,29 @@ CapillaryPressureAux::CapillaryPressureAux(const std::string & name,
     AuxKernel(name, parameters),
 
     _capillary_pressureUO(getUserObject<CapillaryPressure>("capillary_pressure_uo")),
-    _liquid_saturation(coupledValue("liquid_saturation_variable"))
+    _liquid_saturation(coupledValue("liquid_saturation_variable")),
+    _property_enum(getParam<MooseEnum>("property_enum"))
 {}
 
 Real
 CapillaryPressureAux::computeValue()
 {
-  return _capillary_pressureUO.capillaryPressure(_liquid_saturation[_qp]);
+  Real pc;
+
+  if (_property_enum == "capillary_pressure")
+  {
+      pc = _capillary_pressureUO.capillaryPressure(_liquid_saturation[_qp]);
+  }
+
+  if (_property_enum == "dcapillary_pressure")
+  {
+      pc = _capillary_pressureUO.dCapillaryPressure(_liquid_saturation[_qp]);
+  }
+
+  if (_property_enum == "d2capillary_pressure")
+  {
+      pc = _capillary_pressureUO.d2CapillaryPressure(_liquid_saturation[_qp]);
+  }
+
+  return pc;
 }

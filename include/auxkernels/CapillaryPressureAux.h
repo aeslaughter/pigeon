@@ -37,6 +37,9 @@ private:
 
   /// Liquid phase saturation
   VariableValue & _liquid_saturation;
+
+  /// MooseEnum of capillary pressure functions
+  const MooseEnum & _property_enum;
 };
 
 #endif //CAPILLARYPRESSUREAUX_H

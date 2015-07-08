@@ -43,6 +43,7 @@
     variable = CapillaryPressureAux
     liquid_saturation_variable = sat_liq
     execute_on = initial
+    property_enum = capillary_pressure
   [../]
 []
 

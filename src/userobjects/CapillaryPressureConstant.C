@@ -42,3 +42,10 @@ CapillaryPressureConstant::dCapillaryPressure(Real sat_liq) const
 {
   return 0.0;
 }
+
+
+Real
+CapillaryPressureConstant::d2CapillaryPressure(Real sat_liq) const
+{
+  return 0.0;
+}

@@ -32,7 +32,6 @@ FluidStateSinglePhase::FluidStateSinglePhase(const std::string & name, InputPara
   _is_isothermal(getParam<bool>("isothermal"))
 
 {
-  //  _fluid_properties.resize(_subproblem.mesh().nNodes());
     _fsp.resize(_mesh.nNodes());
 }
 

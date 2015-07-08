@@ -5,6 +5,18 @@
     csvdiff = 'CapillaryPressureConstant_vpp_0001.csv'
     abs_zero = 1.0E-6
   [../]
+  [./constant_dPc]
+    type = 'CSVDiff'
+    input = 'CapillaryPressureConstant.i AuxKernels/CapillaryPressureAux/property_enum=dcapillary_pressure Outputs/file_base=CapillaryPressureConstant2'
+    csvdiff = 'CapillaryPressureConstant2_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./constant_d2Pc]
+    type = 'CSVDiff'
+    input = 'CapillaryPressureConstant.i AuxKernels/CapillaryPressureAux/property_enum=d2capillary_pressure Outputs/file_base=CapillaryPressureConstant3'
+    csvdiff = 'CapillaryPressureConstant3_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
 # [./constant2]
 #   type = 'RunException'
 #   input = 'CapillaryPressureConstant.i Functions/initial_saturation/value=x-0.1' 
@@ -37,6 +49,18 @@
     type = 'CSVDiff'
     input = 'CapillaryPressureVanGenuchten.i UserObjects/CapillaryPressure/sat_lr=0.3 UserObjects/CapillaryPressure/sat_ls=0.8 Outputs/file_base=CapillaryPressureVanGenuchten4'
     csvdiff = 'CapillaryPressureVanGenuchten4_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./van_genuchten_dpc1]
+    type = 'CSVDiff'
+    input = 'CapillaryPressureVanGenuchten.i AuxKernels/CapillaryPressureAux/property_enum=dcapillary_pressure Outputs/file_base=CapillaryPressureVanGenuchten_dpc1'
+    csvdiff = 'CapillaryPressureVanGenuchten_dpc1_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./van_genuchten_d2pc1]
+    type = 'CSVDiff'
+    input = 'CapillaryPressureVanGenuchten.i AuxKernels/CapillaryPressureAux/property_enum=d2capillary_pressure Outputs/file_base=CapillaryPressureVanGenuchten_d2pc1'
+    csvdiff = 'CapillaryPressureVanGenuchten_d2pc1_vpp_0001.csv'
     abs_zero = 1.0E-6
   [../]
 # [./van_genuchten5]
