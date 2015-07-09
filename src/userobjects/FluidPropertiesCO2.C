@@ -29,40 +29,140 @@ FluidPropertiesCO2::molarMass() const
 }
 
 Real
-FluidPropertiesCO2::density(Real pressure, Real temperature) const
-
+FluidPropertiesCO2::criticalPressure() const
 {
-  Real tk = temperature + _t_c2k;
-  Real tc = std::pow((tk * 1.e-2), 10./3.);
-  Real pc = pressure * 1.e-6;
+  return 7.3773e6;
+}
 
-  Real vc1 = 1.8882e-4 * tk;
-  Real vc2 = - pc * (8.24e-2 + 1.249e-2 * pc) / tc;
+Real
+FluidPropertiesCO2::criticalTemperature() const
+{
+  return 30.9782;
+}
 
-  return pc / (vc1 + vc2);
+Real
+FluidPropertiesCO2::density(Real pressure, Real temperature) const
+{
+  Real rho;
+
+  if (pressure <= criticalPressure())
+    rho = gasDensity(pressure, temperature);
+
+  if (pressure > criticalPressure())
+    rho = supercriticalDensity(pressure, temperature);
+
+  return rho;
 }
 
 Real
 FluidPropertiesCO2::viscosity(Real pressure, Real temperature) const
-
 {
-  Real A[5] = {1357.8, 4.9227, -2.9661e-3, 2.8529e-6, -2.1829e-9};
-  Real B[5] = {3918.9, -35.984, 2.5825e-1, -7.1178e-4, 6.9578e-7};
-  Real C[5];
+  Real mu;
 
-  Real pbar = pressure * 1.e-5;
-  Real xx = pbar * 0.01;
+  if (pressure <= criticalPressure())
+    mu = gasViscosity(pressure, temperature);
 
-  if (xx > 1.0) xx = 1.0;
+  if (pressure > criticalPressure())
+    mu = supercriticalViscosity(pressure, temperature);
 
-  for (int i = 0; i<5; i++)
-    C[i] = A[i] + xx * (B[i] - A[i]);
+  return mu;
+}
 
-  Real t2 = temperature * temperature;
-  Real t3 = t2 * temperature;
-  Real t4 = t3 * temperature;
+Real
+FluidPropertiesCO2::gasViscosity(Real pressure, Real temperature) const
+{
+  Real tk = temperature + _t_c2k;
+  Real tstar = tk / 251.196;
+  Real a[5] = {0.235156, -0.491266, 5.211155e-2, 5.347906e-2, -1.537102e-2};
+  Real d[5] = {0.4071119e-2, 0.7198037e-4, 0.2411697e-16, 0.2971072e-22, -0.1627888e-22};
+  unsigned int j[5] = {1, 1, 4, 1, 2};
+  unsigned int i[5] = {1, 2, 6, 8, 8};
 
-  return (C[0] + C[1] * temperature + C[2] * t2 + C[3] * t3 + C[4] * t4) * 1.e-8;
+  // Zero-denisty viscosity
+  Real sum = 0.0;
+
+  for (unsigned int n = 0; n < 5; ++n)
+    sum += a[n] * std::pow(std::log(tstar), n);
+
+  Real theta = std::exp(sum);
+  Real mu0 = 1.00697 * std::sqrt(tk) / theta;
+
+  Real b[5];
+  for (unsigned int n = 0; n < 5; ++n)
+    b[n] = d[n] /  std::pow(tstar, j[n] - 1);
+
+  // Calculate the density of the CO2 - gas phase only
+  Real rho = gasDensity(pressure, temperature);
+
+  // Excess viscosity due to density
+  Real mu = 0.0;
+
+  for (unsigned int n = 0; n < 5; ++n)
+    mu += b[n] * std::pow(rho, i[n]);
+
+  return (mu0 + mu) * 1e-6; // convert to Pa.s
+}
+
+Real
+FluidPropertiesCO2::supercriticalViscosity(Real pressure, Real temperature) const
+{
+  Real b0[5] = {-1.958098980443E+01, 1.123243298270E+00, -2.320378874100E-02,
+    2.067060943050E-04, -6.740205984528E-07};
+  Real b1[5] = {4.187280585109E-02, -2.425666731623E-03, 5.051177210444E-05,
+    -4.527585394282E-07, 1.483580144144E-09};
+  Real b2[5] = {-3.164424775231E-05, 1.853493293079E-06, -3.892243662924E-08,
+    3.511599795831E-10, -1.156613338683E-12};
+  Real b3[5] = {1.018084854204E-08, -6.013995738056E-10, 1.271924622771E-11,
+    -1.154170663233E-13, 3.819260251596E-16};
+  Real b4[5] = {-1.185834697489E-12, 7.052301533772E-14, -1.500321307714E-15,
+    1.368104294236E-17, -4.545472651918E-20};
+
+  Real c0[5] = {1.856798626054E-02, 3.083186834281E-03, -1.004022090988E-04,
+    8.331453343531E-07, -1.824126204417E-09};
+  Real c1[5] = {6.519276827948E-05, -3.174897980949E-06, 7.524167185714E-08,
+    -6.141534284471E-10, 1.463896995503E-12};
+  Real c2[5] = {-1.310632653461E-08, 7.702474418324E-10, -1.830098887313E-11,
+    1.530419648245E-13, -3.852361658746E-16};
+  Real c3[5] = {1.335772487425E-12, -8.113168443709E-14, 1.921794651400E-15,
+    -1.632868926659E-17, 4.257160059035E-20};
+  Real c4[5] = {-5.047795395464E-17, 3.115707980951E-18, -7.370406590957E-20,
+    6.333570782917E-22, -1.691344581198E-24};
+
+  Real a0, a1, a2, a3, a4;
+
+  Real t1 = temperature;
+  Real t2 = t1 * t1;
+  Real t3 = t2 * t1;
+  Real t4 = t3 * t1;
+
+  // Correlation uses pressure in psia
+  Real pa2psia = 1.45037738007e-4;
+  Real p1 = pressure * pa2psia;
+  Real p2 = p1 * p1;
+  Real p3 = p2 * p1;
+  Real p4 = p3 * p1;
+
+  if (p1 <= 3000)
+  {
+    a0 = b0[0] + b0[1] * t1 + b0[2] * t2 + b0[3] * t3 + b0[4] * t4;
+    a1 = b1[0] + b1[1] * t1 + b1[2] * t2 + b1[3] * t3 + b1[4] * t4;
+    a2 = b2[0] + b2[1] * t1 + b2[2] * t2 + b2[3] * t3 + b2[4] * t4;
+    a3 = b3[0] + b3[1] * t1 + b3[2] * t2 + b3[3] * t3 + b3[4] * t4;
+    a4 = b4[0] + b4[1] * t1 + b4[2] * t2 + b4[3] * t3 + b4[4] * t4;
+   }
+
+  if (p1 > 3000)
+  {
+    a0 = c0[0] + c0[1] * t1 + c0[2] * t2 + c0[3] * t3 + c0[4] * t4;
+    a1 = c1[0] + c1[1] * t1 + c1[2] * t2 + c1[3] * t3 + c1[4] * t4;
+    a2 = c2[0] + c2[1] * t1 + c2[2] * t2 + c2[3] * t3 + c2[4] * t4;
+    a3 = c3[0] + c3[1] * t1 + c3[2] * t2 + c3[3] * t3 + c3[4] * t4;
+    a4 = c4[0] + c4[1] * t1 + c4[2] * t2 + c4[3] * t3 + c4[4] * t4;
+  }
+
+ Real mu = a0 + a1 * p1 + a2 * p2 + a3 * p3 + a4 * p4;
+
+ return mu * 1e-3; //cP to Pa.s
 }
 
 Real
@@ -108,4 +208,77 @@ FluidPropertiesCO2::partialDensity(Real temperature) const
   Real V = 37.51 - 9.585e-2 * temperature + 8.74e-4 * t2 - 5.044e-7 * t3;
 
   return 1.e6 * _Mco2 / V;
+}
+
+Real
+FluidPropertiesCO2::supercriticalDensity(Real pressure, Real temperature) const
+{
+  Real b0[5] = {-2.148322085348e5, 1.168116599408e4, -2.302236659392e2,
+    1.967428940167, -6.184842764145e-3};
+  Real b1[5] = {4.757146002428e2, -2.619250287624e1, 5.215134206837e-1,
+    -4.494511089838e-3, 1.423058795982e-5};
+  Real b2[5] = {-3.713900186613e-1, 2.072488876536e-2, -4.169082831078e-4,
+    3.622975674137e-6, -1.155050860329e-8};
+  Real b3[5] = {1.228907393482e-4, -6.930063746226e-6, 1.406317206628e-7,
+    -1.230995287169e-9, 3.948417428040e-12};
+  Real b4[5] = {-1.466408011784e-8, 8.338008651366e-10, -1.704242447194e-11,
+    1.500878861807e-13, -4.838826574173e-16};
+
+  Real c0[5] = {6.897382693936e2, 2.730479206931, -2.254102364542e-2,
+    -4.651196146917e-3, 3.439702234956e-5};
+  Real c1[5] = {2.213692462613e-1, -6.547268255814e-3, 5.982258882656e-5,
+    2.274997412526e-6, -1.888361337660e-8};
+  Real c2[5] = {-5.118724890479e-5, 2.019697017603e-6, -2.311332097185e-8,
+    -4.079557404679e-10, 3.893599641874e-12};
+  Real c3[5] ={5.517971126745e-9, -2.415814703211e-10, 3.121603486524e-12,
+    3.171271084870e-14, -3.560785550401e-16};
+  Real c4[5] = {-2.184152941323e-13, 1.010703706059e-14, -1.406620681883e-16,
+    -8.957731136447e-19, 1.215810469539e-20};
+
+  Real a0, a1, a2, a3, a4;
+
+  Real t1 = temperature;
+  Real t2 = t1 * t1;
+  Real t3 = t2 * t1;
+  Real t4 = t3 * t1;
+
+  // Correlation uses pressure in psia
+  Real pa2psia = 1.45037738007e-4;
+  Real p1 = pressure * pa2psia;
+  Real p2 = p1 * p1;
+  Real p3 = p2 * p1;
+  Real p4 = p3 * p1;
+
+  if (p1 <= 3000)
+  {
+     a0 = b0[0] + b0[1] * t1 + b0[2] * t2 + b0[3] * t3 + b0[4] * t4;
+     a1 = b1[0] + b1[1] * t1 + b1[2] * t2 + b1[3] * t3 + b1[4] * t4;
+     a2 = b2[0] + b2[1] * t1 + b2[2] * t2 + b2[3] * t3 + b2[4] * t4;
+     a3 = b3[0] + b3[1] * t1 + b3[2] * t2 + b3[3] * t3 + b3[4] * t4;
+     a4 = b4[0] + b4[1] * t1 + b4[2] * t2 + b4[3] * t3 + b4[4] * t4;
+   }
+
+   if (p1 > 3000)
+   {
+     a0 = c0[0] + c0[1] * t1 + c0[2] * t2 + c0[3] * t3 + c0[4] * t4;
+     a1 = c1[0] + c1[1] * t1 + c1[2] * t2 + c1[3] * t3 + c1[4] * t4;
+     a2 = c2[0] + c2[1] * t1 + c2[2] * t2 + c2[3] * t3 + c2[4] * t4;
+     a3 = c3[0] + c3[1] * t1 + c3[2] * t2 + c3[3] * t3 + c3[4] * t4;
+     a4 = c4[0] + c4[1] * t1 + c4[2] * t2 + c4[3] * t3 + c4[4] * t4;
+   }
+
+  return a0 + a1 * p1 + a2 * p2 + a3 * p3 + a4 * p4;
+}
+
+Real
+FluidPropertiesCO2::gasDensity(Real pressure, Real temperature) const
+{
+  Real tk = temperature + _t_c2k;
+  Real tc = std::pow((tk * 1.e-2), 10./3.);
+  Real pc = pressure * 1.e-6;
+
+  Real vc1 = 1.8882e-4 * tk;
+  Real vc2 = - pc * (8.24e-2 + 1.249e-2 * pc) / tc;
+
+  return pc / (vc1 + vc2);
 }

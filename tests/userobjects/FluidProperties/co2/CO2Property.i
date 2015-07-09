@@ -20,11 +20,11 @@
 [Functions]
   [./initial_pressure]
     type = ParsedFunction
-    value = 1.5e6*x
+    value = 1e6*(1+9.5*x)
   [../]
   [./initial_temperature]
     type = ParsedFunction
-    value = 50.
+    value = 100.
   [../]
 []
 

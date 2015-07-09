@@ -1,14 +1,26 @@
 [Tests]
-  [./co2_density]
+  [./co2_density1]
     type = 'CSVDiff'
-    input = 'CO2Property.i Outputs/file_base=CO2Property_density AuxKernels/CO2PropertyAux/co2_property_enum=density'
-    csvdiff = 'CO2Property_density_vpp_0001.csv'
+    input = 'CO2Property.i Outputs/file_base=CO2Property_density1 AuxKernels/CO2PropertyAux/co2_property_enum=density'
+    csvdiff = 'CO2Property_density1_vpp_0001.csv'
     abs_zero = 1.0E-6
   [../]
-  [./co2_viscosity]
+  [./co2_density2]
     type = 'CSVDiff'
-    input = 'CO2Property.i Outputs/file_base=CO2Property_viscosity AuxKernels/CO2PropertyAux/co2_property_enum=viscosity'
-    csvdiff = 'CO2Property_viscosity_vpp_0001.csv'
+    input = 'CO2Property.i Outputs/file_base=CO2Property_density2 AuxKernels/CO2PropertyAux/co2_property_enum=density Functions/initial_temperature/value=50'
+    csvdiff = 'CO2Property_density2_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./co2_viscosity1]
+    type = 'CSVDiff'
+    input = 'CO2Property.i Outputs/file_base=CO2Property_viscosity1 AuxKernels/CO2PropertyAux/co2_property_enum=viscosity'
+    csvdiff = 'CO2Property_viscosity1_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./co2_viscosity2]
+    type = 'CSVDiff'
+    input = 'CO2Property.i Outputs/file_base=CO2Property_viscosity2 AuxKernels/CO2PropertyAux/co2_property_enum=viscosity Functions/initial_temperature/value=50'
+    csvdiff = 'CO2Property_viscosity2_vpp_0001.csv'
     abs_zero = 1.0E-6
   [../]
 []

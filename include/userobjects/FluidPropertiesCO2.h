@@ -28,16 +28,28 @@ class FluidPropertiesCO2 : public FluidProperties
   Real molarMass() const;
 
   /**
-   * CO2 gas density as a function of  pressure and temperature.
-   * @param pressure gas pressure (Pa)
+   * CO2 critical pressure.
+   * @return critical pressure (Pa)
+   */
+  Real criticalPressure() const;
+
+  /**
+   * CO2 critical temperature.
+   * @return critical temperature (C)
+   */
+  Real criticalTemperature() const;
+
+  /**
+   * CO2 density as a function of pressure and temperature.
+   * @param pressure fluid pressure (Pa)
    * @param temperature fluid temperature (C)
    * @return density (kg/m^3)
    */
   Real density(Real pressure, Real temperature) const;
 
   /**
-   * CO2 gas viscosity as a function of  pressure and temperature.
-   * @param pressure gas pressure (Pa)
+   * CO2 viscosity as a function of  pressure and temperature.
+   * @param pressure fluid pressure (Pa)
    * @param temperature fluid temperature (C)
    * @return viscosity (Pa.s)
    */
@@ -47,8 +59,8 @@ class FluidPropertiesCO2 : public FluidProperties
    * Derivative of the density of gaseous CO2 as a function of
    * pressure.
    *
-   * @param pressure gas pressure (Pa)
-   * @param temperature gas temperature (C)
+   * @param pressure fluid pressure (Pa)
+   * @param temperature fluid temperature (C)
    * @return derivative of CO2 density (kg/m^3) with respect to pressure
    */
   Real dDensity_dP(Real pressure, Real temperature) const;
@@ -67,11 +79,56 @@ class FluidPropertiesCO2 : public FluidProperties
    * Partial density of dissolved CO2. From Garcia, Density of aqueous
    * solutions of CO2, LBNL-49023 (2001).
    *
-   * @param temperature liquid temperature (C)
+   * @param temperature fluid temperature (C)
    * @return partial molar density (kg/m^3)
    */
   Real partialDensity(Real temperature) const;
 
+  /**
+   * Density of supercritical CO2. From Ouyang, New correlations for predicting
+   * the density and viscosity of supercritical Carbon Dioxide under conditions
+   * expected in Carbon Capture and Sequestration operations, The Open Petroleum
+   * Engineering Journal, 4, 13-21 (2011)
+   *
+   * @param pressure fluid pressure (Pa)
+   * @param temperature fluid temperature (C)
+   * @return density (kg/m^3)
+   */
+  Real supercriticalDensity(Real pressure, Real temperature) const;
+
+  /**
+   * CO2 gas density as a function of  pressure and temperature.
+   * @param pressure fluid pressure (Pa)
+   * @param temperature fluid temperature (C)
+   * @return density (kg/m^3)
+   */
+  Real gasDensity(Real pressure, Real temperature) const;
+
+  /**
+   * CO2 gas viscosity as a function of  pressure and temperature.
+   * From Fenghour et al., The viscosity of carbon dioxide, J. Phys. Chem. Ref.
+   * Data, 27, 31-44 (1998).
+   * Note: used up to the critical point. The supercritical viscosity is calculated
+   * in supercriticalViscosity(). As a result, the critical enhancement is not
+   * implemented.
+   *
+   * @param pressure fluid pressure (Pa)
+   * @param temperature fluid temperature (C)
+   * @return viscosity (Pa.s)
+   */
+  Real gasViscosity(Real pressure, Real temperature) const;
+
+  /**
+   * Viscosity of supercritical CO2. From Ouyang, New correlations for predicting
+   * the density and viscosity of supercritical Carbon Dioxide under conditions
+   * expected in Carbon Capture and Sequestration operations, The Open Petroleum
+   * Engineering Journal, 4, 13-21 (2011)
+   *
+   * @param pressure fluid pressure (Pa)
+   * @param temperature fluid temperature (C)
+   * @return viscosity (Pa.s)
+   */
+  Real supercriticalViscosity(Real pressure, Real temperature) const;
 
  protected:
   /// Conversion of temperature from Celcius to Kelvin
