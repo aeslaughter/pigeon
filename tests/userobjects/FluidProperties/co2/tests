@@ -23,4 +23,28 @@
     csvdiff = 'CO2Property_viscosity2_vpp_0001.csv'
     abs_zero = 1.0E-6
   [../]
+  [./co2_dDensity_dP1]
+    type = 'CSVDiff'
+    input = 'CO2Property.i Outputs/file_base=CO2Property_dDensity_dP1 AuxKernels/CO2PropertyAux/co2_property_enum=dDensity_dP'
+    csvdiff = 'CO2Property_dDensity_dP1_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./co2_dDensity_dT1]
+    type = 'CSVDiff'
+    input = 'CO2Property.i Outputs/file_base=CO2Property_dDensity_dT1 AuxKernels/CO2PropertyAux/co2_property_enum=dDensity_dT Functions/initial_pressure/value=5e6 Functions/initial_temperature/value=50+25*x'
+    csvdiff = 'CO2Property_dDensity_dT1_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./co2_dDensity_dT2]
+    type = 'CSVDiff'
+    input = 'CO2Property.i Outputs/file_base=CO2Property_dDensity_dT2 AuxKernels/CO2PropertyAux/co2_property_enum=dDensity_dT Functions/initial_pressure/value=10e6 Functions/initial_temperature/value=50+25*x'
+    csvdiff = 'CO2Property_dDensity_dT2_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./co2_partialDensity1]
+    type = 'CSVDiff'
+    input = 'CO2Property.i Outputs/file_base=CO2Property_partialDensity AuxKernels/CO2PropertyAux/co2_property_enum=partialDensity Functions/initial_pressure/value=10e6 Functions/initial_temperature/value=175*x'
+    csvdiff = 'CO2Property_partialDensity_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
 []

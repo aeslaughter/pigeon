@@ -69,6 +69,34 @@ FluidPropertiesCO2::viscosity(Real pressure, Real temperature) const
 }
 
 Real
+FluidPropertiesCO2::dDensity_dP(Real pressure, Real temperature) const
+{
+  Real drho;
+
+  if (pressure <= criticalPressure())
+    drho = dGasDensity_dP(pressure, temperature);
+
+  if (pressure > criticalPressure())
+    drho = dSupercriticalDensity_dP(pressure, temperature);
+
+  return drho;
+}
+
+Real
+FluidPropertiesCO2::dDensity_dT(Real pressure, Real temperature) const
+{
+  Real drho;
+
+  if (pressure <= criticalPressure())
+    drho = dGasDensity_dT(pressure, temperature);
+
+  if (pressure > criticalPressure())
+    drho = dSupercriticalDensity_dT(pressure, temperature);
+
+  return drho;
+}
+
+Real
 FluidPropertiesCO2::gasViscosity(Real pressure, Real temperature) const
 {
   Real tk = temperature + _t_c2k;
@@ -166,40 +194,6 @@ FluidPropertiesCO2::supercriticalViscosity(Real pressure, Real temperature) cons
 }
 
 Real
-FluidPropertiesCO2::dDensity_dP(Real pressure, Real temperature) const
-{
-  Real tk = temperature + _t_c2k;
-  Real tc = std::pow((tk * 1.e-2), 10./3.);
-  Real pc = pressure * 1.e-6;
-
-  Real vc1 = 1.8882e-4 * tk;
-  Real vc2 = - pc * (8.24e-2 + 1.249e-2 * pc) / tc;
-  Real dvc2 = - (8.24e-2 + 2.498e-2 * pc) / tc;
-
-  return (vc1 + vc2 - pc * dvc2) / ((vc1 + vc2) * (vc1 + vc2));
-}
-
-std::vector<Real>
-FluidPropertiesCO2::henryConstants() const
-
-{
-  std::vector<Real> co2henry;
-  co2henry.push_back(-8.55445);
-  co2henry.push_back(4.01195);
-  co2henry.push_back(9.52345);
-
-  /* Battistelli formulation from TOUGH2
-  Real a[6] = {7.83666e7, 1.96025e6, 8.20574e4, -7.40674e2, 2.1838, -2.20999e-3};
-
-  Real co2henry = 0.;
-
-  for(unsigned int i = 0; i< 6; i++)
-    co2henry += a[i] * std::pow(temperature, i);
-*/
-  return co2henry;
-}
-
-Real
 FluidPropertiesCO2::partialDensity(Real temperature) const
 {
   Real t2 = temperature * temperature;
@@ -281,4 +275,172 @@ FluidPropertiesCO2::gasDensity(Real pressure, Real temperature) const
   Real vc2 = - pc * (8.24e-2 + 1.249e-2 * pc) / tc;
 
   return pc / (vc1 + vc2);
+}
+
+Real
+FluidPropertiesCO2::dGasDensity_dP(Real pressure, Real temperature) const
+{
+  Real tk = temperature + _t_c2k;
+  Real tc = std::pow((tk * 1.e-2), 10./3.);
+  Real pc = pressure * 1.e-6;
+
+  Real vc1 = 1.8882e-4 * tk;
+  Real vc2 = - pc * (8.24e-2 + 1.249e-2 * pc) / tc;
+  Real dvc2 = - (8.24e-2 + 2.498e-2 * pc) / tc;
+
+  return (vc1 + vc2 - pc * dvc2) / ((vc1 + vc2) * (vc1 + vc2)) * 1e-6;
+}
+
+Real
+FluidPropertiesCO2::dGasDensity_dT(Real pressure, Real temperature) const
+{
+  Real tk = temperature + _t_c2k;
+  Real tc = std::pow((tk * 1.e-2), 10./3.);
+  Real pc = pressure * 1.e-6;
+
+  Real vc1 = 1.8882e-4 * tk;
+  Real vc2 = - pc * (8.24e-2 + 1.249e-2 * pc) / tc;
+  Real dtc = (0.1 / 3.0) * std::pow((tk * 1.e-2), 7./3.);
+  Real dvc1 = 1.8882e-4;
+  Real dvc2 = - vc2 / tc;
+
+  return - pc / (vc1 + vc2) / (vc1 + vc2) * (dvc1 + dvc2 * dtc);
+}
+
+Real
+FluidPropertiesCO2::dSupercriticalDensity_dP(Real pressure, Real temperature) const
+{
+  Real b0[5] = {-2.148322085348e5, 1.168116599408e4, -2.302236659392e2,
+    1.967428940167, -6.184842764145e-3};
+  Real b1[5] = {4.757146002428e2, -2.619250287624e1, 5.215134206837e-1,
+    -4.494511089838e-3, 1.423058795982e-5};
+  Real b2[5] = {-3.713900186613e-1, 2.072488876536e-2, -4.169082831078e-4,
+    3.622975674137e-6, -1.155050860329e-8};
+  Real b3[5] = {1.228907393482e-4, -6.930063746226e-6, 1.406317206628e-7,
+    -1.230995287169e-9, 3.948417428040e-12};
+  Real b4[5] = {-1.466408011784e-8, 8.338008651366e-10, -1.704242447194e-11,
+    1.500878861807e-13, -4.838826574173e-16};
+
+  Real c0[5] = {6.897382693936e2, 2.730479206931, -2.254102364542e-2,
+    -4.651196146917e-3, 3.439702234956e-5};
+  Real c1[5] = {2.213692462613e-1, -6.547268255814e-3, 5.982258882656e-5,
+    2.274997412526e-6, -1.888361337660e-8};
+  Real c2[5] = {-5.118724890479e-5, 2.019697017603e-6, -2.311332097185e-8,
+    -4.079557404679e-10, 3.893599641874e-12};
+  Real c3[5] ={5.517971126745e-9, -2.415814703211e-10, 3.121603486524e-12,
+    3.171271084870e-14, -3.560785550401e-16};
+  Real c4[5] = {-2.184152941323e-13, 1.010703706059e-14, -1.406620681883e-16,
+    -8.957731136447e-19, 1.215810469539e-20};
+
+  Real a0, a1, a2, a3, a4;
+
+  Real t1 = temperature;
+  Real t2 = t1 * t1;
+  Real t3 = t2 * t1;
+  Real t4 = t3 * t1;
+
+  // Correlation uses pressure in psia
+  Real pa2psia = 1.45037738007e-4;
+  Real p1 = pressure * pa2psia;
+  Real p2 = p1 * p1;
+  Real p3 = p2 * p1;
+
+  if (p1 <= 3000)
+  {
+     a1 = b1[0] + b1[1] * t1 + b1[2] * t2 + b1[3] * t3 + b1[4] * t4;
+     a2 = b2[0] + b2[1] * t1 + b2[2] * t2 + b2[3] * t3 + b2[4] * t4;
+     a3 = b3[0] + b3[1] * t1 + b3[2] * t2 + b3[3] * t3 + b3[4] * t4;
+     a4 = b4[0] + b4[1] * t1 + b4[2] * t2 + b4[3] * t3 + b4[4] * t4;
+   }
+
+   if (p1 > 3000)
+   {
+     a1 = c1[0] + c1[1] * t1 + c1[2] * t2 + c1[3] * t3 + c1[4] * t4;
+     a2 = c2[0] + c2[1] * t1 + c2[2] * t2 + c2[3] * t3 + c2[4] * t4;
+     a3 = c3[0] + c3[1] * t1 + c3[2] * t2 + c3[3] * t3 + c3[4] * t4;
+     a4 = c4[0] + c4[1] * t1 + c4[2] * t2 + c4[3] * t3 + c4[4] * t4;
+   }
+
+  return (a1 + 2.0 * a2 * p1 + 3.0 * a3 * p2 + 4.0 * a4 * p3) * pa2psia;
+}
+
+Real
+FluidPropertiesCO2::dSupercriticalDensity_dT(Real pressure, Real temperature) const
+{
+  Real b0[5] = {-2.148322085348e5, 1.168116599408e4, -2.302236659392e2,
+    1.967428940167, -6.184842764145e-3};
+  Real b1[5] = {4.757146002428e2, -2.619250287624e1, 5.215134206837e-1,
+    -4.494511089838e-3, 1.423058795982e-5};
+  Real b2[5] = {-3.713900186613e-1, 2.072488876536e-2, -4.169082831078e-4,
+    3.622975674137e-6, -1.155050860329e-8};
+  Real b3[5] = {1.228907393482e-4, -6.930063746226e-6, 1.406317206628e-7,
+    -1.230995287169e-9, 3.948417428040e-12};
+  Real b4[5] = {-1.466408011784e-8, 8.338008651366e-10, -1.704242447194e-11,
+    1.500878861807e-13, -4.838826574173e-16};
+
+  Real c0[5] = {6.897382693936e2, 2.730479206931, -2.254102364542e-2,
+    -4.651196146917e-3, 3.439702234956e-5};
+  Real c1[5] = {2.213692462613e-1, -6.547268255814e-3, 5.982258882656e-5,
+    2.274997412526e-6, -1.888361337660e-8};
+  Real c2[5] = {-5.118724890479e-5, 2.019697017603e-6, -2.311332097185e-8,
+    -4.079557404679e-10, 3.893599641874e-12};
+  Real c3[5] ={5.517971126745e-9, -2.415814703211e-10, 3.121603486524e-12,
+    3.171271084870e-14, -3.560785550401e-16};
+  Real c4[5] = {-2.184152941323e-13, 1.010703706059e-14, -1.406620681883e-16,
+    -8.957731136447e-19, 1.215810469539e-20};
+
+  Real a0, a1, a2, a3, a4;
+
+  Real t1 = temperature;
+  Real t2 = t1 * t1;
+  Real t3 = t2 * t1;
+
+  // Correlation uses pressure in psia
+  Real pa2psia = 1.45037738007e-4;
+  Real p1 = pressure * pa2psia;
+  Real p2 = p1 * p1;
+  Real p3 = p2 * p1;
+  Real p4 = p3 * p1;
+
+  if (p1 <= 3000)
+  {
+     a0 = b0[1]  + 2.0 * b0[2] * t1 + 3.0 * b0[3] * t2 + 4.0 * b0[4] * t3;
+     a1 = b1[1]  + 2.0 * b1[2] * t1 + 3.0 * b1[3] * t2 + 4.0 * b1[4] * t3;
+     a2 = b2[1]  + 2.0 * b2[2] * t1 + 3.0 * b2[3] * t2 + 4.0 * b2[4] * t3;
+     a3 = b3[1]  + 2.0 * b3[2] * t1 + 3.0 * b3[3] * t2 + 4.0 * b3[4] * t3;
+     a4 = b4[1]  + 2.0 * b4[2] * t1 + 3.0 * b4[3] * t2 + 4.0 * b4[4] * t3;
+   }
+
+   if (p1 > 3000)
+   {
+     a0 = c0[1]  + 2.0 * c0[2] * t1 + 3.0 * c0[3] * t2 + 4.0 * c0[4] * t3;
+     a1 = c1[1]  + 2.0 * c1[2] * t1 + 3.0 * c1[3] * t2 + 4.0 * c1[4] * t3;
+     a2 = c2[1]  + 2.0 * c2[2] * t1 + 3.0 * c2[3] * t2 + 4.0 * c2[4] * t3;
+     a3 = c3[1]  + 2.0 * c3[2] * t1 + 3.0 * c3[3] * t2 + 4.0 * c3[4] * t3;
+     a4 = c4[1]  + 2.0 * c4[2] * t1 + 3.0 * c4[3] * t2 + 4.0 * c4[4] * t3;
+   }
+
+  return a0 + a1 * p1 + a2 * p2 + a3 * p3 + a4 * p4;
+}
+
+
+
+std::vector<Real>
+FluidPropertiesCO2::henryConstants() const
+
+{
+  std::vector<Real> co2henry;
+  co2henry.push_back(-8.55445);
+  co2henry.push_back(4.01195);
+  co2henry.push_back(9.52345);
+
+  /* Battistelli formulation from TOUGH2
+  Real a[6] = {7.83666e7, 1.96025e6, 8.20574e4, -7.40674e2, 2.1838, -2.20999e-3};
+
+  Real co2henry = 0.;
+
+  for(unsigned int i = 0; i< 6; i++)
+    co2henry += a[i] * std::pow(temperature, i);
+*/
+  return co2henry;
 }

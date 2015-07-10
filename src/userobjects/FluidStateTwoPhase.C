@@ -36,7 +36,6 @@ FluidStateTwoPhase::FluidStateTwoPhase(const std::string & name, InputParameters
   _is_isothermal(getParam<bool>("isothermal"))
 
 {
-//  _fluid_properties.resize(_subproblem.mesh().nNodes());
   _fsp.resize(_mesh.nNodes());
 }
 

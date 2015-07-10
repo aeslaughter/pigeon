@@ -56,16 +56,6 @@ class FluidPropertiesCO2 : public FluidProperties
   Real viscosity(Real pressure, Real temperature) const;
 
   /**
-   * Derivative of the density of gaseous CO2 as a function of
-   * pressure.
-   *
-   * @param pressure fluid pressure (Pa)
-   * @param temperature fluid temperature (C)
-   * @return derivative of CO2 density (kg/m^3) with respect to pressure
-   */
-  Real dDensity_dP(Real pressure, Real temperature) const;
-
-  /**
    * Henry's law constant coefficients for dissolution of CO2 into water.
    * From Guidelines on the Henry's constant and vapour
    * liquid distribution constant for gases in H20 and D20 at high
@@ -129,6 +119,66 @@ class FluidPropertiesCO2 : public FluidProperties
    * @return viscosity (Pa.s)
    */
   Real supercriticalViscosity(Real pressure, Real temperature) const;
+
+  /**
+   * Derivative of the density of CO2 as a function of
+   * pressure.
+   *
+   * @param pressure fluid pressure (Pa)
+   * @param temperature fluid temperature (C)
+   * @return derivative of CO2 density (kg/m^3) with respect to pressure (Pa)
+   */
+  Real dDensity_dP(Real pressure, Real temperature) const;
+
+  /**
+   * Derivative of the density of CO2 as a function of
+   * temperature.
+   *
+   * @param pressure fluid pressure (Pa)
+   * @param temperature fluid temperature (C)
+   * @return derivative of CO2 density (kg/m^3) with respect to temperature (C)
+   */
+  Real dDensity_dT(Real pressure, Real temperature) const;
+
+  /**
+   * Derivative of the density of gaseous CO2 as a function of
+   * pressure.
+   *
+   * @param pressure fluid pressure (Pa)
+   * @param temperature fluid temperature (C)
+   * @return derivative of CO2 density (kg/m^3) with respect to pressure (Pa)
+   */
+  Real dGasDensity_dP(Real pressure, Real temperature) const;
+
+  /**
+   * Derivative of the density of gaseous CO2 as a function of
+   * temperature.
+   *
+   * @param pressure fluid pressure (Pa)
+   * @param temperature fluid temperature (C)
+   * @return derivative of CO2 density (kg/m^3) with respect to temperature (C)
+   */
+  Real dGasDensity_dT(Real pressure, Real temperature) const;
+
+  /**
+   * Derivative of the density of supercritical CO2 as a function of
+   * pressure.
+   *
+   * @param pressure fluid pressure (Pa)
+   * @param temperature fluid temperature (C)
+   * @return derivative of CO2 density (kg/m^3) with respect to pressure (Pa)
+   */
+  Real dSupercriticalDensity_dP(Real pressure, Real temperature) const;
+
+  /**
+   * Derivative of the density of supercritical CO2 as a function of
+   * temperature.
+   *
+   * @param pressure fluid pressure (Pa)
+   * @param temperature fluid temperature (C)
+   * @return derivative of CO2 density (kg/m^3) with respect to temperature (C)
+   */
+  Real dSupercriticalDensity_dT(Real pressure, Real temperature) const;
 
  protected:
   /// Conversion of temperature from Celcius to Kelvin

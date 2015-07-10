@@ -266,7 +266,7 @@ class FluidStateTwoPhase : public FluidState
 
   /// Fluid state properties class to hold thermophysical properties at
   /// each node
-  std::vector<FluidStateProperties> _fsp;
+  std::vector<FluidStateProperties > _fsp;
 
 };
 

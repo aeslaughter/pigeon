@@ -28,7 +28,6 @@ ConstantMassFluxBC::ConstantMassFluxBC(const std::string & name, InputParameters
 Real
 ConstantMassFluxBC::computeQpResidual()
 {
-  _console << "Bc " << _value - _fluid_density[_qp] * _gravity[_qp] * _normals[_qp] << std::endl;
   return  _test[_i][_qp] * (_value - _fluid_density[_qp] * _gravity[_qp] * _normals[_qp]);
 }
 

@@ -62,7 +62,7 @@
 #include "SideMassFluxIntegralPostprocessor.h"
 
 // Dirac kernels
-//#include "TimeLimitedConstantPointSource.h"
+#include "TimeLimitedConstantPointSource.h"
 
 // Problems
 #include "MultiphaseProblem.h"
@@ -163,7 +163,7 @@ QuollApp::registerObjects(Factory & factory)
    registerPostprocessor(SideMassFluxIntegralPostprocessor);
 
    // Register Dirac kernel
-// registerDiracKernel(TimeLimitedConstantPointSource);
+   registerDiracKernel(TimeLimitedConstantPointSource);
 
    // Register problem
    registerProblem(MultiphaseProblem);
