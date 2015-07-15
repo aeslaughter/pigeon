@@ -50,6 +50,8 @@ ComponentFlux::ComponentFlux(const std::string & name,
 
 Real ComponentFlux::computeQpResidual()
 {
+//  _console << "fluid density " << _fluid_density[0] << std::endl;
+ // _console << "flux no mob" << _phase_flux_no_mobility[_qp][_phase_index] << std::endl;
   return _grad_test[_i][_qp] * (_permeability[_qp] * _phase_flux_no_mobility[_qp][_phase_index]);
 }
 
@@ -110,7 +112,8 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
   // The mobility calculated at the nodes
   for (unsigned int n = 0; n < num_nodes; ++n)
   {
-    mobility[n] = _fluid_relperm[n] *  _fluid_density[n] * _component_mass_fraction[n] / _fluid_viscosity[n];
+    mobility[n] = _fluid_relperm[n] * _fluid_density[n] * _component_mass_fraction[n] / _fluid_viscosity[n];
+//    _console << "node " << n << ", mobility " << mobility[n] << std::endl;
   }
 
   // Compute the residual and jacobian without the mobility terms. Even if we are computing the jacobian
@@ -258,6 +261,15 @@ void ComponentFlux::upwind(bool compute_res, bool compute_jac, unsigned int jvar
     }
   }
 
+  // Output mass flux at each node
+//  _console << "Variable " << _variable << std::endl;
+//  _console << "density " << _fluid_density[0] << std::endl;
+/*
+  for (unsigned int n = 0; n < num_nodes; ++n)
+  {
+   _console << "node " << n << ", mass flow " << _local_re(n) << std::endl;
+  }
+*/
   // Add results to the Residual or Jacobian
   if (compute_res)
   {

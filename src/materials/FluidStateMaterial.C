@@ -86,21 +86,11 @@ FluidStateMaterial::computeQpProperties()
 
   for (unsigned int n = 0; n < _num_phases; ++n)
   {
-    // If the saturation of this phase is zero, the phase density is zero, and
-    // hence the phase flux is zero
-    Real eps = 1.e-10;
-
-    if (saturation[_phase_index] < eps)
-      _phase_flux_no_mobility[_qp][n] = 0.;
-    else
-    {
-      grad_pressure = _grad_primary_pressure[_qp] - _fluid_state.dCapillaryPressure(_primary_saturation[_qp])[n] *
+    grad_pressure = _grad_primary_pressure[_qp] - _fluid_state.dCapillaryPressure(_primary_saturation[_qp])[n] *
       _grad_primary_saturation[_qp];
 
-      _phase_flux_no_mobility[_qp][n] = (grad_pressure - (*_density[n])[_qp] * _gravity[_qp]);
+    _phase_flux_no_mobility[_qp][n] = (grad_pressure - (*_density[n])[_qp] * _gravity[_qp]);
 
-      _dphase_flux_no_mobility_dp[_qp][n] = - _fluid_state.dDensity_dP(_primary_pressure[_qp], temperature)[n] * _gravity[_qp];
-
-    }
+    _dphase_flux_no_mobility_dp[_qp][n] = - _fluid_state.dDensity_dP(_primary_pressure[_qp], temperature)[n] * _gravity[_qp];
   }
 }

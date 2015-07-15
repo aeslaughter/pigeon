@@ -1,0 +1,14 @@
+[Tests]
+  [./mass1]
+    type = 'CSVDiff'
+    input = 'MassPostProcessor1.i'
+    csvdiff = 'MassPostProcessor1.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./mass2]
+    type = 'CSVDiff'
+    input = 'MassPostProcessor2.i'
+    csvdiff = 'MassPostProcessor2.csv'
+    abs_zero = 1.0E-6
+  [../]
+[]

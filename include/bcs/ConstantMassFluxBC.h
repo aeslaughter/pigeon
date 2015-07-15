@@ -1,9 +1,8 @@
 /****************************************************************/
-/* Boundary condition to set the mass flux equal to a constant  */
-/* value over a side.                                           */
+/* MOOSE - Multiphysics Object Oriented Simulation Environment  */
 /*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
+/*          All contents are licensed under LGPL V2.1           */
+/*             See LICENSE for full restrictions                */
 /****************************************************************/
 
 #ifndef CONSTANTMASSFLUXBC_H

@@ -46,16 +46,16 @@ private:
    * Member references that will hold the User Object values for
    * the porous material properties.
    */
-  const RelativePermeability & _material_relative_permeability;
-  const CapillaryPressure & _material_capillary_pressure;
+//  const RelativePermeability & _material_relative_permeability;
+//  const CapillaryPressure & _material_capillary_pressure;
   MaterialProperty<Real> & _rock_density;
   MaterialProperty<Real> & _porosity;
   MaterialProperty<RealTensorValue> & _permeability;
   MaterialProperty<RealVectorValue> & _gravity;
   MaterialProperty<Real> & _diffusivity;
-  MaterialProperty<Real> & _gas_relative_permeability;
-  MaterialProperty<Real> & _liquid_relative_permeability;
-  MaterialProperty<Real> & _capillary_pressure;
+//  MaterialProperty<Real> & _gas_relative_permeability;
+//  MaterialProperty<Real> & _liquid_relative_permeability;
+//  MaterialProperty<Real> & _capillary_pressure;
 
   /**
    * The member reference of the liquid saturation variable
