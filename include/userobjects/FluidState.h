@@ -121,22 +121,37 @@ class FluidState : public NodalUserObject
    *
    * @return temperature (C)
    */
-  virtual Real temperature() const = 0;
+   virtual Real isothermalTemperature() const = 0;
+
+   /**
+    * Temperature variable number for nonisothermal simulations
+    *
+    * @return MOOSE variable number corresponding to the temperature variable
+    */
+   virtual unsigned int temperatureVar() const = 0;
+
+  /**
+   * Checks if the MOOSE variable number is a primary FluidState variable
+   * @param moose_var MOOSE variable number
+   * @return bool
+   */
+  virtual bool isFluidStateVariable(unsigned int moose_var) const = 0;
+
 
   /**
    * List of primary variable names
    */
-  virtual std::vector<std::string> variable_names() const = 0;
+  virtual std::string variableNames(unsigned int moose_var) const = 0;
 
   /**
     * List of primary variable names
     */
-  virtual std::vector<std::string> variable_types() const = 0;
+  virtual std::string variableTypes(unsigned int moose_var) const = 0;
 
   /**
    * List of phase index for each variable
    */
-  virtual std::vector<unsigned int> variable_phase() const = 0;
+  virtual unsigned int variablePhase(unsigned int moose_var) const = 0;
 
   /**
    * Fluid density must be over-written in all derived classes.

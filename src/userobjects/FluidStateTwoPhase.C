@@ -19,6 +19,8 @@ InputParameters validParams<FluidStateTwoPhase>()
   params.addCoupledVar("pressure_variable",  "The primary pressure variable");
   params.addCoupledVar("temperature_variable", 100, "The primary temperature variable.");
   params.addCoupledVar("saturation_variable", 1.0, "The primary saturation variable");
+  params.addParam<unsigned int>("pressure_variable_phase", 0, "The phase corresponding to the pressure variable");
+  params.addParam<unsigned int>("saturation_variable_phase", 0, "The phase corresponding to the saturation variable");
   params.addParam<bool>("isothermal", false, "Is the simulations isothermal?");
   return params;
 }
@@ -33,65 +35,107 @@ FluidStateTwoPhase::FluidStateTwoPhase(const std::string & name, InputParameters
   _pressure(coupledNodalValue("pressure_variable")),
   _temperature(coupledNodalValue("temperature_variable")),
   _saturation(coupledNodalValue("saturation_variable")),
-  _is_isothermal(getParam<bool>("isothermal"))
+  _not_isothermal(isCoupled("temperature_variable")),
+  _p_phase(getParam<unsigned int>("pressure_variable_phase")),
+  _s_phase(getParam<unsigned int>("saturation_variable_phase")),
+  _pvar(coupled("pressure_variable")),
+  _svar(coupled("saturation_variable")),
+  _tvar(coupled("temperature_variable"))
 
 {
   _fsp.resize(_mesh.nNodes());
+
+  _num_components = 1;
+  _num_phases = 2;
+  _num_vars = _num_phases + _not_isothermal;
+
+  _varnums.push_back(_pvar);
+  if (_not_isothermal)
+   _varnums.push_back(_tvar);
+
+  // The pressure variable must always be coupled
+  _pname = getVar("pressure_variable", 0)->name();
+  // The saturation variable must always be coupled
+  _sname = getVar("saturation_variable", 0)->name();
+  if (_not_isothermal) // Check if temperature is coupled
+    _tname = getVar("temperature_variable", 0)->name();
 }
 
 unsigned int
 FluidStateTwoPhase::numPhases() const
 {
-  return 2;
+  return _num_phases;
 }
 
 unsigned int
 FluidStateTwoPhase::numComponents() const
 {
-  return 2;
+  return _num_components;
 }
 
 bool
 FluidStateTwoPhase::isIsothermal() const
 {
-   return _is_isothermal;
+   return 1 - _not_isothermal;  // Returns true if isothermal
 }
 
 Real
-FluidStateTwoPhase::temperature() const
+FluidStateTwoPhase::isothermalTemperature() const
 {
   // For isothermal simulations
   return _temperature[0];
 }
 
-std::vector<std::string>
-FluidStateTwoPhase::variable_names() const
+bool
+FluidStateTwoPhase::isFluidStateVariable(unsigned int moose_var) const
 {
-  std::vector<std::string> varnames;
-  varnames.push_back("gas_pressure");
-  varnames.push_back("liquid_saturation");
+  bool isvariable = true;
+  if (std::find(_varnums.begin(), _varnums.end(), moose_var) == _varnums.end())
+    isvariable = false;
 
-  return varnames;
+  return isvariable;
+}
+std::string
+FluidStateTwoPhase::variableNames(unsigned int moose_var) const
+{
+  std::string varname;
+
+  if (moose_var == _pvar)
+    varname = _pname;
+  if (moose_var == _svar)
+    varname = _sname;
+  if (moose_var == _tvar)
+    varname = _tname;
+
+  return varname;
 }
 
-std::vector<std::string>
-FluidStateTwoPhase::variable_types() const
+std::string
+FluidStateTwoPhase::variableTypes(unsigned int moose_var) const
 {
-  std::vector<std::string> varnames;
-  varnames.push_back("pressure");
-  varnames.push_back("saturation");
+  std::string vartype;
 
-  return varnames;
+  if (moose_var == _pvar)
+    vartype = "pressure";
+  if (moose_var == _svar)
+    vartype = "saturation";
+  if (moose_var == _tvar)
+    vartype = "temperature";
+
+  return vartype;
 }
 
-std::vector<unsigned int>
-FluidStateTwoPhase::variable_phase() const
+unsigned int
+FluidStateTwoPhase::variablePhase(unsigned int moose_var) const
 {
-  std::vector<unsigned int> varphases;
-  varphases.push_back(1);  // gas phase
-  varphases.push_back(0);  // liquid phase
+  unsigned int varphase;
 
-  return varphases;
+  if (moose_var == _pvar)
+    varphase = _p_phase;
+  if (moose_var == _svar)
+    varphase = _s_phase;
+
+  return varphase;
 }
 
 void

@@ -61,23 +61,37 @@ class FluidStateTwoPhase : public FluidState
    *
    * @return temperature (C)
    */
-  virtual Real temperature() const;
+  virtual Real isothermalTemperature() const;
+
+  /**
+   * Temperature variable number for nonisothermal simulations
+   *
+   * @return MOOSE variable number corresponding to the temperature variable
+   */
+  virtual unsigned int temperatureVar() const;
+
+  /**
+   * Checks if the MOOSE variable number is a primary FluidState variable
+   * @param moose_var MOOSE variable number
+   * @return bool
+   */
+  virtual bool isFluidStateVariable(unsigned int moose_var) const;
 
   /**
    * List of primary variable names
    */
-  virtual std::vector<std::string> variable_names() const;
+  virtual std::string variableNames(unsigned int moose_var) const;
 
 
   /**
    * List of primary variable types
    */
-  virtual std::vector<std::string> variable_types() const;
+  virtual std::string variableTypes(unsigned int moose_var) const;
 
   /**
    * List of phase index for each variable
    */
-  virtual std::vector<unsigned int> variable_phase() const;
+  virtual unsigned int variablePhase(unsigned int moose_var) const;
 
   /**
    * Fluid density for each phase
@@ -262,7 +276,20 @@ class FluidStateTwoPhase : public FluidState
   /// Primary saturation variable
   VariableValue & _saturation;
 
-  bool _is_isothermal;
+  unsigned int _num_components;
+  unsigned int _num_phases;
+  unsigned int _num_vars;
+  bool _not_isothermal;
+  std::vector<unsigned int> _varnums;
+
+  unsigned int _p_phase;
+  unsigned int _s_phase;
+  unsigned int _pvar;
+  unsigned int _svar;
+  unsigned int _tvar;
+  std::string _pname;
+  std::string _sname;
+  std::string _tname;
 
   /// Fluid state properties class to hold thermophysical properties at
   /// each node

@@ -65,18 +65,18 @@ class FluidStateWaterCO2 : public FluidState
   /**
    * List of primary variable names
    */
-  virtual std::vector<std::string> variable_names() const;
+  virtual std::vector<std::string> variableNames() const;
 
 
   /**
    * List of primary variable types
    */
-  virtual std::vector<std::string> variable_types() const;
+  virtual std::vector<std::string> variableTypes() const;
 
   /**
    * List of phase index for each variable
    */
-  virtual std::vector<unsigned int> variable_phase() const;
+  virtual std::vector<unsigned int> variablePhase() const;
 
   /**
    * Fluid density using FluidPropertiesWater and FluidPropertiesCO2 UserObjects.
@@ -263,9 +263,19 @@ class FluidStateWaterCO2 : public FluidState
   /// Primary saturation variable
   VariableValue & _saturation;
 
-  bool _is_isothermal;
+  bool _not_isothermal;
+  unsigned int _num_vars;
   Real _Mh2o;
   Real _Mco2;
+
+  /// Variable names corresponding to MOOSE variable numbers
+  std::vector<std::string> _varnames;
+
+  /// Variable types corresponding to MOOSE variable numbers
+  std::vector<std::string> _vartypes;
+
+  /// Variable phases corresponding to MOOSE variable numbers
+  std::vector<unsigned int> _varphases;
 
   /// Fluid state properties class to hold thermophysical properties at
   /// each node

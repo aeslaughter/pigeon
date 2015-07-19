@@ -57,17 +57,17 @@ class FluidStateBrineCO2 : public FluidState
   /**
    * List of primary variable names
    */
-  virtual std::vector<std::string> variable_names() const;
+  virtual std::vector<std::string> variableNames() const;
 
   /**
    * List of primary variable names
    */
-  virtual std::vector<std::string> variable_types() const;
+  virtual std::vector<std::string> variableTypes() const;
 
   /**
     * List of phase index for each variable
    */
-  virtual std::vector<unsigned int> variable_phase() const;
+  virtual std::vector<unsigned int> variablePhase() const;
 
   /**
    * Fluid density using FluidPropertiesBrine and FluidPropertiesCO2 UserObjects.

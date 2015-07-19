@@ -8,8 +8,10 @@
 #ifndef FLUIDSTATESINGLEPHASE_H
 #define FLUIDSTATESINGLEPHASE_H
 
-#include "FluidPropertiesWater.h"
 #include "FluidState.h"
+//#include "FluidStateVariables.h"
+#include "FluidProperties.h"
+
 
 class FluidStateSinglePhase;
 
@@ -53,24 +55,43 @@ class FluidStateSinglePhase : public FluidState
    *
    * @return temperature (C)
    */
-  virtual Real temperature() const;
+  virtual Real isothermalTemperature() const;
+
+  /**
+   * Temperature variable number for nonisothermal simulations
+   *
+   * @return MOOSE variable number corresponding to the temperature variable
+   */
+  virtual unsigned int temperatureVar() const;
+
+  /**
+   * Checks if the MOOSE variable number is a primary FluidState variable
+   * @param moose_var MOOSE variable number
+   * @return bool
+   */
+  virtual bool isFluidStateVariable(unsigned int moose_var) const;
+
+  /**
+    * Primary variable name corresponding to MOOSE variable number
+    * @param moose_var MOOSE variable number
+    * @return variable name
+   */
+  virtual std::string variableNames(unsigned int moose_var) const;
 
 
   /**
-    * List of primary variable names
+    * Primary variable type corresponding to MOOSE variable number
+    * @param moose_var MOOSE variable number
+    * @return variable type
    */
-  virtual std::vector<std::string> variable_names() const;
-
-
-  /**
-    * List of primary variable names
-   */
-  virtual std::vector<std::string> variable_types() const;
+  virtual std::string variableTypes(unsigned int moose_var) const;
 
   /**
-   * List of phase index for each variable
+   * Primary variable phase index of MOOSE variable number
+   * @param moose_var MOOSE variable number
+   * @return variable phase
    */
-  virtual std::vector<unsigned int> variable_phase() const;
+  virtual unsigned int variablePhase(unsigned int moose_var) const;
 
   /**
    * Fluid density
@@ -226,21 +247,26 @@ class FluidStateSinglePhase : public FluidState
    */
   const FluidProperties & _fluid_property;
 
-  /// Primary pressure variable
+
+  /// Fluid pressure variable
   VariableValue & _pressure;
-  /// Primary temperature variable
+  /// Fluid temperature
   VariableValue & _temperature;
-  /// Primary saturation variable
-  VariableValue & _saturation;
 
   unsigned int _num_components;
-  bool _is_isothermal;
+  unsigned int _num_phases;
+  unsigned int _num_vars;
+  bool _not_isothermal;
+  std::vector<unsigned int> _varnums;
+
+  unsigned int _pvar;
+  unsigned int _tvar;
+  std::string _pname;
+  std::string _tname;
 
   /// Fluid state properties class to hold thermophysical properties at
   /// each node
   std::vector<FluidStateProperties> _fsp;
-
-
 
 };
 

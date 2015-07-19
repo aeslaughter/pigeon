@@ -59,7 +59,7 @@ FluidStateMaterial::computeQpProperties()
 
   // Check if the simulation is isothermal
   if (_fluid_state.isIsothermal())
-    temperature = _fluid_state.temperature();
+    temperature = _fluid_state.isothermalTemperature();
   else
     temperature = _temperature[_qp];
 

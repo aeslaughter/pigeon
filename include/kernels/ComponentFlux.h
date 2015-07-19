@@ -49,7 +49,6 @@ private:
   VariableValue & _fluid_viscosity;
   VariableValue & _component_mass_fraction;
   VariableValue & _fluid_relperm;
-  const MooseEnum & _primary_variable_type;
 
   /**
    * This is the member reference that will hold the User Object
@@ -57,12 +56,9 @@ private:
    */
   const FluidState & _fluid_state;
 
+  unsigned int _phase_index;
+  std::string _primary_variable_type;
 
-  unsigned int _fluid_pressure_var;
-  unsigned int _num_phases;
-  unsigned int _phase_index;  
-  unsigned int _pressure_var;
-  unsigned int _saturation_var;
 };
 
 #endif //COMPONENTFLUX_H

@@ -13,32 +13,42 @@ InputParameters validParams<FluidStateSinglePhase>()
   InputParameters params = validParams<FluidState>();
   params.addClassDescription("Thermophysical fluid state of single phase fluid");
   params.addRequiredParam<UserObjectName>("fluid_property_uo", "Name of the User Object defining the fluid properties");
-  params.addCoupledVar("pressure_variable",  "The primary pressure variable");
-  params.addCoupledVar("temperature_variable", 100, "The primary temperature variable.");
-  params.addCoupledVar("saturation_variable", 1.0, "The primary saturation variable");
-  params.addParam<unsigned int>("num_components", 1, "The number of components in the fluid");
-  params.addParam<bool>("isothermal", false, "Is the simulations isothermal?");
+  params.addRequiredCoupledVar("temperature_variable", "The fluid temperature variable. For isothermal simulations, enter the fluid temperature (C)");
+  params.addRequiredCoupledVar("pressure_variable", "The fluid pressure variable (Pa)");
   return params;
 }
 
 FluidStateSinglePhase::FluidStateSinglePhase(const std::string & name, InputParameters parameters) :
   FluidState(name, parameters),
 
-  _fluid_property(getUserObject<FluidPropertiesWater>("fluid_property_uo")),
+  _fluid_property(getUserObject<FluidProperties>("fluid_property_uo")),
   _pressure(coupledNodalValue("pressure_variable")),
   _temperature(coupledNodalValue("temperature_variable")),
-  _saturation(coupledNodalValue("saturation_variable")),
-  _num_components(getParam<unsigned int>("num_components")),
-  _is_isothermal(getParam<bool>("isothermal"))
+  _not_isothermal(isCoupled("temperature_variable")),
+  _pvar(coupled("pressure_variable")),
+  _tvar(coupled("temperature_variable"))
 
 {
-    _fsp.resize(_mesh.nNodes());
+  _fsp.resize(_mesh.nNodes());
+
+  _num_components = 1;
+  _num_phases = 1;
+  _num_vars = _num_phases + _num_components + _not_isothermal;
+
+  _varnums.push_back(_pvar);
+  if (_not_isothermal)
+   _varnums.push_back(_tvar);
+
+  // The pressure variable must always be coupled
+  _pname = getVar("pressure_variable", 0)->name();
+  if (_not_isothermal) // Check if temperature is coupled
+    _tname = getVar("temperature_variable", 0)->name();
 }
 
 unsigned int
 FluidStateSinglePhase::numPhases() const
 {
-  return 1;
+  return _num_phases;
 }
 
 unsigned int
@@ -50,42 +60,62 @@ FluidStateSinglePhase::numComponents() const
 bool
 FluidStateSinglePhase::isIsothermal() const
 {
-   return _is_isothermal;
+   return 1 - _not_isothermal;  // Returns true if isothermal
 }
 
 Real
-FluidStateSinglePhase::temperature() const
+FluidStateSinglePhase::isothermalTemperature() const
 {
   // For isothermal simulations
-  return _temperature[0];
+  return _temperature[_qp];
 }
 
-std::vector<std::string>
-FluidStateSinglePhase::variable_names() const
+unsigned int
+FluidStateSinglePhase::temperatureVar() const
 {
-  std::vector<std::string> varnames;
-  varnames.push_back("pressure");
+  return _tvar;
+}
 
-  return varnames;
+bool
+FluidStateSinglePhase::isFluidStateVariable(unsigned int moose_var) const
+{
+  bool isvariable = true;
+  if (std::find(_varnums.begin(), _varnums.end(), moose_var) == _varnums.end())
+    isvariable = false;
+
+  return isvariable;
 }
 
 
-std::vector<std::string>
-FluidStateSinglePhase::variable_types() const
+std::string
+FluidStateSinglePhase::variableNames(unsigned int moose_var) const
 {
-  std::vector<std::string> vartypes;
-  vartypes.push_back("pressure");
+  std::string varname;
+  if (moose_var == _pvar)
+    varname = _pname;
+  if (moose_var == _tvar)
+    varname = _tname;
 
-  return vartypes;
+  return varname;
 }
 
-std::vector<unsigned int>
-FluidStateSinglePhase::variable_phase() const
+std::string
+FluidStateSinglePhase::variableTypes(unsigned int moose_var) const
 {
-  std::vector<unsigned int> varphases;
-  varphases.push_back(0);
+  std::string vartype;
+  if (moose_var == _pvar)
+    vartype = "pressure";
+  if (moose_var == _tvar)
+    vartype = "temperature";
 
-  return varphases;
+  return vartype;
+}
+
+unsigned int
+FluidStateSinglePhase::variablePhase(unsigned int moose_var) const
+{
+ // Only one phase in this FluidState
+  return 0;
 }
 
 void
@@ -93,12 +123,13 @@ FluidStateSinglePhase::execute()
 {
   // Current node
   unsigned int node = _current_node->id();
+  Real fluid_saturation = 1.0;
 
   // Store the phase pressures
-  _fsp[node].pressure = pressure(_pressure[_qp], _saturation[_qp]);
+  _fsp[node].pressure = pressure(_pressure[_qp], fluid_saturation);
 
   // Store the phase saturations
-  _fsp[node].saturation = saturation(_saturation[_qp]);
+  _fsp[node].saturation = saturation(fluid_saturation);
 
   // Density of phases
   std::vector<Real> densities;

@@ -14,34 +14,38 @@ InputParameters validParams<ComponentMassTimeDerivative>()
   params.addRequiredCoupledVar("fluid_density_variable", "The fluid density variable for this phase.");
   params.addRequiredCoupledVar("fluid_saturation_variable", "The fluid saturation variable for this phase.");
   params.addRequiredCoupledVar("fluid_pressure_variable", "The fluid pressure variable for this phase.");
-  params.addCoupledVar("temperature_variable", 50, "The temperature variable.");
+  params.addCoupledVar("temperature_variable", 50,  "The temperature variable.");
   params.addCoupledVar("component_mass_fraction_variable", 1.0, "The component mass fraction variable for this phase.");
-  MooseEnum primary_variable_type("pressure saturation mass_fraction");
-  params.addRequiredParam<MooseEnum>("primary_variable_type", primary_variable_type, "The type of primary variable for this kernel (e.g. pressure, saturation or component mass fraction");
   params.addRequiredParam<UserObjectName>("fluid_state_uo", "Name of the User Object defining the fluid state");
-  params.addParam<unsigned int>("phase_index", 0, "The index of the phase this kernel acts on");
   return params;
 }
 
 ComponentMassTimeDerivative::ComponentMassTimeDerivative(const std::string & name,
                        InputParameters parameters) :
-    TimeKernel(name, parameters),
-    _porosity(getMaterialProperty<Real>("porosity")),
-    _fluid_density(coupledNodalValue("fluid_density_variable")),
-    _fluid_density_old(coupledNodalValueOld("fluid_density_variable")),
-    _fluid_saturation(coupledNodalValue("fluid_saturation_variable")),
-    _fluid_saturation_old(coupledNodalValueOld("fluid_saturation_variable")),
-    _component_mass_fraction(coupledNodalValue("component_mass_fraction_variable")),
-    _component_mass_fraction_old(coupledNodalValueOld("component_mass_fraction_variable")),
-    _fluid_pressure(coupledNodalValue("fluid_pressure_variable")),
-    _fluid_pressure_old(coupledNodalValueOld("fluid_pressure_variable")),
-    _primary_variable_type(getParam<MooseEnum>("primary_variable_type")),
-    _temperature(coupledValue("temperature_variable")),
-    _fluid_state(getUserObject<FluidState>("fluid_state_uo")),
-    _phase_index(getParam<unsigned int>("phase_index")),
-    _pressure_var(coupled("fluid_pressure_variable")),
-    _saturation_var(coupled("fluid_saturation_variable"))
+  TimeKernel(name, parameters),
+  _porosity(getMaterialProperty<Real>("porosity")),
+  _fluid_density(coupledNodalValue("fluid_density_variable")),
+  _fluid_density_old(coupledNodalValueOld("fluid_density_variable")),
+  _fluid_saturation(coupledNodalValue("fluid_saturation_variable")),
+  _fluid_saturation_old(coupledNodalValueOld("fluid_saturation_variable")),
+  _component_mass_fraction(coupledNodalValue("component_mass_fraction_variable")),
+  _component_mass_fraction_old(coupledNodalValueOld("component_mass_fraction_variable")),
+  _fluid_pressure(coupledNodalValue("fluid_pressure_variable")),
+  _fluid_pressure_old(coupledNodalValueOld("fluid_pressure_variable")),
+  _temperature(coupledNodalValue("temperature_variable")),
+//  _temperature(getVar("temperature_variable", 0)),
+  _fluid_state(getUserObject<FluidState>("fluid_state_uo"))
+
 {
+  if (!_fluid_state.isFluidStateVariable(_var.number()))
+    mooseError("Variable " << _var.name() << " in the " << _name << " kernel is not a FluidState variable");
+
+  // Determine the primary variable type
+  _primary_variable_type = _fluid_state.variableTypes(_var.number());
+
+  // Determine the phase of the primary variable that this Kernel acts on
+  _phase_index = _fluid_state.variablePhase(_var.number());
+  
 }
 
 // Note that this kernel lumps the mass terms to the nodes, so that there is no mass at the qp's.
@@ -64,7 +68,7 @@ ComponentMassTimeDerivative::computeQpJacobian() // TODO: Jacobians need further
   if (_i != _j)
     return 0.0;
 
-  Real qpjacobian;
+  Real qpjacobian = 0.;
 
     if (_primary_variable_type == "saturation")
       qpjacobian =  _component_mass_fraction[_i] * _fluid_density[_i];
@@ -90,17 +94,23 @@ ComponentMassTimeDerivative::computeQpOffDiagJacobian(unsigned int jvar)
   if (_i != _j)
     return 0.0;
 
-  Real qpoffdiagjacobian;
+  if (!_fluid_state.isFluidStateVariable(jvar))
+    return 0.0;
+
+  // Determine the variable type to take the derivative with respect to
+  std::string jvar_type = _fluid_state.variableTypes(jvar);
+
+  Real qpoffdiagjacobian = 0.;
 
     if (_primary_variable_type == "saturation")
-      if (jvar == _pressure_var)
+      if (jvar_type == "pressure")
       {
         Real dDensity_dP = _fluid_state.dDensity_dP(_fluid_pressure[_i], _temperature[_i])[_phase_index];
         qpoffdiagjacobian = _component_mass_fraction[_i] * _fluid_saturation[_i] * dDensity_dP;
       }
 
     if (_primary_variable_type == "pressure")
-      if (jvar == _saturation_var)
+      if (jvar_type == "saturation")
         qpoffdiagjacobian =  _component_mass_fraction[_i] * _fluid_density[_i];
 
     if (_primary_variable_type == "mass_fraction")

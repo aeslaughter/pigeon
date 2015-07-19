@@ -9,9 +9,6 @@
 #include "LumpedMassChange.h"
 #include "FullyUpwindFlux.h"
 
-// Initial conditions
-// #include "PerturbationIC.h"
-
 // Boundary conditions
 #include "ConstantMassFluxBC.h"
 
@@ -25,9 +22,6 @@
 #include "FluidPropertyMethaneAux.h"
 #include "RelativePermeabilityAux.h"
 #include "FluidStateAux.h"
-
-// Mesh modifiers
-#include "VerticalRefine.h"
 
 // Materials
 #include "PorousMaterial.h"
@@ -53,9 +47,9 @@
 
 // Fluid states
 #include "FluidStateSinglePhase.h"
-#include "FluidStateBrineCO2.h"
-#include "FluidStateWaterCO2.h"
-#include "FluidStateTwoPhase.h"
+//#include "FluidStateBrineCO2.h"
+//#include "FluidStateWaterCO2.h"
+//#include "FluidStateTwoPhase.h"
 
 // Postprocessors
 #include "ComponentMassPostprocessor.h"
@@ -104,20 +98,16 @@ void
 QuollApp::registerObjects(Factory & factory)
 {
 
-   // Register the custom convection and Darcy kernels defined for this problem
+   // Register the kernels
    registerKernel(ComponentMassTimeDerivative);
    registerKernel(ComponentFlux);
    registerKernel(LumpedMassChange);
    registerKernel(FullyUpwindFlux);
 
-   // Register the pertubation initial condition to seed the instability
-// registerInitialCondition(PerturbationIC);
-
    // Register the boundary conditions
    registerBoundaryCondition(ConstantMassFluxBC);
 
-   // Register the auxillary kernel to calculate the fluid velocities from the streamfunction
-   // registerAux(VelocityAux);
+   // Register the auxillary kernels
    registerAux(SaturationAux);
    registerAux(CapillaryPressureAux);
    registerAux(FluidPressureAux);
@@ -127,9 +117,6 @@ QuollApp::registerObjects(Factory & factory)
    registerAux(FluidPropertyCO2Aux);
    registerAux(FluidPropertyMethaneAux);
    registerAux(FluidStateAux);
-
-   // Register the mesh modifier to rescale the vertical component so that the mesh is refined at the top
-// registerMeshModifier(VerticalRefine);
 
    // Register the materials
    registerMaterial(PorousMaterial);
@@ -154,9 +141,9 @@ QuollApp::registerObjects(Factory & factory)
 
    // Register user objects for fluid states
    registerUserObject(FluidStateSinglePhase);
-   registerUserObject(FluidStateBrineCO2);
-   registerUserObject(FluidStateWaterCO2);
-   registerUserObject(FluidStateTwoPhase);
+  // registerUserObject(FluidStateBrineCO2);
+  // registerUserObject(FluidStateWaterCO2);
+  // registerUserObject(FluidStateTwoPhase);
 
    // Register postprocessors
    registerPostprocessor(ComponentMassPostprocessor);

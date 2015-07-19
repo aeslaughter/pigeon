@@ -39,7 +39,6 @@ private:
   VariableValue & _component_mass_fraction_old;
   VariableValue & _fluid_pressure;
   VariableValue & _fluid_pressure_old;
-  const MooseEnum & _primary_variable_type;
   VariableValue & _temperature;
 
   /**
@@ -48,8 +47,8 @@ private:
    */
   const FluidState & _fluid_state;
   unsigned int _phase_index;
-  unsigned int _pressure_var;
-  unsigned int _saturation_var;
+  Real _node_temperature;
+  std::string _primary_variable_type;
 };
 
 #endif //COMPONENTMASSTIMEDERIVATIVE_H
