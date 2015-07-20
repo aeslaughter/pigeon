@@ -45,11 +45,12 @@ FluidStateTwoPhase::FluidStateTwoPhase(const std::string & name, InputParameters
 {
   _fsp.resize(_mesh.nNodes());
 
-  _num_components = 1;
+  _num_components = 2;
   _num_phases = 2;
   _num_vars = _num_phases + _not_isothermal;
 
   _varnums.push_back(_pvar);
+  _varnums.push_back(_svar);
   if (_not_isothermal)
    _varnums.push_back(_tvar);
 
@@ -84,6 +85,12 @@ FluidStateTwoPhase::isothermalTemperature() const
 {
   // For isothermal simulations
   return _temperature[0];
+}
+
+unsigned int
+FluidStateTwoPhase::temperatureVar() const
+{
+  return _tvar;
 }
 
 bool
@@ -145,9 +152,11 @@ FluidStateTwoPhase::execute()
   unsigned int node = _current_node->id();
 
   // Assign the fluid properties
-  // Pressure and saturation first
-  _fsp[node].pressure = pressure(_pressure[_qp], _saturation[_qp]);
+  // Saturation
   _fsp[node].saturation = saturation(_saturation[_qp]);
+
+  // Pressure (takes liquid saturation for capillary pressure calculation)
+  _fsp[node].pressure = pressure(_pressure[_qp], _fsp[node].saturation[0]);
 
   // Density of each phase
   std::vector<Real> densities;
@@ -176,7 +185,6 @@ FluidStateTwoPhase::execute()
   xmass[1].push_back(1.0); // Only gas component in gas
 
   _fsp[node].mass_fraction = xmass;
-
 }
 
 Real
@@ -247,7 +255,7 @@ FluidStateTwoPhase::viscosity(Real pressure, Real temperature, unsigned int phas
     fluid_viscosity = _gas_property.viscosity(pressure, temperature);
 
   else
-    mooseError("phase_index is out of range in FluidStateWaterCO2::viscosity");
+    mooseError("phase_index is out of range in FluidStateTwoPhase::viscosity");
 
   // TODO: effect of co2 in water on viscosity
 
@@ -283,13 +291,23 @@ FluidStateTwoPhase::relativePermeability(Real liquid_saturation) const
 }
 
 std::vector<Real>
-FluidStateTwoPhase::pressure(Real gas_pressure, Real liquid_saturation) const
+FluidStateTwoPhase::pressure(Real pressure, Real liquid_saturation) const
 {
   std::vector<Real> pressures;
   Real capillary_pressure = _capillary_pressure.capillaryPressure(liquid_saturation);
 
-  pressures.push_back(gas_pressure + capillary_pressure);
-  pressures.push_back(gas_pressure);
+  // Primary pressure is liquid: Pg = Pl - Pc
+  if (_p_phase == 0)
+  {
+    pressures.push_back(pressure);
+    pressures.push_back(pressure - capillary_pressure);
+  }
+  // Primary pressure is gas: Pl = Pg + Pc
+  if (_p_phase == 1)
+  {
+    pressures.push_back(pressure + capillary_pressure);
+    pressures.push_back(pressure);
+  }
 
   return pressures;
 }
@@ -299,22 +317,64 @@ FluidStateTwoPhase::dCapillaryPressure(Real liquid_saturation) const
 {
   std::vector<Real> dpc;
 
+  // Primary pressure is liquid: Pg = Pl - Pc
+  if (_p_phase == 0)
+  {
   dpc.push_back(0.);
-  dpc.push_back(_capillary_pressure.dCapillaryPressure(liquid_saturation));
+  dpc.push_back(- _capillary_pressure.dCapillaryPressure(liquid_saturation));
+  }
 
+  // Primary pressure is gas: Pl = Pg + Pc
+  if (_p_phase == 1)
+  {
+  dpc.push_back(_capillary_pressure.dCapillaryPressure(liquid_saturation));
+  dpc.push_back(0.);
+  }
   return dpc;
 }
 
 std::vector<Real>
-FluidStateTwoPhase::saturation(Real liquid_saturation) const
+FluidStateTwoPhase::saturation(Real saturation) const
 {
   std::vector<Real> saturations;
 
-  saturations.push_back(liquid_saturation);
-  saturations.push_back(1.0 - liquid_saturation);
+  // Primary saturation is liquid
+  if (_s_phase == 0)
+  {
+    saturations.push_back(saturation);
+    saturations.push_back(1.0 - saturation);
+  }
+  // Else the primary saturation is gas
+  if (_s_phase == 1)
+  {
+    saturations.push_back(1.0 - saturation);
+    saturations.push_back(saturation);
+  }
 
   return saturations;
 }
+/*
+std::vector<Real>
+FluidStateTwoPhase::gradLiquidSaturationSgn() const
+{
+  std::vector<Real> sgn;
+
+  // Primary saturation is liquid
+  if (_s_phase == 0)
+  {
+    sgn.push_back(1.0);
+    sgn.push_back(-1.0);
+  }
+  // Else the primary saturation is gas
+  if (_s_phase == 1)
+  {
+    sgn.push_back(-1.0);
+    sgn.push_back(1.0);
+  }
+
+  return sgn;
+}
+*/
 
 std::vector<Real>
 FluidStateTwoPhase::dDensity_dP(Real pressure, Real temperature) const

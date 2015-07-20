@@ -45,7 +45,7 @@ ComponentMassTimeDerivative::ComponentMassTimeDerivative(const std::string & nam
 
   // Determine the phase of the primary variable that this Kernel acts on
   _phase_index = _fluid_state.variablePhase(_var.number());
-  
+
 }
 
 // Note that this kernel lumps the mass terms to the nodes, so that there is no mass at the qp's.
@@ -99,6 +99,7 @@ ComponentMassTimeDerivative::computeQpOffDiagJacobian(unsigned int jvar)
 
   // Determine the variable type to take the derivative with respect to
   std::string jvar_type = _fluid_state.variableTypes(jvar);
+  _console << "jvar_type " << jvar_type << std::endl;
 
   Real qpoffdiagjacobian = 0.;
 

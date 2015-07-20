@@ -51,8 +51,6 @@
   [./H2OLiquidFlux]
     type = ComponentFlux
     variable = gas_pressure
-    phase_index = 0
-    primary_variable_type = pressure
     fluid_state_uo = FluidState
     fluid_density_variable = liquid_density
     fluid_viscosity_variable = liquid_viscosity
@@ -65,10 +63,8 @@
     type = ComponentFlux
     variable = liquid_saturation
     fluid_state_uo = FluidState
-    primary_variable_type = saturation
     fluid_density_variable = gas_density
     fluid_viscosity_variable = gas_viscosity
-    phase_index = 1
     component_mass_fraction_variable = xco2gas
     fluid_relperm_variable = gas_relperm
     fluid_saturation_variable = gas_saturation
@@ -179,9 +175,7 @@
   [./PorousMaterial]
     type = PorousMaterial
     block = 0
-    rel_perm_uo = RelativePermeabilityVanGenuchten
     density = 2600.
-    cap_pres_uo = CapillaryPressure
     gravity = '0 0 0'
     liquid_saturation_variable = liquid_saturation
     diffusivity = 0.
@@ -192,7 +186,6 @@
     type = FluidStateMaterial
     block = 0
     fluid_state_uo = FluidState
-    phase_index = 1
     primary_pressure_variable = gas_pressure
     primary_saturation_variable = liquid_saturation
     temperature_variable = 100
@@ -262,6 +255,7 @@
     gas_property_uo = FluidPropertiesCO2
     liquid_property_uo = FluidPropertiesWater
     pressure_variable = gas_pressure
+    pressure_variable_phase = 1
     temperature_variable = 100
     saturation_variable = liquid_saturation
   [../]

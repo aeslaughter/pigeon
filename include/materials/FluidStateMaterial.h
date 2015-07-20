@@ -12,7 +12,6 @@
 #include "PorousMaterial.h"
 #include "FluidState.h"
 
-//Forward Declarations
 class FluidStateMaterial;
 
 template<>
@@ -46,6 +45,7 @@ private:
   std::vector<VariableValue *> _density;
   unsigned int _num_phases;
   unsigned int _phase_index;
+  unsigned int _svar;
 
  /**
    * This is the member reference that will hold the User Object

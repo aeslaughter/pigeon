@@ -1,0 +1,26 @@
+[Tests]
+  [./phase_flux1]
+    type = 'CSVDiff'
+    input = 'fluidstatematerial1.i'
+    csvdiff = 'fluidstatematerial1_grad_pressure_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./phase_flux2]
+    type = 'CSVDiff'
+    input = 'fluidstatematerial2.i'
+    csvdiff = 'fluidstatematerial2_grad_pressure_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./phase_flux3]
+    type = 'CSVDiff'
+    input = 'fluidstatematerial3.i'
+    csvdiff = 'fluidstatematerial3_grad_pressure_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+  [./phase_flux4]
+    type = 'CSVDiff'
+    input = 'fluidstatematerial4.i'
+    csvdiff = 'fluidstatematerial4_grad_pressure_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
+[]

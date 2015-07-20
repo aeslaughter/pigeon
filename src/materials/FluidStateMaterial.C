@@ -17,7 +17,6 @@ InputParameters validParams<FluidStateMaterial>()
   params.addRequiredCoupledVar("primary_pressure_variable", "The primary pressure variable");
   params.addCoupledVar("temperature_variable", 50., "The temperature variable");
   params.addRequiredCoupledVar("fluid_density_variables", "The density of each fluid phase");
-  params.addParam<unsigned int>("phase_index", 0, "The phase index of the primary pressure variable");
 
   return params;
 }
@@ -40,7 +39,7 @@ FluidStateMaterial::FluidStateMaterial(const std::string & name,
     _primary_pressure(coupledValue("primary_pressure_variable")),
     _grad_primary_pressure(coupledGradient("primary_pressure_variable")),
     _temperature(coupledValue("temperature_variable")),
-    _phase_index(getParam<unsigned int>("phase_index")),
+    _svar(coupled("primary_saturation_variable")),
     _fluid_state(getUserObject<FluidState>("fluid_state_uo"))
 
 {
@@ -67,8 +66,9 @@ FluidStateMaterial::computeQpProperties()
   std::vector<Real> pressure, saturation;
 
   // Compute pressure, saturation and density at the qp's
-  pressure = _fluid_state.pressure(_primary_pressure[_qp], _primary_saturation[_qp]);
   saturation = _fluid_state.saturation(_primary_saturation[_qp]);
+  Real liquid_saturation = saturation[0];
+  pressure = _fluid_state.pressure(_primary_pressure[_qp], liquid_saturation);
 
   _phase_mass[_qp].resize(_num_phases);
   _density.resize(_num_phases);
@@ -84,10 +84,13 @@ FluidStateMaterial::computeQpProperties()
 
   RealVectorValue grad_pressure;
 
+  // Depending on the primary saturation, the sign of the gradient in saturation is + or -
+  Real sgn = std::pow(-1.0, _fluid_state.variablePhase(_svar));
+
   for (unsigned int n = 0; n < _num_phases; ++n)
   {
-    grad_pressure = _grad_primary_pressure[_qp] - _fluid_state.dCapillaryPressure(_primary_saturation[_qp])[n] *
-      _grad_primary_saturation[_qp];
+    grad_pressure = _grad_primary_pressure[_qp] + _fluid_state.dCapillaryPressure(liquid_saturation)[n] *
+      sgn * _grad_primary_saturation[_qp];
 
     _phase_flux_no_mobility[_qp][n] = (grad_pressure - (*_density[n])[_qp] * _gravity[_qp]);
 

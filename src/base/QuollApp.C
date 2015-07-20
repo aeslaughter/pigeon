@@ -6,8 +6,8 @@
 // Kernels
 #include "ComponentMassTimeDerivative.h"
 #include "ComponentFlux.h"
-#include "LumpedMassChange.h"
-#include "FullyUpwindFlux.h"
+//#include "LumpedMassChange.h"
+//#include "FullyUpwindFlux.h"
 
 // Boundary conditions
 #include "ConstantMassFluxBC.h"
@@ -49,7 +49,7 @@
 #include "FluidStateSinglePhase.h"
 //#include "FluidStateBrineCO2.h"
 //#include "FluidStateWaterCO2.h"
-//#include "FluidStateTwoPhase.h"
+#include "FluidStateTwoPhase.h"
 
 // Postprocessors
 #include "ComponentMassPostprocessor.h"
@@ -143,7 +143,7 @@ QuollApp::registerObjects(Factory & factory)
    registerUserObject(FluidStateSinglePhase);
   // registerUserObject(FluidStateBrineCO2);
   // registerUserObject(FluidStateWaterCO2);
-  // registerUserObject(FluidStateTwoPhase);
+   registerUserObject(FluidStateTwoPhase);
 
    // Register postprocessors
    registerPostprocessor(ComponentMassPostprocessor);
