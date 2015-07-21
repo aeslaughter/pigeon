@@ -33,6 +33,11 @@ class FluidState : public NodalUserObject
     std::vector<Real> viscosity;
     std::vector<Real> relperm;
     std::vector<std::vector<Real> > mass_fraction;
+    std::vector<Real> mobility;
+    std::vector<Real> ddensity_dp;
+    std::vector<Real> drelperm;
+    std::vector<Real> dmobility_dp;
+    std::vector<Real> dmobility_ds;
   };
 
 
@@ -94,6 +99,55 @@ class FluidState : public NodalUserObject
    * @return component mass fraction at the node (-)
    */
   virtual Real getMassFraction(unsigned int node_num, unsigned int phase_index, unsigned int component_index) const = 0;
+
+  /**
+   * Return mobility for each phase at each node.
+   *
+   * @param node_num node number
+   * @param phase_index index of phase
+   * @return phase mobility at the node ()
+   */
+  virtual Real getMobility(unsigned int node_num, unsigned int phase_index) const = 0;
+
+  /**
+   * Return the derivative of relative permeability for each phase at each node
+   * wrt liquid saturation
+   *
+   * @param node_num node number
+   * @param phase_index index of phase
+   * @return derivative of relative permeability at the node (-)
+   */
+  virtual Real getDRelativePermeability(unsigned int node_num, unsigned int phase_index) const = 0;
+
+  /**
+   * Return the derivative of density for each phase at each node
+   * wrt pressure
+   *
+   * @param node_num node number
+   * @param phase_index index of phase
+   * @return derivative of density wrt pressure at the node (-)
+   */
+  virtual Real getDDensityDP(unsigned int node_num, unsigned int phase_index) const = 0;
+
+  /**
+   * Return the derivative of mobility for each phase at each node
+   * wrt pressure
+   *
+   * @param node_num node number
+   * @param phase_index index of phase
+   * @return derivative of mobility wrt pressure at the node (-)
+   */
+  virtual Real getDMobilityDP(unsigned int node_num, unsigned int phase_index) const = 0;
+
+  /**
+   * Return the derivative of mobility for each phase at each node
+   * wrt saturation
+   *
+   * @param node_num node number
+   * @param phase_index index of phase
+   * @return derivative of mobility wrt saturation at the node (-)
+   */
+  virtual Real getDMobilityDS(unsigned int node_num, unsigned int phase_index) const = 0;
 
   /**
    * Number of fluid phases
@@ -191,13 +245,21 @@ class FluidState : public NodalUserObject
   virtual std::vector<Real> relativePermeability(Real liquid_saturation) const = 0;
 
   /**
+   * Derivative of relative permeabilities of each phase wrt liquid saturation
+   *
+   * @param saturation liquid saturation
+   * @return derivative of relative permeabilities for each phase (-/m)
+   */
+  virtual std::vector<Real> dRelativePermeability(Real liquid_saturation) const = 0;
+
+  /**
    * Phase pressures
    *
    * @param pressure primary pressure (Pa)
    * @param saturation primary saturation (-)
    * @return pressure phase pressure (Pa)
    */
-  virtual std::vector<Real> pressure(Real primary_pressure, Real primary_saturation) const = 0;
+  virtual std::vector<Real> pressure(Real primary_pressure, Real primary_saturation, unsigned int phase_index = 0) const = 0;
 
   /**
    * Derivative of capillary pressure for each phase with respect to the
@@ -209,12 +271,31 @@ class FluidState : public NodalUserObject
   virtual std::vector<Real> dCapillaryPressure(Real liquid_saturation) const = 0;
 
   /**
-   * Gas saturation given liquid saturation.
+   * Saturation of all phases given one saturation.
    *
    * @param saturation liquid saturation (-)
    * @return saturation gas saturation (-)
    */
-  virtual std::vector<Real> saturation(Real liquid_saturation) const = 0;
+  virtual std::vector<Real> saturation(Real saturation, unsigned int phase_index = 0) const = 0;
+
+  /**
+   * Sign of the derivative of primary saturation variable with respect to
+   * liquid saturation. Used in calculating the pressure gradient of non-primary
+   * pressure variables
+   *
+   * @return sign of derivative
+   */
+
+  virtual Real dSaturation_dSl(unsigned int phase_index = 0) const = 0;
+
+  /**
+   * Sign of the derivative of a saturation variable with respect to
+   * the primary saturation variable. Used in Jacobian calculations
+   *
+   * @return sign of derivative
+   */
+
+  virtual Real dSaturation_dS(unsigned int var) const = 0;
 
 /**
    * Derivative of fluid  density with respect to fluid pressure.
@@ -224,7 +305,7 @@ class FluidState : public NodalUserObject
    * @param xmass vector of component mass fractions (kg/kg)
    * @return fluid density vector (element for each phase) (kg/m^3)
    */
-  virtual std::vector<Real> dDensity_dP(Real pressure, Real temperature) const = 0;
+  virtual Real dDensity_dP(Real pressure, Real temperature, unsigned int phase_index = 0) const = 0;
 
 /**
  * General formulation for Henry's constant for gas solubility in

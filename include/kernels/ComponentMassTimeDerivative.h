@@ -46,8 +46,9 @@ private:
    * value for the fluid state User Object.
    */
   const FluidState & _fluid_state;
-  unsigned int _phase_index;
   Real _node_temperature;
+  unsigned int _svar;
+  unsigned int _phase_index;
   std::string _primary_variable_type;
 };
 

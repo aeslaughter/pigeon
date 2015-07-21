@@ -58,6 +58,7 @@
     fluid_saturation_variable = liquid_saturation
     fluid_pressure_variable = liquid_pressure
     component_mass_fraction_variable = xh2oliquid
+    phase_index = 0
   [../]
   [./CO2MassFlux]
     type = ComponentFlux
@@ -69,6 +70,7 @@
     fluid_relperm_variable = gas_relperm
     fluid_saturation_variable = gas_saturation
     fluid_pressure_variable = gas_pressure
+    phase_index = 1
   [../]
 []
 

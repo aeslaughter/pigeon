@@ -16,6 +16,7 @@ InputParameters validParams<ComponentMassTimeDerivative>()
   params.addRequiredCoupledVar("fluid_pressure_variable", "The fluid pressure variable for this phase.");
   params.addCoupledVar("temperature_variable", 50,  "The temperature variable.");
   params.addCoupledVar("component_mass_fraction_variable", 1.0, "The component mass fraction variable for this phase.");
+  params.addParam<unsigned int>("phase_index", 0, "The index corresponding to the fluid phase eg: 0 for liquid, 1 for gas");
   params.addRequiredParam<UserObjectName>("fluid_state_uo", "Name of the User Object defining the fluid state");
   return params;
 }
@@ -33,8 +34,9 @@ ComponentMassTimeDerivative::ComponentMassTimeDerivative(const std::string & nam
   _fluid_pressure(coupledNodalValue("fluid_pressure_variable")),
   _fluid_pressure_old(coupledNodalValueOld("fluid_pressure_variable")),
   _temperature(coupledNodalValue("temperature_variable")),
-//  _temperature(getVar("temperature_variable", 0)),
-  _fluid_state(getUserObject<FluidState>("fluid_state_uo"))
+  _fluid_state(getUserObject<FluidState>("fluid_state_uo")),
+  _svar(coupled("fluid_saturation_variable")),
+  _phase_index(getParam<unsigned int>("phase_index"))
 
 {
   if (!_fluid_state.isFluidStateVariable(_var.number()))
@@ -42,9 +44,6 @@ ComponentMassTimeDerivative::ComponentMassTimeDerivative(const std::string & nam
 
   // Determine the primary variable type
   _primary_variable_type = _fluid_state.variableTypes(_var.number());
-
-  // Determine the phase of the primary variable that this Kernel acts on
-  _phase_index = _fluid_state.variablePhase(_var.number());
 
 }
 
@@ -70,12 +69,22 @@ ComponentMassTimeDerivative::computeQpJacobian() // TODO: Jacobians need further
 
   Real qpjacobian = 0.;
 
+  // In order to call the derivatives for the Jacobian from the FluidState UserObject,
+  // determine the node id's of the nodes in this element
+
+  unsigned int num_nodes = _test.size();
+  std::vector<unsigned int> elem_node_ids;
+  elem_node_ids.resize(num_nodes);
+
+  for (unsigned int n = 0; n < num_nodes; ++n)
+    elem_node_ids[n] = _current_elem->get_node(n)->id();
+
     if (_primary_variable_type == "saturation")
-      qpjacobian =  _component_mass_fraction[_i] * _fluid_density[_i];
+      qpjacobian =  _fluid_state.dSaturation_dS(_svar) * _component_mass_fraction[_i] * _fluid_density[_i];
 
     if (_primary_variable_type == "pressure")
     {
-      Real dDensity_dP = _fluid_state.dDensity_dP(_fluid_pressure[_i], _temperature[_i])[_phase_index];
+      Real dDensity_dP = _fluid_state.getDDensityDP(elem_node_ids[_i], _phase_index);
       qpjacobian = _component_mass_fraction[_i] * _fluid_saturation[_i] * dDensity_dP;
     }
 
@@ -97,22 +106,28 @@ ComponentMassTimeDerivative::computeQpOffDiagJacobian(unsigned int jvar)
   if (!_fluid_state.isFluidStateVariable(jvar))
     return 0.0;
 
+  unsigned int num_nodes = _test.size();
+  std::vector<unsigned int> elem_node_ids;
+  elem_node_ids.resize(num_nodes);
+
+  for (unsigned int n = 0; n < num_nodes; ++n)
+    elem_node_ids[n] = _current_elem->get_node(n)->id();
+
   // Determine the variable type to take the derivative with respect to
   std::string jvar_type = _fluid_state.variableTypes(jvar);
-  _console << "jvar_type " << jvar_type << std::endl;
 
   Real qpoffdiagjacobian = 0.;
 
     if (_primary_variable_type == "saturation")
       if (jvar_type == "pressure")
       {
-        Real dDensity_dP = _fluid_state.dDensity_dP(_fluid_pressure[_i], _temperature[_i])[_phase_index];
+        Real dDensity_dP = _fluid_state.getDDensityDP(elem_node_ids[_i], _phase_index);
         qpoffdiagjacobian = _component_mass_fraction[_i] * _fluid_saturation[_i] * dDensity_dP;
       }
 
     if (_primary_variable_type == "pressure")
       if (jvar_type == "saturation")
-        qpoffdiagjacobian =  _component_mass_fraction[_i] * _fluid_density[_i];
+        qpoffdiagjacobian =  _fluid_state.dSaturation_dS(_svar) * _component_mass_fraction[_i] * _fluid_density[_i];
 
     if (_primary_variable_type == "mass_fraction")
     {

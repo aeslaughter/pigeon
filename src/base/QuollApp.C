@@ -101,8 +101,8 @@ QuollApp::registerObjects(Factory & factory)
    // Register the kernels
    registerKernel(ComponentMassTimeDerivative);
    registerKernel(ComponentFlux);
-   registerKernel(LumpedMassChange);
-   registerKernel(FullyUpwindFlux);
+//   registerKernel(LumpedMassChange);
+//   registerKernel(FullyUpwindFlux);
 
    // Register the boundary conditions
    registerBoundaryCondition(ConstantMassFluxBC);

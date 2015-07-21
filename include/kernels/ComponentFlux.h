@@ -40,6 +40,7 @@ protected:
   // Member reference to phase flux (without mobility) material properties
   const MaterialProperty<std::vector<RealGradient> > & _phase_flux_no_mobility;
   const MaterialProperty<std::vector<RealVectorValue> > & _dphase_flux_no_mobility_dp;
+  const MaterialProperty<std::vector<RealVectorValue> > & _dphase_flux_no_mobility_ds;
 
 private:
   VariableValue & _fluid_pressure;

@@ -39,6 +39,7 @@ FluidStateMaterial::FluidStateMaterial(const std::string & name,
     _primary_pressure(coupledValue("primary_pressure_variable")),
     _grad_primary_pressure(coupledGradient("primary_pressure_variable")),
     _temperature(coupledValue("temperature_variable")),
+    _pvar(coupled("primary_pressure_variable")),
     _svar(coupled("primary_saturation_variable")),
     _fluid_state(getUserObject<FluidState>("fluid_state_uo"))
 
@@ -49,6 +50,11 @@ FluidStateMaterial::FluidStateMaterial(const std::string & name,
   // Check that the required number of auxillary variables have been provided
   if (coupledComponents("fluid_density_variables") != _num_phases)
     mooseError("The number of phase densities provided in FluidStateMaterial is not equal to the number of phases in the FluidState UserObject");
+
+  // Determine the phase of the primary variable that this Kernel acts on
+  _p_phase = _fluid_state.variablePhase(_pvar);
+  _s_phase = _fluid_state.variablePhase(_svar);
+
 }
 
 void
@@ -66,9 +72,9 @@ FluidStateMaterial::computeQpProperties()
   std::vector<Real> pressure, saturation;
 
   // Compute pressure, saturation and density at the qp's
-  saturation = _fluid_state.saturation(_primary_saturation[_qp]);
+  saturation = _fluid_state.saturation(_primary_saturation[_qp], _s_phase);
   Real liquid_saturation = saturation[0];
-  pressure = _fluid_state.pressure(_primary_pressure[_qp], liquid_saturation);
+  pressure = _fluid_state.pressure(_primary_pressure[_qp], liquid_saturation, _p_phase);
 
   _phase_mass[_qp].resize(_num_phases);
   _density.resize(_num_phases);
@@ -81,19 +87,27 @@ FluidStateMaterial::computeQpProperties()
 
   _phase_flux_no_mobility[_qp].resize(_num_phases);
   _dphase_flux_no_mobility_dp[_qp].resize(_num_phases);
+  _dphase_flux_no_mobility_ds[_qp].resize(_num_phases);
 
   RealVectorValue grad_pressure;
 
   // Depending on the primary saturation, the sign of the gradient in saturation is + or -
-  Real sgn = std::pow(-1.0, _fluid_state.variablePhase(_svar));
+  Real sgn = _fluid_state.dSaturation_dSl(_s_phase);
 
   for (unsigned int n = 0; n < _num_phases; ++n)
   {
+    // The pressure gradient of phase n
     grad_pressure = _grad_primary_pressure[_qp] + _fluid_state.dCapillaryPressure(liquid_saturation)[n] *
       sgn * _grad_primary_saturation[_qp];
 
+    // Flux (without mobility) of phase n
     _phase_flux_no_mobility[_qp][n] = (grad_pressure - (*_density[n])[_qp] * _gravity[_qp]);
 
-    _dphase_flux_no_mobility_dp[_qp][n] = - _fluid_state.dDensity_dP(_primary_pressure[_qp], temperature)[n] * _gravity[_qp];
+    // Derivative of flux (without mobility) of phase n wrt pressure of phase n
+    _dphase_flux_no_mobility_dp[_qp][n] = - _fluid_state.dDensity_dP(pressure[n], temperature, n) * _gravity[_qp];
+
+    // Derivative of flux (without mobility) of phase n wrt saturation of phase n (through capillary pressure)
+    _dphase_flux_no_mobility_ds[_qp][n] = - _fluid_state.dCapillaryPressure(liquid_saturation)[n] *
+      sgn * _grad_primary_saturation[_qp];
   }
 }

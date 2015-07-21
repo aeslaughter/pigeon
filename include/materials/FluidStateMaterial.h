@@ -45,6 +45,7 @@ private:
   std::vector<VariableValue *> _density;
   unsigned int _num_phases;
   unsigned int _phase_index;
+  unsigned int _pvar;
   unsigned int _svar;
 
  /**
@@ -52,6 +53,9 @@ private:
    * value for the fluid state User Object.
    */
   const FluidState & _fluid_state;
+
+  unsigned int _p_phase;
+  unsigned int _s_phase;
 
 };
 
