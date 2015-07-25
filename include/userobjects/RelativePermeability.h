@@ -43,7 +43,7 @@ class RelativePermeability : public GeneralUserObject
    * @param sat_liq liquid phase saturation
    * @return liquid phase relative permeability
    */
-  virtual Real relativePermLiq(Real sat_liq) const = 0;
+  virtual Real relativePermLiquid(Real sat_liq) const = 0;
 
   /**
    * Gas relative permeability calculated as a function of saturation.

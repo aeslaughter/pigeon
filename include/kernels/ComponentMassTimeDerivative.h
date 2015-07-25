@@ -47,7 +47,7 @@ private:
    */
   const FluidState & _fluid_state;
   Real _node_temperature;
-  unsigned int _svar;
+  Real _dsaturation;
   unsigned int _phase_index;
   std::string _primary_variable_type;
 };

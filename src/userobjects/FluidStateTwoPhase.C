@@ -11,17 +11,16 @@ template<>
 InputParameters validParams<FluidStateTwoPhase>()
 {
   InputParameters params = validParams<FluidState>();
-  params.addClassDescription("Thermophysical fluid state of liquid and gas.");
+  params.addClassDescription("Thermophysical fluid state of two-phase sliquid and gas.");
   params.addRequiredParam<UserObjectName>("liquid_property_uo", "Name of the User Object defining the liquid properties");
   params.addRequiredParam<UserObjectName>("gas_property_uo", "Name of the User Object defining the gas properties");
   params.addRequiredParam<UserObjectName>("relative_permeability_uo", "Name of the User Object defining the relative permeabilities");
   params.addRequiredParam<UserObjectName>("capillary_pressure_uo", "Name of the User Object defining the capillary pressure");
-  params.addCoupledVar("pressure_variable",  "The primary pressure variable");
-  params.addCoupledVar("temperature_variable", 100, "The primary temperature variable.");
-  params.addCoupledVar("saturation_variable", 1.0, "The primary saturation variable");
+  params.addRequiredCoupledVar("pressure_variable",  "The primary pressure variable");
+  params.addRequiredCoupledVar("temperature_variable", "The primary temperature variable.");
+  params.addRequiredCoupledVar("saturation_variable", "The primary saturation variable");
   params.addParam<unsigned int>("pressure_variable_phase", 0, "The phase corresponding to the pressure variable");
   params.addParam<unsigned int>("saturation_variable_phase", 0, "The phase corresponding to the saturation variable");
-  params.addParam<bool>("isothermal", false, "Is the simulations isothermal?");
   return params;
 }
 
@@ -43,11 +42,9 @@ FluidStateTwoPhase::FluidStateTwoPhase(const std::string & name, InputParameters
   _tvar(coupled("temperature_variable"))
 
 {
-  _fsp.resize(_mesh.nNodes());
-
   _num_components = 2;
   _num_phases = 2;
-  _num_vars = _num_phases + _not_isothermal;
+  _num_vars = _coupled_moose_vars.size() + (1 - _not_isothermal);
 
   _varnums.push_back(_pvar);
   _varnums.push_back(_svar);
@@ -84,7 +81,7 @@ Real
 FluidStateTwoPhase::isothermalTemperature() const
 {
   // For isothermal simulations
-  return _temperature[0];
+  return _temperature[_qp];
 }
 
 unsigned int
@@ -146,36 +143,100 @@ FluidStateTwoPhase::variablePhase(unsigned int moose_var) const
 }
 
 void
+FluidStateTwoPhase::initialize()
+{
+  _nodal_properties.clear();
+  _primary_vars.resize(_num_vars);
+}
+
+void
 FluidStateTwoPhase::execute()
 {
-  // Current node
-  unsigned int node = _current_node->id();
+  MooseVariable * pvar, * svar, * tvar;
+  FluidStateProperties nodalfsp;
+
+  if (isCoupled("pressure_variable"))
+    pvar = getVar("pressure_variable", 0);
+  if (isCoupled("saturation_variable"))
+    svar = getVar("saturation_variable", 0);
+  if(isCoupled("temperature_variable"))
+    tvar = getVar("temperature_variable", 0);
+
+  // Loop over all elements on current processor
+  const MeshBase::element_iterator end = _mesh.getMesh().active_local_elements_end();
+  for (MeshBase::element_iterator el = _mesh.getMesh().active_local_elements_begin(); el != end; ++el)
+  {
+    const Elem * current_elem = *el;
+
+    // Loop over all nodes on each element
+    for (unsigned int i = 0; i < current_elem->n_vertices(); ++i)
+    {
+      const Node * current_node = current_elem->get_node(i);
+      unsigned int nodeid = current_node->id();
+
+      // Check if the properties at this node have already been calcualted, and if so,
+      // skip to the next node
+      if (_nodal_properties.find(nodeid) == _nodal_properties.end())
+      {
+        if (isCoupled("pressure_variable"))
+          _primary_vars[0] = pvar->getNodalValue(*current_node);
+        else
+          _primary_vars[0] = _pressure[_qp];
+
+        if (isCoupled("saturation_variable"))
+          _primary_vars[1] = svar->getNodalValue(*current_node);
+        else
+          _primary_vars[1] = _saturation[_qp];
+
+        if (isCoupled("temperature_variable"))
+          _primary_vars[2] = tvar->getNodalValue(*current_node);
+        else
+          _primary_vars[2] = _temperature[_qp];
+
+        // Now calculate all thermophysical properties at the current node
+        thermophysicalProperties(_primary_vars, nodalfsp);
+
+        // Now insert these properties into the _nodal_properties map
+        _nodal_properties.insert( std::pair<int, FluidStateProperties>(nodeid, nodalfsp));
+      }
+    }
+  }
+}
+
+void
+FluidStateTwoPhase::thermophysicalProperties(std::vector<Real> primary_vars, FluidStateProperties & fsp)
+{
+  // Primary variables at the node
+  Real node_pressure = primary_vars[0];
+  Real node_saturation = primary_vars[1];
+  Real node_temperature = primary_vars[2];
 
   // Assign the fluid properties
   // Saturation
-  _fsp[node].saturation = saturation(_saturation[_qp], _s_phase);
+  fsp.saturation = saturation(node_saturation);
 
   // Pressure (takes liquid saturation for capillary pressure calculation)
-  _fsp[node].pressure = pressure(_pressure[_qp], _fsp[node].saturation[0], _p_phase);
+  fsp.pressure = pressure(node_pressure, fsp.saturation[0]);
 
   // Density of each phase
   std::vector<Real> densities(_num_phases);
 
-    densities[0] = _liquid_property.density(_fsp[node].pressure[0], _temperature[_qp]);
-    densities[1] = _gas_property.density(_fsp[node].pressure[1], _temperature[_qp]);
+  densities[0] = _liquid_property.density(fsp.pressure[0], node_temperature);
+  densities[1] = _gas_property.density(fsp.pressure[1], node_temperature);
 
-  _fsp[node].density = densities;
+  fsp.density = densities;
 
   // Viscosity of each phase
   std::vector<Real> viscosities(_num_phases);
 
   // Water viscosity uses water density in calculation.
-  viscosities[0] = _liquid_property.viscosity(_temperature[_qp], _fsp[node].density[0]);
-  viscosities[1] = _gas_property.viscosity(_fsp[node].pressure[1], _temperature[_qp]);
-  _fsp[node].viscosity = viscosities;
+  viscosities[0] = _liquid_property.viscosity(node_temperature, fsp.density[0]);
+  viscosities[1] = _gas_property.viscosity(fsp.pressure[1], node_temperature);
+
+  fsp.viscosity = viscosities;
 
   // Relative permeability of each phase
-  _fsp[node].relperm = relativePermeability(_fsp[node].saturation[0]);
+  fsp.relperm = relativePermeability(fsp.saturation[0]);
 
   // Mass fraction of each component in each phase
   std::vector<std::vector<Real> > xmass;
@@ -186,107 +247,116 @@ FluidStateTwoPhase::execute()
   xmass[1].push_back(0.0); // No gas component in liquid
   xmass[1].push_back(1.0); // Only gas component in gas
 
-  _fsp[node].mass_fraction = xmass;
+  fsp.mass_fraction = xmass;
 
   // Mobility of each phase
   std::vector<Real> mobilities(_num_phases);
 
   for (unsigned int i = 0; i < _num_phases; ++i)
-    mobilities[i] = _fsp[node].relperm[i] * _fsp[node].density[i]  / _fsp[node].viscosity[i];
-  _fsp[node].mobility = mobilities;
+    mobilities[i] = fsp.relperm[i] * fsp.density[i]  / fsp.viscosity[i];
+
+  fsp.mobility = mobilities;
+
+  // For derivatives wrt saturation, the sign of the derivative depends on whether the primary
+  // saturation variable is liquid or not. This can be accounted for by multiplying all derivatives
+  // wrt S by dS/dSl
+  Real sgn = dSaturation_dSl(_svar);
 
   // Derivative of relative permeability wrt liquid_saturation
-  _fsp[node].drelperm = dRelativePermeability(_fsp[node].saturation[0]);
+  std::vector<Real> drelperm(_num_phases);
+
+  for (unsigned int i = 0; i < _num_phases; ++i)
+    drelperm[i] = sgn * dRelativePermeability(fsp.saturation[0])[i];
+
+  fsp.drelperm = drelperm;
 
   // Derivative of density wrt pressure
-  // Density of each phase
   std::vector<Real> ddensities_dp(_num_phases);
 
   for (unsigned int i = 0; i < _num_phases; ++i)
-    ddensities_dp[i] = dDensity_dP(_fsp[node].pressure[i], _temperature[_qp], i);
-  _fsp[node].ddensity_dp = ddensities_dp;
+    ddensities_dp[i] = dDensity_dP(fsp.pressure[i], node_temperature, i);
+
+  fsp.ddensity_dp = ddensities_dp;
+
+  // Derivative of density wrt saturation
+  std::vector<Real> ddensities_ds(_num_phases);
+
+  for (unsigned int i = 0; i < _num_phases; ++i)
+    ddensities_ds[i] = sgn * dCapillaryPressure(fsp.saturation[0])[i] * fsp.ddensity_dp[i];
+
+  fsp.ddensity_ds = ddensities_ds;
 
   // Derivative of mobility wrt pressure
   // Note: dViscosity_dP not implemnted yet
   std::vector<Real> dmobilities_dp(_num_phases);
 
   for (unsigned int i = 0; i < _num_phases; ++i)
-    dmobilities_dp[i] = _fsp[node].relperm[i] * _fsp[node].ddensity_dp[i]  / _fsp[node].viscosity[i];
-  _fsp[node].dmobility_dp = dmobilities_dp;
+    dmobilities_dp[i] = fsp.relperm[i] * fsp.ddensity_dp[i]  / fsp.viscosity[i];
+
+  fsp.dmobility_dp = dmobilities_dp;
 
   // Derivative of mobility wrt saturation
-  // Note: dDensity_dS and dViscosity_dS not implemnted yet
+  // Note: dViscosity_dS not implemnted yet
+  // Note: drelperm and ddensity_ds are already the correct sign, so don't multiply by sgn
   std::vector<Real> dmobilities_ds(_num_phases);
 
   for (unsigned int i = 0; i < _num_phases; ++i)
-    dmobilities_ds[i] = _fsp[node].drelperm[i] * _fsp[node].density[i]  / _fsp[node].viscosity[i];
-  _fsp[node].dmobility_ds = dmobilities_ds;
+    dmobilities_ds[i] = (fsp.drelperm[i] * fsp.density[i] + fsp.relperm[i] *
+      fsp.ddensity_ds[i]) / fsp.viscosity[i];
+
+  fsp.dmobility_ds = dmobilities_ds;
 }
 
 Real
-FluidStateTwoPhase::getPressure(unsigned int node_num, unsigned int phase_index) const
+FluidStateTwoPhase::getNodalProperty(std::string property, unsigned int nodeid, unsigned int phase_index, unsigned int component_index) const
 {
-  return _fsp[node_num].pressure[phase_index];
+  if (phase_index >= _num_phases)
+    mooseError("Phase index " << phase_index << " out of range in FluidStateTwoPhase::getNodalProperty");
+  FluidStateProperties fsp;
+  Real value=0;
+
+  std::map<int, FluidStateProperties>::const_iterator node_it = _nodal_properties.find(nodeid);
+
+  if (node_it != _nodal_properties.end())
+    fsp = node_it->second;
+  else
+    mooseError("Node id "<< nodeid << " out of range in FluidStateTwoPhase::getNodalProperty");
+
+  // Now access the property and phase index
+  if (property == "pressure")
+    value = fsp.pressure[phase_index];
+  else if (property == "saturation")
+    value = fsp.saturation[phase_index];
+  else if (property == "density")
+    value = fsp.density[phase_index];
+  else if (property == "viscosity")
+    value = fsp.viscosity[phase_index];
+  else if (property == "relperm")
+    value = fsp.relperm[phase_index];
+  else if (property == "mass_fraction")
+    value = fsp.mass_fraction[phase_index][component_index];
+  else if (property == "mobility")
+    value = fsp.mobility[phase_index];
+  else if (property == "ddensity_dp")
+    value = fsp.ddensity_dp[phase_index];
+  else if (property == "ddensity_ds")
+    value = fsp.ddensity_ds[phase_index];
+  else if (property == "drelperm")
+    value = fsp.drelperm[phase_index];
+  else if (property == "dmobility_dp")
+    value = fsp.dmobility_dp[phase_index];
+  else if (property == "dmobility_ds")
+    value = fsp.dmobility_ds[phase_index];
+  else
+    mooseError("Property " << property << " in FluidStateTwoPhase::getNodalProperty is not one of the members of the FluidStateProperties class. Check spelling of property.");
+
+  return value;
 }
 
-Real
-FluidStateTwoPhase::getSaturation(unsigned int node_num, unsigned int phase_index) const
+unsigned int
+FluidStateTwoPhase::getPrimarySaturationVar() const
 {
-  return _fsp[node_num].saturation[phase_index];
-}
-
-Real
-FluidStateTwoPhase::getDensity(unsigned int node_num, unsigned int phase_index) const
-{
-  return _fsp[node_num].density[phase_index];
-}
-
-Real
-FluidStateTwoPhase::getViscosity(unsigned int node_num, unsigned int phase_index) const
-{
-  return _fsp[node_num].viscosity[phase_index];
-}
-
-Real
-FluidStateTwoPhase::getRelativePermeability(unsigned int node_num, unsigned int phase_index) const
-{
-  return _fsp[node_num].relperm[phase_index];
-}
-
-Real
-FluidStateTwoPhase::getMassFraction(unsigned int node_num, unsigned int phase_index, unsigned int component_index) const
-{
-  return _fsp[node_num].mass_fraction[component_index][phase_index];
-}
-
-Real
-FluidStateTwoPhase::getMobility(unsigned int node_num, unsigned int phase_index) const
-{
-  return _fsp[node_num].mobility[phase_index];
-}
-
-Real
-FluidStateTwoPhase::getDRelativePermeability(unsigned int node_num, unsigned int phase_index) const
-{
-  return _fsp[node_num].drelperm[phase_index];
-}
-
-Real
-FluidStateTwoPhase::getDDensityDP(unsigned int node_num, unsigned int phase_index) const
-{
-  return _fsp[node_num].ddensity_dp[phase_index];
-}
-
-Real
-FluidStateTwoPhase::getDMobilityDP(unsigned int node_num, unsigned int phase_index) const
-{
-  return _fsp[node_num].dmobility_dp[phase_index];
-}
-
-Real
-FluidStateTwoPhase::getDMobilityDS(unsigned int node_num, unsigned int phase_index) const
-{
-  return _fsp[node_num].dmobility_ds[phase_index];
+  return _svar;
 }
 
 Real
@@ -350,7 +420,7 @@ FluidStateTwoPhase::relativePermeability(Real liquid_saturation) const
 {
   std::vector<Real> relperm;
 
-  relperm.push_back(_relative_permeability.relativePermLiq(liquid_saturation));
+  relperm.push_back(_relative_permeability.relativePermLiquid(liquid_saturation));
   relperm.push_back(_relative_permeability.relativePermGas(liquid_saturation));
 
   return relperm;
@@ -361,37 +431,26 @@ FluidStateTwoPhase::dRelativePermeability(Real liquid_saturation) const
 {
   std::vector<Real> drelperm;
 
-  // Primary saturation is liquid
-  if (_s_phase == 0)
-  {
   drelperm.push_back(_relative_permeability.dRelativePermLiquid(liquid_saturation));
   drelperm.push_back(_relative_permeability.dRelativePermLiquid(liquid_saturation));
-  }
-
-  // Primary saturation is gas:
-  if (_s_phase == 1)
-  {
-    drelperm.push_back(- _relative_permeability.dRelativePermLiquid(liquid_saturation));
-    drelperm.push_back(- _relative_permeability.dRelativePermLiquid(liquid_saturation));
-  }
 
   return drelperm;
 }
 
 std::vector<Real>
-FluidStateTwoPhase::pressure(Real pressure, Real liquid_saturation, unsigned int phase_index) const
+FluidStateTwoPhase::pressure(Real pressure, Real liquid_saturation) const
 {
   std::vector<Real> pressures;
   Real capillary_pressure = _capillary_pressure.capillaryPressure(liquid_saturation);
 
   // Primary pressure is liquid: Pg = Pl - Pc
-  if (phase_index == 0)
+  if (_p_phase == 0)
   {
     pressures.push_back(pressure);
     pressures.push_back(pressure - capillary_pressure);
   }
   // Primary pressure is gas: Pl = Pg + Pc
-  if (phase_index == 1)
+  if (_p_phase == 1)
   {
     pressures.push_back(pressure + capillary_pressure);
     pressures.push_back(pressure);
@@ -422,18 +481,18 @@ FluidStateTwoPhase::dCapillaryPressure(Real liquid_saturation) const
 }
 
 std::vector<Real>
-FluidStateTwoPhase::saturation(Real saturation, unsigned int phase_index) const
+FluidStateTwoPhase::saturation(Real saturation) const
 {
   std::vector<Real> saturations;
 
   // Primary saturation is liquid
-  if (phase_index == 0)
+  if (_s_phase == 0)
   {
     saturations.push_back(saturation);
     saturations.push_back(1.0 - saturation);
   }
   // Else the primary saturation is gas
-  if (phase_index == 1)
+  if (_s_phase == 1)
   {
     saturations.push_back(1.0 - saturation);
     saturations.push_back(saturation);
@@ -443,7 +502,7 @@ FluidStateTwoPhase::saturation(Real saturation, unsigned int phase_index) const
 }
 
 Real
-FluidStateTwoPhase::dSaturation_dSl(unsigned int phase_index) const
+FluidStateTwoPhase::dSaturation_dS(unsigned int phase_index) const
 {
   Real sgn = 1.0;
 
@@ -455,12 +514,12 @@ FluidStateTwoPhase::dSaturation_dSl(unsigned int phase_index) const
 }
 
 Real
-FluidStateTwoPhase::dSaturation_dS(unsigned int var) const
+FluidStateTwoPhase::dSaturation_dSl(unsigned int var) const
 {
   Real sgn = 1.0;
 
   // If saturation is not the primary saturation variable
-  if (var != _svar)
+  if (var != _svar || variablePhase(var) != 0)
     sgn *= -1.0;
 
   return sgn;
@@ -490,3 +549,116 @@ FluidStateTwoPhase::dissolved(Real pressure, Real temperature) const
 {
   return 0.;
 }
+
+/*
+// Previous version that used the nodeid and filled the map inside this function
+void
+FluidStateTwoPhase::thermophysicalProperties(const unsigned int nodeid, std::vector<Real> primary_vars)
+{
+  FluidStateProperties fsp;
+
+  // Primary variables at the node
+  Real node_pressure = primary_vars[0];
+  Real node_saturation = primary_vars[1];
+  Real node_temperature = primary_vars[2];
+
+  // Assign the fluid properties
+  // Saturation
+  fsp.saturation = saturation(node_saturation);
+
+  // Pressure (takes liquid saturation for capillary pressure calculation)
+  fsp.pressure = pressure(node_pressure, fsp.saturation[0]);
+
+  // Density of each phase
+  std::vector<Real> densities(_num_phases);
+
+  densities[0] = _liquid_property.density(fsp.pressure[0], node_temperature);
+  densities[1] = _gas_property.density(fsp.pressure[1], node_temperature);
+
+  fsp.density = densities;
+
+  // Viscosity of each phase
+  std::vector<Real> viscosities(_num_phases);
+
+  // Water viscosity uses water density in calculation.
+  viscosities[0] = _liquid_property.viscosity(node_temperature, fsp.density[0]);
+  viscosities[1] = _gas_property.viscosity(fsp.pressure[1], node_temperature);
+
+  fsp.viscosity = viscosities;
+
+  // Relative permeability of each phase
+  fsp.relperm = relativePermeability(fsp.saturation[0]);
+
+  // Mass fraction of each component in each phase
+  std::vector<std::vector<Real> > xmass;
+  xmass.resize(numComponents());
+
+  xmass[0].push_back(1.0); // Only liquid component in liquid
+  xmass[0].push_back(0.0); // No liquid component in gas
+  xmass[1].push_back(0.0); // No gas component in liquid
+  xmass[1].push_back(1.0); // Only gas component in gas
+
+  fsp.mass_fraction = xmass;
+
+  // Mobility of each phase
+  std::vector<Real> mobilities(_num_phases);
+
+  for (unsigned int i = 0; i < _num_phases; ++i)
+    mobilities[i] = fsp.relperm[i] * fsp.density[i]  / fsp.viscosity[i];
+
+  fsp.mobility = mobilities;
+
+  // For derivatives wrt saturation, the sign of the derivative depends on whether the primary
+  // saturation variable is liquid or not. This can be accounted for by multiplying all derivatives
+  // wrt S by dS/dSl
+  Real sgn = dSaturation_dSl(_svar);
+
+  // Derivative of relative permeability wrt liquid_saturation
+  std::vector<Real> drelperm(_num_phases);
+
+  for (unsigned int i = 0; i < _num_phases; ++i)
+    drelperm[i] = sgn * dRelativePermeability(fsp.saturation[0])[i];
+
+  fsp.drelperm = drelperm;
+
+  // Derivative of density wrt pressure
+  std::vector<Real> ddensities_dp(_num_phases);
+
+  for (unsigned int i = 0; i < _num_phases; ++i)
+    ddensities_dp[i] = dDensity_dP(fsp.pressure[i], node_temperature, i);
+
+  fsp.ddensity_dp = ddensities_dp;
+
+  // Derivative of density wrt saturation
+  std::vector<Real> ddensities_ds(_num_phases);
+
+  for (unsigned int i = 0; i < _num_phases; ++i)
+    ddensities_ds[i] = sgn * dCapillaryPressure(fsp.saturation[0])[i] * fsp.ddensity_dp[i];
+
+  fsp.ddensity_ds = ddensities_ds;
+
+  // Derivative of mobility wrt pressure
+  // Note: dViscosity_dP not implemnted yet
+  std::vector<Real> dmobilities_dp(_num_phases);
+
+  for (unsigned int i = 0; i < _num_phases; ++i)
+    dmobilities_dp[i] = fsp.relperm[i] * fsp.ddensity_dp[i]  / fsp.viscosity[i];
+
+  fsp.dmobility_dp = dmobilities_dp;
+
+  // Derivative of mobility wrt saturation
+  // Note: dViscosity_dS not implemnted yet
+  // Note: drelperm and ddensity_ds are already the correct sign, so don't multiply by sgn
+  std::vector<Real> dmobilities_ds(_num_phases);
+
+  for (unsigned int i = 0; i < _num_phases; ++i)
+
+    dmobilities_ds[i] = (fsp.drelperm[i] * fsp.density[i] + fsp.relperm[i] *
+      fsp.ddensity_ds[i]) / fsp.viscosity[i];
+
+  fsp.dmobility_ds = dmobilities_ds;
+
+  // Now insert these properties into the _nodal_properties map
+  _nodal_properties.insert( std::pair<int, FluidStateProperties>(nodeid, fsp));
+}
+*/

@@ -8,7 +8,10 @@
 #ifndef FLUIDSTATE_H
 #define FLUIDSTATE_H
 
-#include "NodalUserObject.h"
+//#include "NodalUserObject.h"
+#include "GeneralUserObject.h"
+#include "Coupleable.h"
+#include "MooseVariable.h"
 
 class FluidState;
 
@@ -17,13 +20,25 @@ template<>
 InputParameters validParams<FluidState>();
 
 /**
- * Base class for fluid state for multiphase flow in porous media.
+ * Base class for fluid state calculations of multiphase flow in porous media.
+ * The thermophysical properties required are computed at each node of each element
+ * of the processor.
+ *
+ * Dervived classes should implement thermophysicalProperties with the appropriate
+ * physics to describe the simulation.
  */
-class FluidState : public NodalUserObject
+class FluidState : public GeneralUserObject,
+public Coupleable
+
 {
  public:
   FluidState(const std::string & name, InputParameters parameters);
 
+ /**
+  * FluidStateProperties class used to store thermophysical properties. This
+  * class is used to populate a map of DOF ids and properties, and for accessing
+  * the properties given an id.
+  */
   class FluidStateProperties
   {
   public:
@@ -35,6 +50,7 @@ class FluidState : public NodalUserObject
     std::vector<std::vector<Real> > mass_fraction;
     std::vector<Real> mobility;
     std::vector<Real> ddensity_dp;
+    std::vector<Real> ddensity_ds;
     std::vector<Real> drelperm;
     std::vector<Real> dmobility_dp;
     std::vector<Real> dmobility_ds;
@@ -44,110 +60,25 @@ class FluidState : public NodalUserObject
   virtual void initialize();
   virtual void execute();
   virtual void finalize();
-  virtual void threadJoin(const UserObject & uo);
 
   /**
-   * Return pressure for each phase at each node.
+   * Calculate all thermophysical properties given the primary variables provided. This is
+   * the main routine where specialisations for particular fluids must be included.
    *
-   * @param node_num node number
-   * @param phase_index index of phase
-   * @return phase pressure at the node (Pa)
+   * @param vector of primary variables
+   * @param fsp reference to a FluidStateProperties object
    */
-  virtual Real getPressure(unsigned int node_num, unsigned int phase_index) const = 0;
-  /**
-   * Return saturation for each phase at each node.
-   *
-   * @param node_num node number
-   * @param phase_index index of phase
-   * @return phase saturation at the node (-)
-   */
-  virtual Real getSaturation(unsigned int node_num, unsigned int phase_index) const = 0;
+  virtual void thermophysicalProperties(std::vector<Real> primary_vars, FluidStateProperties & fsp) = 0;
 
   /**
-   * Return density for each phase at each node.
+   * Retrieves properties at node
    *
-   * @param node_num node number
+   * @param property property name (string)
+   * @param nodeid id of node where properties are required
    * @param phase_index index of phase
-   * @return phase density at the node (kg/m^3)
+   * @param component_index index of component (used for mass fraction)
    */
-  virtual Real getDensity(unsigned int node_num, unsigned int phase_index) const = 0;
-
-  /**
-   * Return viscosity for each phase at each node.
-   *
-   * @param node_num node number
-   * @param phase_index index of phase
-   * @return phase viscosity at the node (Pa/s)
-   */
-  virtual Real getViscosity(unsigned int node_num, unsigned int phase_index) const = 0;
-
-  /**
-   * Return relative permeability for each phase at each node.
-   *
-   * @param node_num node number
-   * @param phase_index index of phase
-   * @return relative permeability at the node (-)
-   */
-  virtual Real getRelativePermeability(unsigned int node_num, unsigned int phase_index) const = 0;
-
-  /**
-   * Return mass fraction for each component in each phase at each node.
-   *
-   * @param node_num node number
-   * @param phase_index index of phase
-   * @param component_index index of the component
-   * @return component mass fraction at the node (-)
-   */
-  virtual Real getMassFraction(unsigned int node_num, unsigned int phase_index, unsigned int component_index) const = 0;
-
-  /**
-   * Return mobility for each phase at each node.
-   *
-   * @param node_num node number
-   * @param phase_index index of phase
-   * @return phase mobility at the node ()
-   */
-  virtual Real getMobility(unsigned int node_num, unsigned int phase_index) const = 0;
-
-  /**
-   * Return the derivative of relative permeability for each phase at each node
-   * wrt liquid saturation
-   *
-   * @param node_num node number
-   * @param phase_index index of phase
-   * @return derivative of relative permeability at the node (-)
-   */
-  virtual Real getDRelativePermeability(unsigned int node_num, unsigned int phase_index) const = 0;
-
-  /**
-   * Return the derivative of density for each phase at each node
-   * wrt pressure
-   *
-   * @param node_num node number
-   * @param phase_index index of phase
-   * @return derivative of density wrt pressure at the node (-)
-   */
-  virtual Real getDDensityDP(unsigned int node_num, unsigned int phase_index) const = 0;
-
-  /**
-   * Return the derivative of mobility for each phase at each node
-   * wrt pressure
-   *
-   * @param node_num node number
-   * @param phase_index index of phase
-   * @return derivative of mobility wrt pressure at the node (-)
-   */
-  virtual Real getDMobilityDP(unsigned int node_num, unsigned int phase_index) const = 0;
-
-  /**
-   * Return the derivative of mobility for each phase at each node
-   * wrt saturation
-   *
-   * @param node_num node number
-   * @param phase_index index of phase
-   * @return derivative of mobility wrt saturation at the node (-)
-   */
-  virtual Real getDMobilityDS(unsigned int node_num, unsigned int phase_index) const = 0;
+  virtual Real getNodalProperty(std::string property, unsigned int nodeid, unsigned int phase_index, unsigned int component_index = 0) const = 0;
 
   /**
    * Number of fluid phases
@@ -259,7 +190,7 @@ class FluidState : public NodalUserObject
    * @param saturation primary saturation (-)
    * @return pressure phase pressure (Pa)
    */
-  virtual std::vector<Real> pressure(Real primary_pressure, Real primary_saturation, unsigned int phase_index = 0) const = 0;
+  virtual std::vector<Real> pressure(Real primary_pressure, Real primary_saturation) const = 0;
 
   /**
    * Derivative of capillary pressure for each phase with respect to the
@@ -276,7 +207,7 @@ class FluidState : public NodalUserObject
    * @param saturation liquid saturation (-)
    * @return saturation gas saturation (-)
    */
-  virtual std::vector<Real> saturation(Real saturation, unsigned int phase_index = 0) const = 0;
+  virtual std::vector<Real> saturation(Real saturation) const = 0;
 
   /**
    * Sign of the derivative of primary saturation variable with respect to
@@ -318,6 +249,10 @@ class FluidState : public NodalUserObject
  */
 virtual Real henry(Real temperature) const = 0;
 
+protected:
+  MooseMesh & _mesh;
+
+  const unsigned int _qp;
 };
 
 #endif // FLUIDSTATE_H

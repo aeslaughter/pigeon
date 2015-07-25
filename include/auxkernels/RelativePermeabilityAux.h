@@ -36,6 +36,7 @@ private:
   const RelativePermeability & _relative_permeabilityUO;
   VariableValue & _liquid_saturation;
   const MooseEnum & fluid_phase_enum;
+  const MooseEnum & property_enum;
 };
 
 #endif //RELATIVEPERMEABILITYAUX_H

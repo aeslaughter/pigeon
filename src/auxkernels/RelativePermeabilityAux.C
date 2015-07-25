@@ -15,6 +15,8 @@ InputParameters validParams<RelativePermeabilityAux>()
   params.addRequiredCoupledVar("liquid_saturation_variable", "The liquid saturation variable.");
   MooseEnum fluid_phase_enum("liquid gas");
   params.addRequiredParam<MooseEnum>("fluid_phase_enum", fluid_phase_enum, "The fluid phase that this auxillary kernel is to act on (liquid or gas)");
+  MooseEnum property_enum("relperm drelperm");
+  params.addRequiredParam<MooseEnum>("property_enum", property_enum, "The relative permeability property that this auxillary kernel is to act on");
   return params;
 }
 
@@ -24,20 +26,32 @@ RelativePermeabilityAux::RelativePermeabilityAux(const std::string & name,
 
     _relative_permeabilityUO(getUserObject<RelativePermeability>("relative_permeability_uo")),
     _liquid_saturation(coupledValue("liquid_saturation_variable")),
-    fluid_phase_enum(getParam<MooseEnum>("fluid_phase_enum"))
+    fluid_phase_enum(getParam<MooseEnum>("fluid_phase_enum")),
+    property_enum(getParam<MooseEnum>("property_enum"))
 {}
 
 Real
 RelativePermeabilityAux::computeValue()
 {
-  Real relperm;
+  Real property;
 
-  if (fluid_phase_enum == "liquid") {
-     relperm =  _relative_permeabilityUO.relativePermLiq(_liquid_saturation[_qp]);
-  }
-  if (fluid_phase_enum == "gas") {
-     relperm =  _relative_permeabilityUO.relativePermGas(_liquid_saturation[_qp]);
+  if (property_enum == "relperm")
+  {
+    if (fluid_phase_enum == "liquid")
+      property =  _relative_permeabilityUO.relativePermLiquid(_liquid_saturation[_qp]);
+
+    if (fluid_phase_enum == "gas")
+     property =  _relative_permeabilityUO.relativePermGas(_liquid_saturation[_qp]);
   }
 
-  return relperm;
+  if (property_enum == "drelperm")
+  {
+    if (fluid_phase_enum == "liquid")
+      property =  _relative_permeabilityUO.dRelativePermLiquid(_liquid_saturation[_qp]);
+
+    if (fluid_phase_enum == "gas")
+     property =  _relative_permeabilityUO.dRelativePermGas(_liquid_saturation[_qp]);
+  }
+
+  return property;
 }

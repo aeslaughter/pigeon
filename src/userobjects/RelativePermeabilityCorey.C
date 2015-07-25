@@ -24,7 +24,7 @@ RelativePermeabilityCorey::RelativePermeabilityCorey(const std::string & name, I
 }
 
 Real
-RelativePermeabilityCorey::relativePermLiq(Real sat_liq) const
+RelativePermeabilityCorey::relativePermLiquid(Real sat_liq) const
 {
   // Check whether liquid saturation is [0,1] - if not, print error message.
   if (sat_liq < 0.0 || sat_liq > 1.0)

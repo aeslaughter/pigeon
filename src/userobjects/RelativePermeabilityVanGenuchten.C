@@ -29,7 +29,7 @@ RelativePermeabilityVanGenuchten::RelativePermeabilityVanGenuchten(const std::st
 }
 
 Real
-RelativePermeabilityVanGenuchten::relativePermLiq(Real sat_liq) const
+RelativePermeabilityVanGenuchten::relativePermLiquid(Real sat_liq) const
 {
   if (sat_liq < 0.0 )
     sat_liq = 0.0;
@@ -77,13 +77,13 @@ RelativePermeabilityVanGenuchten::relativePermGas(Real sat_liq) const
   if (sat_liq < 0.0 || sat_liq > 1.0)
     mooseError("RelativePermeabilityVanGenuchten: Liquid saturation is outside the range 0 <= Sl <= 1\n");
 
-  if (sat_liq >= _sat_ls) {
+  if (sat_liq >= _sat_ls)
     return 0.0;
-  }
 
-  if (sat_liq <= _sat_lr) {
+
+  if (sat_liq <= _sat_lr)
     return 1.0;
-  }
+
 
   if (_sat_gr > 0.0) {
 
@@ -100,9 +100,9 @@ RelativePermeabilityVanGenuchten::relativePermGas(Real sat_liq) const
   if (krel > 1) { krel = 1;}
   }
 
-  else {
-  krel = 1.0 - relativePermLiq(sat_liq);
-  }
+  else
+    krel = 1.0 - relativePermLiquid(sat_liq);
+
 
   return krel;
 }
@@ -110,6 +110,16 @@ RelativePermeabilityVanGenuchten::relativePermGas(Real sat_liq) const
 Real
 RelativePermeabilityVanGenuchten::dRelativePermLiquid(Real sat_liq) const
 {
+  // Check whether liquid saturation is [0,1] - if not, print error message.
+  if (sat_liq < 0.0 || sat_liq > 1.0)
+    mooseError("RelativePermeabilityVanGenuchten: Liquid saturation is outside the range 0 <= Sl <= 1\n");
+
+  if (sat_liq >= _sat_ls)
+    return 0.0;
+
+  if (sat_liq <= _sat_lr)
+    return 0.0;
+
   Real sat_eff = (sat_liq - _sat_lr)/(_sat_ls - _sat_lr);
   Real a = 1.0 - std::pow(sat_eff, 1.0 / _m);
   Real a2 = 1.0 - std::pow(a, _m);
@@ -122,6 +132,10 @@ RelativePermeabilityVanGenuchten::dRelativePermLiquid(Real sat_liq) const
 Real
 RelativePermeabilityVanGenuchten::dRelativePermGas(Real sat_liq) const
 {
+  // Check whether liquid saturation is [0,1] - if not, print error message.
+  if (sat_liq < 0.0 || sat_liq > 1.0)
+    mooseError("RelativePermeabilityVanGenuchten: Liquid saturation is outside the range 0 <= Sl <= 1\n");
+
   Real dkrel;
 
   if (_sat_gr > 0.0)

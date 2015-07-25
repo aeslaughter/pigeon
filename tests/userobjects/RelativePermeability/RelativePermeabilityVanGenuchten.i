@@ -32,24 +32,48 @@
 []
 
 [AuxVariables]
-  [./LiquidRelativePermeabilityAux]
+  [./LiquidRelPermAux]
   [../]
-  [./GasRelativePermeabilityAux]
+  [./GasRelPermAux]
+  [../]
+  [./dLiquidRelPermAux]
+  [../]
+  [./dGasRelPermAux]
   [../]
 []
 
 [AuxKernels]
-  [./LiquidRelativePermeabilityAux]
+  [./LiquidRelPermAux]
     type = RelativePermeabilityAux
-    variable = LiquidRelativePermeabilityAux
+    variable = LiquidRelPermAux
+    property_enum = relperm
     fluid_phase_enum = liquid
     relative_permeability_uo = RelativePermeability
     liquid_saturation_variable = sat_liq
     execute_on = initial
   [../]
-  [./GasRelativePermeabilityAux]
+  [./GasRelPermAux]
     type = RelativePermeabilityAux
-    variable = GasRelativePermeabilityAux
+    variable = GasRelPermAux
+    property_enum = relperm
+    fluid_phase_enum = gas
+    relative_permeability_uo = RelativePermeability
+    liquid_saturation_variable = sat_liq
+    execute_on = initial
+  [../]
+  [./dLiquidRelPermAux]
+    type = RelativePermeabilityAux
+    variable = dLiquidRelPermAux
+    property_enum = drelperm
+    fluid_phase_enum = liquid
+    relative_permeability_uo = RelativePermeability
+    liquid_saturation_variable = sat_liq
+    execute_on = initial
+  [../]
+  [./dGasRelPermAux]
+    type = RelativePermeabilityAux
+    variable = dGasRelPermAux
+    property_enum = drelperm
     fluid_phase_enum = gas
     relative_permeability_uo = RelativePermeability
     liquid_saturation_variable = sat_liq
@@ -74,7 +98,7 @@
 [VectorPostprocessors]
   [./vpp]
     type = NodalValueSampler
-    variable = 'GasRelativePermeabilityAux LiquidRelativePermeabilityAux'
+    variable = 'GasRelPermAux LiquidRelPermAux dGasRelPermAux dLiquidRelPermAux'
     sort_by = x
   [../]
 []

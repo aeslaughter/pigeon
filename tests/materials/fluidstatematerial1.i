@@ -49,6 +49,38 @@
     family = monomial
     order = constant
   [../]
+  [./gas_dpressure_flux_dp]
+    family = monomial
+    order = constant
+  [../]
+  [./gas_dpressure_flux_ds]
+    family = monomial
+    order = constant
+  [../]
+  [./liquid_dpressure_flux_dp]
+    family = monomial
+    order = constant
+  [../]
+  [./liquid_dpressure_flux_ds]
+    family = monomial
+    order = constant
+  [../]
+  [./gas_dgravity_flux_dp]
+    family = monomial
+    order = constant
+  [../]
+  [./gas_dgravity_flux_ds]
+    family = monomial
+    order = constant
+  [../]
+  [./liquid_dgravity_flux_dp]
+    family = monomial
+    order = constant
+  [../]
+  [./liquid_dgravity_flux_ds]
+    family = monomial
+    order = constant
+  [../]
 []
 
 [Kernels]
@@ -148,6 +180,54 @@
     gradient_variable = gas_pressure
     variable = grad_gas_pressure
     component = x
+  [../]
+  [./dGasFluxAuxDp]
+    type = MaterialStdVectorAux
+    index = 1
+    property = dpressure_flux_dp
+    variable = gas_dpressure_flux_dp
+  [../]
+  [./dGasFluxAuxDs]
+    type = MaterialStdVectorAux
+    index = 1
+    property = dpressure_flux_ds
+    variable = gas_dpressure_flux_ds
+  [../]
+  [./dLiquidFluxAuxDp]
+    type = MaterialStdVectorAux
+    index = 0
+    property = dpressure_flux_dp
+    variable = liquid_dpressure_flux_dp
+  [../]
+  [./dLiquidFluxAuxDs]
+    type = MaterialStdVectorAux
+    index = 0
+    property = dpressure_flux_ds
+    variable = liquid_dpressure_flux_ds
+  [../]
+  [./dLiquidGFluxAuxDs]
+    type = MaterialStdVectorRealGradientAux
+    index = 0
+    property = dgravity_flux_ds
+    variable = liquid_dgravity_flux_ds
+  [../]
+  [./dLiquidGFluxAuxDp]
+    type = MaterialStdVectorRealGradientAux
+    index = 0
+    property = dgravity_flux_dp
+    variable = liquid_dgravity_flux_dp
+  [../]
+  [./dGasGFluxAuxDs]
+    type = MaterialStdVectorRealGradientAux
+    index = 1
+    property = dgravity_flux_ds
+    variable = gas_dgravity_flux_ds
+  [../]
+  [./dGasGFluxAuxDp]
+    type = MaterialStdVectorRealGradientAux
+    index = 1
+    property = dgravity_flux_dp
+    variable = gas_dgravity_flux_dp
   [../]
 []
 
@@ -280,8 +360,8 @@
     sort_by = x
     start_point = '0 0 0'
     end_point = '100 0 0'
-    num_points = 11
-    variable = 'grad_liquid_pressure grad_gas_pressure liquid_phase_flux gas_phase_flux'
+    num_points = 21
+    variable = 'liquid_saturation liquid_pressure gas_pressure grad_liquid_pressure grad_gas_pressure liquid_phase_flux gas_phase_flux gas_dpressure_flux_dp gas_dpressure_flux_ds liquid_dpressure_flux_dp liquid_dpressure_flux_ds gas_dgravity_flux_dp gas_dgravity_flux_ds liquid_dgravity_flux_dp liquid_dgravity_flux_ds'
   [../] 
 []
 

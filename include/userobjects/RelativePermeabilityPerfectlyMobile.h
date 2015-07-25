@@ -36,7 +36,7 @@ class RelativePermeabilityPerfectlyMobile : public RelativePermeability
    * @param sat_liq liquid phase saturation
    * @return liquid phase relative permeability (= 1.0)
    */
-  Real relativePermLiq(Real sat_liq) const;
+  Real relativePermLiquid(Real sat_liq) const;
 
   /**
    * Perfectly mobile gas relative permeability as a function of saturation.

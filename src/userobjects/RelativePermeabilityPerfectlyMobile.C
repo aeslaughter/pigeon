@@ -21,7 +21,7 @@ RelativePermeabilityPerfectlyMobile::RelativePermeabilityPerfectlyMobile(const s
 }
 
 Real
-RelativePermeabilityPerfectlyMobile::relativePermLiq(Real sat_liq) const
+RelativePermeabilityPerfectlyMobile::relativePermLiquid(Real sat_liq) const
 {
   if (sat_liq < 0.0)
     sat_liq = 0.0;

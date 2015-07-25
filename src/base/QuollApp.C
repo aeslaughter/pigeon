@@ -26,7 +26,7 @@
 // Materials
 #include "PorousMaterial.h"
 #include "FluidStateMaterial.h"
-#include "tmpMaterial.h"
+//#include "tmpMaterial.h"
 #include "SimpleFluidStateMaterial.h"
 
 // User object
@@ -121,7 +121,7 @@ QuollApp::registerObjects(Factory & factory)
    // Register the materials
    registerMaterial(PorousMaterial);
    registerMaterial(FluidStateMaterial);
-   registerMaterial(tmpMaterial);
+   //registerMaterial(tmpMaterial);
    registerMaterial(SimpleFluidStateMaterial);
 
    // Register user objects for relative permeability and capillary pressure

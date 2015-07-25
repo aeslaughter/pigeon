@@ -43,7 +43,7 @@ class RelativePermeabilityVanGenuchten : public RelativePermeability
    * @param sat_liq is liquid phase saturation
    * @return liquid phase relative permeability
    */
-  Real relativePermLiq(Real sat_liq) const;
+  Real relativePermLiquid(Real sat_liq) const;
 
   /**
    * Corey form of gas phase relative permeability as a function of liquid saturation

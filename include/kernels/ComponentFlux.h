@@ -39,17 +39,20 @@ protected:
 
   // Member reference to phase flux (without mobility) material properties
   const MaterialProperty<std::vector<RealGradient> > & _phase_flux_no_mobility;
-  const MaterialProperty<std::vector<RealVectorValue> > & _dphase_flux_no_mobility_dp;
-  const MaterialProperty<std::vector<RealVectorValue> > & _dphase_flux_no_mobility_ds;
+  const MaterialProperty<std::vector<RealVectorValue> > & _dgravity_flux_dp;
+  const MaterialProperty<std::vector<RealVectorValue> > & _dgravity_flux_ds;
+  const MaterialProperty<std::vector<Real> > & _dpressure_flux_dp;
+  const MaterialProperty<std::vector<Real> > & _dpressure_flux_ds;
+
 
 private:
-  VariableValue & _fluid_pressure;
-  VariableValue & _fluid_saturation;
-  VariableValue & _temperature;
-  VariableValue & _fluid_density;
-  VariableValue & _fluid_viscosity;
+//  VariableValue & _fluid_pressure;
+//  VariableValue & _fluid_saturation;
+//  VariableValue & _temperature;
+//  VariableValue & _fluid_density;
+//  VariableValue & _fluid_viscosity;
   VariableValue & _component_mass_fraction;
-  VariableValue & _fluid_relperm;
+//  VariableValue & _fluid_relperm;
 
   /**
    * This is the member reference that will hold the User Object
