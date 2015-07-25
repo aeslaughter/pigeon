@@ -17,9 +17,8 @@ InputParameters validParams<FluidPressureAux>()
   return params;
 }
 
-FluidPressureAux::FluidPressureAux(const std::string & name,
-                       InputParameters parameters) :
-    AuxKernel(name, parameters),
+FluidPressureAux::FluidPressureAux(const InputParameters & parameters) :
+    AuxKernel(parameters),
 
     _capillary_pressure(getUserObject<CapillaryPressure>("capillary_pressure_uo")),
     _primary_pressure(coupledValue("primary_pressure_variable")),

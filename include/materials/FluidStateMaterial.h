@@ -23,8 +23,7 @@ InputParameters validParams<FluidStateMaterial>();
 class FluidStateMaterial : public Material
 {
 public:
-  FluidStateMaterial(const std::string & name,
-                  InputParameters parameters);
+  FluidStateMaterial(const InputParameters & parameters);
 
 protected:
   virtual void computeQpProperties();

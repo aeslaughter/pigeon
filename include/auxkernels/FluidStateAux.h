@@ -20,8 +20,7 @@ class FluidStateAux : public AuxKernel
 {
 public:
 
-  FluidStateAux(const std::string & name,
-             InputParameters parameters);
+  FluidStateAux(const InputParameters & parameters);
 
 protected:
 

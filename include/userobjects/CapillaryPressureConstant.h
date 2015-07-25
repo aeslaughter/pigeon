@@ -27,7 +27,7 @@ InputParameters validParams<CapillaryPressureConstant>();
 class CapillaryPressureConstant : public CapillaryPressure
 {
  public:
-  CapillaryPressureConstant(const std::string & name, InputParameters parameters);
+  CapillaryPressureConstant(const InputParameters & parameters);
 
   /**
    * Capillary pressure is constant for all liquid saturations

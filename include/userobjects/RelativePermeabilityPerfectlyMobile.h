@@ -29,7 +29,7 @@ InputParameters validParams<RelativePermeabilityPerfectlyMobile>();
 class RelativePermeabilityPerfectlyMobile : public RelativePermeability
 {
  public:
-  RelativePermeabilityPerfectlyMobile(const std::string & name, InputParameters parameters);
+  RelativePermeabilityPerfectlyMobile(const InputParameters & parameters);
 
   /**
    * Perfectly mobile liquid relative permeability as a function of saturation.

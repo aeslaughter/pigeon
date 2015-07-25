@@ -15,8 +15,8 @@ InputParameters validParams<FluidProperties>()
   return params;
 }
 
-FluidProperties::FluidProperties(const std::string & name, InputParameters parameters) :
-  GeneralUserObject(name, parameters)
+FluidProperties::FluidProperties(const InputParameters & parameters) :
+  GeneralUserObject(parameters)
 {}
 
 void

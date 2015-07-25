@@ -18,7 +18,7 @@ InputParameters validParams<ComponentMassPostprocessor>();
 class ComponentMassPostprocessor : public ElementIntegralPostprocessor
 {
 public:
-  ComponentMassPostprocessor(const std::string & name, InputParameters parameters);
+  ComponentMassPostprocessor(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpIntegral();

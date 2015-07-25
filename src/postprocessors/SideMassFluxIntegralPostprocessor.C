@@ -18,8 +18,8 @@ InputParameters validParams<SideMassFluxIntegralPostprocessor>()
   return params;
 }
 
-SideMassFluxIntegralPostprocessor::SideMassFluxIntegralPostprocessor(const std::string & name, InputParameters parameters) :
-    SideIntegralVariablePostprocessor(name, parameters),
+SideMassFluxIntegralPostprocessor::SideMassFluxIntegralPostprocessor(const InputParameters & parameters) :
+    SideIntegralVariablePostprocessor(parameters),
     _permeability(getMaterialProperty<RealTensorValue>("permeability")),
     _gravity(getMaterialProperty<RealVectorValue>("gravity")),
     _fluid_density(coupledValue("fluid_density_variable")),

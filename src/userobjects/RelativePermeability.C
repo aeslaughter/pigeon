@@ -15,8 +15,8 @@ InputParameters validParams<RelativePermeability>()
   return params;
 }
 
-RelativePermeability::RelativePermeability(const std::string & name, InputParameters parameters) :
-  GeneralUserObject(name, parameters)
+RelativePermeability::RelativePermeability(const InputParameters & parameters) :
+  GeneralUserObject(parameters)
 {}
 
 void

@@ -18,7 +18,7 @@ InputParameters validParams<SideMassFluxIntegralPostprocessor>();
 class SideMassFluxIntegralPostprocessor : public SideIntegralVariablePostprocessor
 {
 public:
-  SideMassFluxIntegralPostprocessor(const std::string & name, InputParameters parameters);
+  SideMassFluxIntegralPostprocessor(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpIntegral();

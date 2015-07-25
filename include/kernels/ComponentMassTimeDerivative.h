@@ -19,7 +19,7 @@ InputParameters validParams<ComponentMassTimeDerivative>();
 class ComponentMassTimeDerivative : public TimeKernel
 {
 public:
-  ComponentMassTimeDerivative(const std::string & name, InputParameters parameters);
+  ComponentMassTimeDerivative(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpResidual();

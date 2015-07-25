@@ -19,9 +19,8 @@ InputParameters validParams<FluidStateAux>()
   return params;
 }
 
-FluidStateAux::FluidStateAux(const std::string & name,
-                       InputParameters parameters) :
-    AuxKernel(name, parameters),
+FluidStateAux::FluidStateAux(const InputParameters & parameters) :
+    AuxKernel(parameters),
 
     _fluid_state(getUserObject<FluidState>("fluid_state_uo")),
     _state_property_enum(getParam<MooseEnum>("state_property_enum")),

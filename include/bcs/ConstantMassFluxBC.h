@@ -19,8 +19,7 @@ class ConstantMassFluxBC : public IntegratedBC
 {
 public:
 
-  ConstantMassFluxBC(const std::string & name,
-            InputParameters parameters);
+  ConstantMassFluxBC(const InputParameters & parameters);
 
 private:
   virtual Real computeQpResidual();

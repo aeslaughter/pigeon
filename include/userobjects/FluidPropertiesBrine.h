@@ -28,7 +28,7 @@ InputParameters validParams<FluidProperties>();
 class FluidPropertiesBrine : public FluidProperties
 {
  public:
-  FluidPropertiesBrine(const std::string & name, InputParameters parameters);
+  FluidPropertiesBrine(const InputParameters & parameters);
 
   /**
    * NaCl molar mass.

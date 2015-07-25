@@ -24,8 +24,7 @@ InputParameters validParams<PorousMaterial>();
 class PorousMaterial : public Material
 {
 public:
-  PorousMaterial(const std::string & name,
-                  InputParameters parameters);
+  PorousMaterial(const InputParameters & parameters);
 
 protected:
   virtual void computeQpProperties();

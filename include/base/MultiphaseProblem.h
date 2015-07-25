@@ -23,7 +23,7 @@ InputParameters validParams<MultiphaseProblem>();
 class MultiphaseProblem : public FEProblem
 {
 public:
-  MultiphaseProblem(const std::string & name, InputParameters params);
+  MultiphaseProblem(const InputParameters & params);
   virtual ~MultiphaseProblem();
 
   /**

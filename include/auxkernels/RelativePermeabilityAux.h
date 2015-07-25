@@ -20,8 +20,7 @@ class RelativePermeabilityAux : public AuxKernel
 {
 public:
 
-  RelativePermeabilityAux(const std::string & name,
-             InputParameters parameters);
+  RelativePermeabilityAux(const InputParameters & parameters);
 
 protected:
 

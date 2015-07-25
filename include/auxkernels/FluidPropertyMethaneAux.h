@@ -20,8 +20,7 @@ class FluidPropertyMethaneAux : public AuxKernel
 {
 public:
 
-  FluidPropertyMethaneAux(const std::string & name,
-             InputParameters parameters);
+  FluidPropertyMethaneAux(const InputParameters & parameters);
 
 protected:
 

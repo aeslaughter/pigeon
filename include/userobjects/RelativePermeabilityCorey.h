@@ -30,7 +30,7 @@ InputParameters validParams<RelativePermeabilityCorey>();
 class RelativePermeabilityCorey : public RelativePermeability
 {
  public:
-  RelativePermeabilityCorey(const std::string & name, InputParameters parameters);
+  RelativePermeabilityCorey(const InputParameters & parameters);
 
   /**
    * Perfectly mobile liquid relative permeability as a function of saturation.

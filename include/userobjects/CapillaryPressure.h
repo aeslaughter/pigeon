@@ -30,7 +30,7 @@ InputParameters validParams<CapillaryPressure>();
 class CapillaryPressure : public GeneralUserObject
 {
  public:
-  CapillaryPressure(const std::string & name, InputParameters parameters);
+  CapillaryPressure(const InputParameters & parameters);
 
   void initialize();
   void execute();

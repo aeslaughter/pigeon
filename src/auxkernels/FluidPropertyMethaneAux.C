@@ -19,9 +19,8 @@ InputParameters validParams<FluidPropertyMethaneAux>()
   return params;
 }
 
-FluidPropertyMethaneAux::FluidPropertyMethaneAux(const std::string & name,
-                       InputParameters parameters) :
-    AuxKernel(name, parameters),
+FluidPropertyMethaneAux::FluidPropertyMethaneAux(const InputParameters & parameters) :
+    AuxKernel(parameters),
 
     _ch4_property(getUserObject<FluidPropertiesMethane>("ch4_property_uo")),
     _pressure(coupledValue("pressure_variable")),

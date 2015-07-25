@@ -19,9 +19,8 @@ InputParameters validParams<FluidPropertyCO2Aux>()
   return params;
 }
 
-FluidPropertyCO2Aux::FluidPropertyCO2Aux(const std::string & name,
-                       InputParameters parameters) :
-    AuxKernel(name, parameters),
+FluidPropertyCO2Aux::FluidPropertyCO2Aux(const InputParameters & parameters) :
+    AuxKernel(parameters),
 
     _co2_property(getUserObject<FluidPropertiesCO2>("co2_property_uo")),
     _pressure(coupledValue("pressure_variable")),

@@ -17,8 +17,8 @@ InputParameters validParams<MultiphaseProblem>()
 }
 
 
-MultiphaseProblem::MultiphaseProblem(const std::string & name, InputParameters params) :
-    FEProblem(name, params),
+MultiphaseProblem::MultiphaseProblem(const InputParameters & params) :
+    FEProblem(params),
     // In the following have to get the names of the variables, and then find their numbers in initialSetup,
     // as their numbers won't be defined at the moment of instantiation of this class
     _bounded_var_name(params.get<NonlinearVariableName>("saturation_variable")),

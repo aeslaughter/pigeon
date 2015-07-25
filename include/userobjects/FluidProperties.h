@@ -22,7 +22,7 @@ InputParameters validParams<FluidProperties>();
 class FluidProperties : public GeneralUserObject
 {
  public:
-  FluidProperties(const std::string & name, InputParameters parameters);
+  FluidProperties(const InputParameters & parameters);
 
   void initialize();
   void execute();

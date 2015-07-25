@@ -15,8 +15,8 @@ InputParameters validParams<FluidPropertiesCO2>()
   return params;
 }
 
-FluidPropertiesCO2::FluidPropertiesCO2(const std::string & name, InputParameters parameters) :
-  FluidProperties(name, parameters)
+FluidPropertiesCO2::FluidPropertiesCO2(const InputParameters & parameters) :
+  FluidProperties(parameters)
 {
   _t_c2k = 273.15;
   _Mco2 = 44.0e-3;

@@ -27,7 +27,7 @@ InputParameters validParams<FluidState>();
 class FluidStateSinglePhase : public FluidState
 {
  public:
-  FluidStateSinglePhase(const std::string & name, InputParameters parameters);
+  FluidStateSinglePhase(const InputParameters & parameters);
 
   /**
    * Number of fluid phases

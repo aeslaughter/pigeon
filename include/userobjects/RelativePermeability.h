@@ -30,7 +30,7 @@ InputParameters validParams<RelativePermeability>();
 class RelativePermeability : public GeneralUserObject
 {
  public:
-  RelativePermeability(const std::string & name, InputParameters parameters);
+  RelativePermeability(const InputParameters & parameters);
 
   void initialize();
   void execute();

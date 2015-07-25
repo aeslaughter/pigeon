@@ -15,9 +15,8 @@ InputParameters validParams<SaturationAux>()
   return params;
 }
 
-SaturationAux::SaturationAux(const std::string & name,
-                       InputParameters parameters) :
-    AuxKernel(name, parameters),
+SaturationAux::SaturationAux(const InputParameters & parameters) :
+    AuxKernel(parameters),
 
     _liquid_saturation(coupledValue("liquid_saturation_variable"))
 {}

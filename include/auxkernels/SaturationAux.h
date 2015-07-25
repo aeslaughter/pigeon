@@ -28,8 +28,7 @@ class SaturationAux : public AuxKernel
 {
 public:
 
-  SaturationAux(const std::string & name,
-             InputParameters parameters);
+  SaturationAux(const InputParameters & parameters);
 
 protected:
 

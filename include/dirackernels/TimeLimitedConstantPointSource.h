@@ -24,7 +24,7 @@ InputParameters validParams<TimeLimitedConstantPointSource>();
 class TimeLimitedConstantPointSource : public DiracKernel
 {
 public:
-  TimeLimitedConstantPointSource(const std::string & name, InputParameters parameters);
+  TimeLimitedConstantPointSource(const InputParameters & parameters);
 
   virtual void addPoints();
   virtual Real computeQpResidual();

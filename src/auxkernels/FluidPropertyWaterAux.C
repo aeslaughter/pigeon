@@ -20,9 +20,8 @@ InputParameters validParams<FluidPropertyWaterAux>()
   return params;
 }
 
-FluidPropertyWaterAux::FluidPropertyWaterAux(const std::string & name,
-                       InputParameters parameters) :
-    AuxKernel(name, parameters),
+FluidPropertyWaterAux::FluidPropertyWaterAux(const InputParameters & parameters) :
+    AuxKernel(parameters),
 
     _fluid_property(getUserObject<FluidPropertiesWater>("fluid_property_uo")),
     _pressure(coupledValue("pressure_variable")),

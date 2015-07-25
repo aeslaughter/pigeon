@@ -26,7 +26,7 @@ InputParameters validParams<CapillaryPressureVanGenuchten>();
 class CapillaryPressureVanGenuchten : public CapillaryPressure
 {
  public:
-  CapillaryPressureVanGenuchten(const std::string & name, InputParameters parameters);
+  CapillaryPressureVanGenuchten(const InputParameters & parameters);
 
   /**
    * van Genuchten form of capillary pressure as a function of liquid saturation

@@ -15,8 +15,8 @@ InputParameters validParams<CapillaryPressure>()
   return params;
 }
 
-CapillaryPressure::CapillaryPressure(const std::string & name, InputParameters parameters) :
-  GeneralUserObject(name, parameters)
+CapillaryPressure::CapillaryPressure(const InputParameters & parameters) :
+  GeneralUserObject(parameters)
 {}
 
 void

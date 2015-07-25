@@ -8,7 +8,6 @@
 #ifndef FLUIDSTATE_H
 #define FLUIDSTATE_H
 
-//#include "NodalUserObject.h"
 #include "GeneralUserObject.h"
 #include "Coupleable.h"
 #include "MooseVariable.h"
@@ -32,7 +31,7 @@ public Coupleable
 
 {
  public:
-  FluidState(const std::string & name, InputParameters parameters);
+  FluidState(const InputParameters & parameters);
 
  /**
   * FluidStateProperties class used to store thermophysical properties. This

@@ -20,9 +20,8 @@ InputParameters validParams<RelativePermeabilityAux>()
   return params;
 }
 
-RelativePermeabilityAux::RelativePermeabilityAux(const std::string & name,
-                       InputParameters parameters) :
-    AuxKernel(name, parameters),
+RelativePermeabilityAux::RelativePermeabilityAux(const InputParameters & parameters) :
+    AuxKernel(parameters),
 
     _relative_permeabilityUO(getUserObject<RelativePermeability>("relative_permeability_uo")),
     _liquid_saturation(coupledValue("liquid_saturation_variable")),

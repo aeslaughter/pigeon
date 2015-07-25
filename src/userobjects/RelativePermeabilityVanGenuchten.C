@@ -19,8 +19,8 @@ InputParameters validParams<RelativePermeabilityVanGenuchten>()
   return params;
 }
 
-RelativePermeabilityVanGenuchten::RelativePermeabilityVanGenuchten(const std::string & name, InputParameters parameters) :
-  RelativePermeability(name, parameters),
+RelativePermeabilityVanGenuchten::RelativePermeabilityVanGenuchten(const InputParameters & parameters) :
+  RelativePermeability(parameters),
   _sat_lr(getParam<Real>("sat_lr")),
   _sat_ls(getParam<Real>("sat_ls")),
   _sat_gr(getParam<Real>("sat_gr")),

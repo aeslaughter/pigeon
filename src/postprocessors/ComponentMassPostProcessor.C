@@ -17,8 +17,8 @@ InputParameters validParams<ComponentMassPostprocessor>()
   return params;
 }
 
-ComponentMassPostprocessor::ComponentMassPostprocessor(const std::string & name, InputParameters parameters) :
-    ElementIntegralPostprocessor(name, parameters),
+ComponentMassPostprocessor::ComponentMassPostprocessor(const InputParameters & parameters) :
+    ElementIntegralPostprocessor(parameters),
     _porosity(getMaterialProperty<Real>("porosity"))
 
 {

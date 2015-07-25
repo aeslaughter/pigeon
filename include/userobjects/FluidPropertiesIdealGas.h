@@ -19,7 +19,7 @@ InputParameters validParams<FluidProperties>();
 class FluidPropertiesIdealGas : public FluidProperties
 {
  public:
-  FluidPropertiesIdealGas(const std::string & name, InputParameters parameters);
+  FluidPropertiesIdealGas(const InputParameters & parameters);
 
   /**
    * Ideal gas density as a function of  pressure, temperature and molar mass.

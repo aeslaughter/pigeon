@@ -15,8 +15,8 @@ InputParameters validParams<RelativePermeabilityPerfectlyMobile>()
   return params;
 }
 
-RelativePermeabilityPerfectlyMobile::RelativePermeabilityPerfectlyMobile(const std::string & name, InputParameters parameters) :
-  RelativePermeability(name, parameters)
+RelativePermeabilityPerfectlyMobile::RelativePermeabilityPerfectlyMobile(const InputParameters & parameters) :
+  RelativePermeability(parameters)
 {
 }
 

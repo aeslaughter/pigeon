@@ -68,8 +68,8 @@ InputParameters validParams<QuollApp>()
   return params;
 }
 
-QuollApp::QuollApp(const std::string & name, InputParameters parameters) :
-    MooseApp(name, parameters)
+QuollApp::QuollApp(InputParameters parameters) :
+    MooseApp(parameters)
 {
   srand(processor_id());
 
@@ -91,12 +91,18 @@ extern "C" void QuollApp__registerApps() { QuollApp::registerApps(); }
 void
 QuollApp::registerApps()
 {
+#undef  registerApp
+#define registerApp(name) AppFactory::instance().reg<name>(#name)
   registerApp(QuollApp);
+#undef  registerApp
+#define registerApp(name) AppFactory::instance().regLegacy<name>(#name)
 }
 
 void
 QuollApp::registerObjects(Factory & factory)
 {
+#undef registerObject
+#define registerObject(name) factory.reg<name>(stringifyName(name))
 
    // Register the kernels
    registerKernel(ComponentMassTimeDerivative);
@@ -155,9 +161,16 @@ QuollApp::registerObjects(Factory & factory)
    // Register problem
    registerProblem(MultiphaseProblem);
 
+#undef registerObject
+#define registerObject(name) factory.regLegacy<name>(stringifyName(name))
 }
 
 void
 QuollApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 {
+#undef registerAction
+#define registerAction(tplt, action) action_factory.reg<tplt>(stringifyName(tplt), action)
+
+#undef registerAction
+#define registerAction(tplt, action) action_factory.regLegacy<tplt>(stringifyName(tplt), action)
 }

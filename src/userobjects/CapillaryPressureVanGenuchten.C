@@ -21,8 +21,8 @@ InputParameters validParams<CapillaryPressureVanGenuchten>()
   return params;
 }
 
-CapillaryPressureVanGenuchten::CapillaryPressureVanGenuchten(const std::string & name, InputParameters parameters) :
-  CapillaryPressure(name, parameters),
+CapillaryPressureVanGenuchten::CapillaryPressureVanGenuchten(const InputParameters & parameters) :
+  CapillaryPressure(parameters),
   _sat_lr(getParam<Real>("sat_lr")),
   _sat_ls(getParam<Real>("sat_ls")),
   _m(getParam<Real>("m")),

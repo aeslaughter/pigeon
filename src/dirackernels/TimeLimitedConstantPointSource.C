@@ -18,8 +18,8 @@ InputParameters validParams<TimeLimitedConstantPointSource>()
   return params;
 }
 
-TimeLimitedConstantPointSource::TimeLimitedConstantPointSource(const std::string & name, InputParameters parameters) :
-    DiracKernel(name, parameters),
+TimeLimitedConstantPointSource::TimeLimitedConstantPointSource(const InputParameters & parameters) :
+    DiracKernel(parameters),
     _value(getParam<Real>("value")),
     _point_param(getParam<std::vector<Real> >("point")),
     _end_time(getParam<Real>("end_time"))

@@ -27,7 +27,7 @@ InputParameters validParams<FluidProperties>();
 class FluidPropertiesWater : public FluidProperties
 {
  public:
-  FluidPropertiesWater(const std::string & name, InputParameters parameters);
+  FluidPropertiesWater(const InputParameters & parameters);
 
   /**
    * Water molar mass.

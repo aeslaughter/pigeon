@@ -24,8 +24,8 @@ InputParameters validParams<FluidStateTwoPhase>()
   return params;
 }
 
-FluidStateTwoPhase::FluidStateTwoPhase(const std::string & name, InputParameters parameters) :
-  FluidState(name, parameters),
+FluidStateTwoPhase::FluidStateTwoPhase(const InputParameters & parameters) :
+  FluidState(parameters),
 
   _liquid_property(getUserObject<FluidProperties>("liquid_property_uo")),
   _gas_property(getUserObject<FluidProperties>("gas_property_uo")),

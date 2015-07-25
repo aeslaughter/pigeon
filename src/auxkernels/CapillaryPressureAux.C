@@ -19,9 +19,8 @@ InputParameters validParams<CapillaryPressureAux>()
   return params;
 }
 
-CapillaryPressureAux::CapillaryPressureAux(const std::string & name,
-                       InputParameters parameters) :
-    AuxKernel(name, parameters),
+CapillaryPressureAux::CapillaryPressureAux(const InputParameters & parameters) :
+    AuxKernel(parameters),
 
     _capillary_pressureUO(getUserObject<CapillaryPressure>("capillary_pressure_uo")),
     _liquid_saturation(coupledValue("liquid_saturation_variable")),

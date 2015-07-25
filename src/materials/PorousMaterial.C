@@ -23,9 +23,8 @@ InputParameters validParams<PorousMaterial>()
   return params;
 }
 
-PorousMaterial::PorousMaterial(const std::string & name,
-                                   InputParameters parameters) :
-    Material(name, parameters),
+PorousMaterial::PorousMaterial(const InputParameters & parameters) :
+    Material(parameters),
 
     _material_density(getParam<Real>("density")),
     _material_porosity(getParam<Real>("porosity")),

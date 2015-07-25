@@ -24,7 +24,7 @@ InputParameters validParams<FluidState>();
 class FluidStateBrineCO2 : public FluidState
 {
  public:
-  FluidStateBrineCO2(const std::string & name, InputParameters parameters);
+  FluidStateBrineCO2(const InputParameters & parameters);
 
   /**
    * Number of fluid phases

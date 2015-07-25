@@ -15,8 +15,8 @@ InputParameters validParams<FluidPropertiesIdealGas>()
   return params;
 }
 
-FluidPropertiesIdealGas::FluidPropertiesIdealGas(const std::string & name, InputParameters parameters) :
-  FluidProperties(name, parameters)
+FluidPropertiesIdealGas::FluidPropertiesIdealGas(const InputParameters & parameters) :
+  FluidProperties(parameters)
 {
   _t_c2k = 273.15;
   _R = 8.3144621;

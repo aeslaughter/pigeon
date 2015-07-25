@@ -23,9 +23,8 @@ InputParameters validParams<ComponentFlux>()
   return params;
 }
 
-ComponentFlux::ComponentFlux(const std::string & name,
-                       InputParameters parameters) :
-  Kernel(name, parameters),
+ComponentFlux::ComponentFlux(const InputParameters & parameters) :
+  Kernel(parameters),
   _permeability(getMaterialProperty<RealTensorValue>("permeability")),
   _gravity(getMaterialProperty<RealVectorValue>("gravity")),
   _phase_flux_no_mobility(getMaterialProperty<std::vector<RealGradient> >("phase_flux_no_mobility")),

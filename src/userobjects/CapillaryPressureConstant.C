@@ -16,8 +16,8 @@ InputParameters validParams<CapillaryPressureConstant>()
   return params;
 }
 
-CapillaryPressureConstant::CapillaryPressureConstant(const std::string & name, InputParameters parameters) :
-  CapillaryPressure(name, parameters),
+CapillaryPressureConstant::CapillaryPressureConstant(const InputParameters & parameters) :
+  CapillaryPressure(parameters),
   _cp(getParam<Real>("cp"))
 {
 }

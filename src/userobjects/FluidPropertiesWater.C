@@ -15,8 +15,8 @@ InputParameters validParams<FluidPropertiesWater>()
   return params;
 }
 
-FluidPropertiesWater::FluidPropertiesWater(const std::string & name, InputParameters parameters) :
-  FluidProperties(name, parameters)
+FluidPropertiesWater::FluidPropertiesWater(const InputParameters & parameters) :
+  FluidProperties(parameters)
 {
   /// Reference critical constants used in to calculate thermophysical properties of water.
   _t_critical = 647.096;

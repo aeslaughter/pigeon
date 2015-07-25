@@ -20,7 +20,7 @@ InputParameters validParams<FluidPropertiesIdealGas>();
 class FluidPropertiesMethane : public FluidPropertiesIdealGas
 {
  public:
-  FluidPropertiesMethane(const std::string & name, InputParameters parameters);
+  FluidPropertiesMethane(const InputParameters & parameters);
 
   /**
    * Methane molar mass.

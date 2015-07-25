@@ -20,8 +20,7 @@ class FluidPropertyCO2Aux : public AuxKernel
 {
 public:
 
-  FluidPropertyCO2Aux(const std::string & name,
-             InputParameters parameters);
+  FluidPropertyCO2Aux(const InputParameters & parameters);
 
 protected:
 

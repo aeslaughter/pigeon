@@ -16,8 +16,8 @@ InputParameters validParams<FluidPropertiesBrine>()
   return params;
 }
 
-FluidPropertiesBrine::FluidPropertiesBrine(const std::string & name, InputParameters parameters) :
-  FluidProperties(name, parameters),
+FluidPropertiesBrine::FluidPropertiesBrine(const InputParameters & parameters) :
+  FluidProperties(parameters),
 
   _water_property(getUserObject<FluidPropertiesWater>("water_property_uo"))
 {

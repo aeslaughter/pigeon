@@ -18,8 +18,8 @@ InputParameters validParams<FluidStateSinglePhase>()
   return params;
 }
 
-FluidStateSinglePhase::FluidStateSinglePhase(const std::string & name, InputParameters parameters) :
-  FluidState(name, parameters),
+FluidStateSinglePhase::FluidStateSinglePhase(const InputParameters & parameters) :
+  FluidState(parameters),
 
   _fluid_property(getUserObject<FluidProperties>("fluid_property_uo")),
   _pressure(coupledNodalValue("pressure_variable")),

@@ -20,8 +20,7 @@ class FluidPropertyBrineAux : public AuxKernel
 {
 public:
 
-  FluidPropertyBrineAux(const std::string & name,
-             InputParameters parameters);
+  FluidPropertyBrineAux(const InputParameters & parameters);
 
 protected:
 

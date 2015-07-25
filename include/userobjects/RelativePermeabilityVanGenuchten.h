@@ -36,7 +36,7 @@ InputParameters validParams<RelativePermeabilityVanGenuchten>();
 class RelativePermeabilityVanGenuchten : public RelativePermeability
 {
  public:
-  RelativePermeabilityVanGenuchten(const std::string & name, InputParameters parameters);
+  RelativePermeabilityVanGenuchten(const InputParameters & parameters);
 
   /**
    * van Genuchten form of liquid phase relative permeability as a function of liquid saturation

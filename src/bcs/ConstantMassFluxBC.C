@@ -16,8 +16,8 @@ InputParameters validParams<ConstantMassFluxBC>()
   return params;
 }
 
-ConstantMassFluxBC::ConstantMassFluxBC(const std::string & name, InputParameters params) :
-    IntegratedBC(name, params),
+ConstantMassFluxBC::ConstantMassFluxBC(const InputParameters & params) :
+    IntegratedBC(params),
     _value(getParam<Real>("value")),
     _gravity(getMaterialProperty<RealVectorValue>("gravity")),
     _fluid_density(coupledValue("fluid_density_variable"))

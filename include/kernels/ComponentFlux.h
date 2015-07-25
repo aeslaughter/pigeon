@@ -19,7 +19,7 @@ InputParameters validParams<ComponentFlux>();
 class ComponentFlux : public Kernel
 {
 public:
-  ComponentFlux(const std::string & name, InputParameters parameters);
+  ComponentFlux(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpResidual();

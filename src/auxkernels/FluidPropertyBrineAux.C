@@ -22,9 +22,8 @@ InputParameters validParams<FluidPropertyBrineAux>()
   return params;
 }
 
-FluidPropertyBrineAux::FluidPropertyBrineAux(const std::string & name,
-                       InputParameters parameters) :
-    AuxKernel(name, parameters),
+FluidPropertyBrineAux::FluidPropertyBrineAux(const InputParameters & parameters) :
+    AuxKernel(parameters),
 
     _brine_property(getUserObject<FluidPropertiesBrine>("brine_property_uo")),
     _water_property(getUserObject<FluidPropertiesWater>("water_property_uo")),

@@ -21,9 +21,8 @@ InputParameters validParams<FluidStateMaterial>()
   return params;
 }
 
-FluidStateMaterial::FluidStateMaterial(const std::string & name,
-                                   InputParameters parameters) :
-    Material(name, parameters),
+FluidStateMaterial::FluidStateMaterial(const InputParameters & parameters) :
+    Material(parameters),
 
     // Get gravity from PorousMaterial class
     _gravity(getMaterialProperty<RealVectorValue>("gravity")),

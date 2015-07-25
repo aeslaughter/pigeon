@@ -20,8 +20,7 @@ class CapillaryPressureAux : public AuxKernel
 {
 public:
 
-  CapillaryPressureAux(const std::string & name,
-             InputParameters parameters);
+  CapillaryPressureAux(const InputParameters & parameters);
 
 protected:
 

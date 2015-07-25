@@ -21,9 +21,8 @@ InputParameters validParams<ComponentMassTimeDerivative>()
   return params;
 }
 
-ComponentMassTimeDerivative::ComponentMassTimeDerivative(const std::string & name,
-                       InputParameters parameters) :
-  TimeKernel(name, parameters),
+ComponentMassTimeDerivative::ComponentMassTimeDerivative(const InputParameters & parameters) :
+  TimeKernel(parameters),
   _porosity(getMaterialProperty<Real>("porosity")),
   _fluid_density(coupledNodalValue("fluid_density_variable")),
   _fluid_density_old(coupledNodalValueOld("fluid_density_variable")),

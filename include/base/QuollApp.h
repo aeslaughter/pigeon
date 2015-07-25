@@ -11,7 +11,7 @@ InputParameters validParams<QuollApp>();
 class QuollApp : public MooseApp
 {
 public:
-  QuollApp(const std::string & name, InputParameters parameters);
+  QuollApp(InputParameters parameters);
   virtual ~QuollApp();
 
   static void registerApps();

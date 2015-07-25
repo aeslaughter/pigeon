@@ -16,8 +16,8 @@ InputParameters validParams<RelativePermeabilityCorey>()
   return params;
 }
 
-RelativePermeabilityCorey::RelativePermeabilityCorey(const std::string & name, InputParameters parameters) :
-  RelativePermeability(name, parameters),
+RelativePermeabilityCorey::RelativePermeabilityCorey(const InputParameters & parameters) :
+  RelativePermeability(parameters),
   _sat_lr(getParam<Real>("sat_lr")),
   _sat_gr(getParam<Real>("sat_gr"))
 {

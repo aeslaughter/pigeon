@@ -23,7 +23,7 @@ InputParameters validParams<EquationOfState>();
 class EquationOfState : public GeneralUserObject
 {
  public:
-  EquationOfState(const std::string & name, InputParameters parameters);
+  EquationOfState(const InputParameters & parameters);
 
   void initialize();
   void execute();
