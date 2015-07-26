@@ -64,15 +64,15 @@ void ComponentAdvectiveFlux::computeResidual()
 
 Real ComponentAdvectiveFlux::computeQpJacobian()
 {
-  Real qpjacobian;
+  Real qpjacobian = 0.0;
 
   if (_primary_variable_type == "pressure")
     qpjacobian = _grad_test[_i][_qp] * (_permeability[_qp] * (_grad_phi[_j][_qp] * _dpressure_flux_dp[_qp][_phase_index] + _phi[_j][_qp] * _dgravity_flux_dp[_qp][_phase_index]));
 
-  if (_primary_variable_type == "saturation")
+  else if (_primary_variable_type == "saturation")
     qpjacobian = _grad_test[_i][_qp] * (_permeability[_qp] * (_grad_phi[_j][_qp] * _dpressure_flux_ds[_qp][_phase_index] + _phi[_j][_qp] * _dgravity_flux_ds[_qp][_phase_index]));
 
-  if (_primary_variable_type == "mass_fraction")
+  else if (_primary_variable_type == "mass_fraction")
     qpjacobian = 0.; //TODO
 
   return qpjacobian;
@@ -88,7 +88,7 @@ Real ComponentAdvectiveFlux::computeQpOffDiagJacobian(unsigned int jvar)
   if (!_fluid_state.isFluidStateVariable(jvar))
     return 0.0;
 
-  Real qpoffdiagjacobian;
+  Real qpoffdiagjacobian = 0.0;
 
   // Determine the variable type to take the derivative with respect to
   std::string jvar_type = _fluid_state.variableTypes(jvar);
@@ -96,10 +96,10 @@ Real ComponentAdvectiveFlux::computeQpOffDiagJacobian(unsigned int jvar)
   if (jvar_type == "pressure")
     qpoffdiagjacobian = _grad_test[_i][_qp] * (_permeability[_qp] * (_grad_phi[_j][_qp] * _dpressure_flux_dp[_qp][_phase_index] + _phi[_j][_qp] * _dgravity_flux_dp[_qp][_phase_index]));
 
-  if (jvar_type == "saturation")
+  else if (jvar_type == "saturation")
     qpoffdiagjacobian = _grad_test[_i][_qp] * (_permeability[_qp] * (_grad_phi[_j][_qp] * _dpressure_flux_ds[_qp][_phase_index] + _phi[_j][_qp] * _dgravity_flux_ds[_qp][_phase_index]));
 
-  if (jvar_type == "mass_fraction")
+  else if (jvar_type == "mass_fraction")
     qpoffdiagjacobian = 0.; //TODO
 
   return qpoffdiagjacobian;

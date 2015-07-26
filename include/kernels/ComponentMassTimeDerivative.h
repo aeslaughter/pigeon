@@ -16,6 +16,10 @@ class ComponentMassTimeDerivative;
 template<>
 InputParameters validParams<ComponentMassTimeDerivative>();
 
+/**
+ * Derivative of mass of component k in fluid phase alpha wrt time
+ * In this formulation, all mass is lumped to the nodes of the element
+ */
 class ComponentMassTimeDerivative : public TimeKernel
 {
 public:
@@ -26,7 +30,7 @@ protected:
   virtual Real computeQpJacobian();
   virtual Real computeQpOffDiagJacobian(unsigned int jvar);
 
-  // Member reference to the porosity material property
+  /// Member reference to the porosity material property
   const MaterialProperty<Real> & _porosity;
 
 
@@ -46,9 +50,15 @@ private:
    * value for the fluid state User Object.
    */
   const FluidState & _fluid_state;
-  Real _node_temperature;
+
+  /**
+   * The sign of the derivative of the saturation variable that this kernel
+   * acts on wrt the liquid phase saturation
+   */
   Real _dsaturation;
+  /// Index of the fluid phase that this kernel acts on
   unsigned int _phase_index;
+  /// Primary variable type (used in Jacobian calculations)
   std::string _primary_variable_type;
 };
 

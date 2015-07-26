@@ -5,9 +5,9 @@
 
 // Kernels
 #include "ComponentMassTimeDerivative.h"
-#include "ComponentFlux.h"
-//#include "LumpedMassChange.h"
-//#include "FullyUpwindFlux.h"
+#include "ComponentAdvectiveFlux.h"
+#include "ComponentDiffusiveFlux.h"
+
 
 // Boundary conditions
 #include "ConstantMassFluxBC.h"
@@ -26,7 +26,6 @@
 // Materials
 #include "PorousMaterial.h"
 #include "FluidStateMaterial.h"
-//#include "tmpMaterial.h"
 #include "SimpleFluidStateMaterial.h"
 
 // User object
@@ -108,9 +107,9 @@ QuollApp::registerObjects(Factory & factory)
 
    // Register the kernels
    registerKernel(ComponentMassTimeDerivative);
-   registerKernel(ComponentFlux);
-//   registerKernel(LumpedMassChange);
-//   registerKernel(FullyUpwindFlux);
+   registerKernel(ComponentAdvectiveFlux);
+   registerKernel(ComponentDiffusiveFlux);
+
 
    // Register the boundary conditions
    registerBoundaryCondition(ConstantMassFluxBC);
