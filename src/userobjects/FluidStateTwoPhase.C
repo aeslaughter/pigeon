@@ -312,15 +312,16 @@ FluidStateTwoPhase::getNodalProperty(std::string property, unsigned int nodeid, 
 {
   if (phase_index >= _num_phases)
     mooseError("Phase index " << phase_index << " out of range in FluidStateTwoPhase::getNodalProperty");
+
   FluidStateProperties fsp;
   Real value=0;
-
   std::map<int, FluidStateProperties>::const_iterator node_it = _nodal_properties.find(nodeid);
 
   if (node_it != _nodal_properties.end())
     fsp = node_it->second;
   else
-    mooseError("Node id "<< nodeid << " out of range in FluidStateTwoPhase::getNodalProperty");
+    return value;  // FIXME: Sometimes the AuxKernel was trying to access data before execute above was run
+  //  mooseError("Node id "<< nodeid << " out of range in FluidStateTwoPhase::getNodalProperty");
 
   // Now access the property and phase index
   if (property == "pressure")

@@ -168,78 +168,6 @@ FluidStateSinglePhase::execute()
       }
     }
   }
-  /*
-  // Current node
-  unsigned int node = _current_node->id();
-  Real fluid_saturation = 1.0;
-
-  // Store the phase pressures
-  _fsp[node].pressure = pressure(_pressure[_qp], fluid_saturation);
-
-  // Store the phase saturations
-  _fsp[node].saturation = saturation(fluid_saturation);
-
-  // Density of phases
-  std::vector<Real> densities;
-
-  densities.push_back(_fluid_property.density(_fsp[node].pressure[0], _temperature[_qp]));
-  _fsp[node].density = densities;
-
-  // Viscosity of fluid
-  std::vector<Real> viscosities;
-  // Water viscosity uses water density in calculation. TODO Fix this for generality
-  viscosities.push_back(_fluid_property.viscosity(_temperature[_qp], _fsp[node].density[0]));
-  _fsp[node].viscosity = viscosities;
-
-  // Relative permeability of the phase is equal to 1.0 by definition
-  _fsp[node].relperm = relativePermeability(_fsp[node].saturation[0]);
-
-  // Mass fraction of each component in the fluid
-  std::vector<std::vector<Real> > xmass;
-  xmass.resize(numComponents());
-
-  xmass[0].push_back(1.0); // Only component in liquid
-
-  _fsp[node].mass_fraction = xmass;
-
-  // Mobility of each phase
-  std::vector<Real> mobilities(_num_phases);
-
-  mobilities[0] = _fsp[node].relperm[0] * _fsp[node].density[0]  / _fsp[node].viscosity[0];
-  _fsp[node].mobility = mobilities;
-
-
-  // Derivative of relative permeability wrt liquid_saturation
-  _fsp[node].drelperm = dRelativePermeability(_fsp[node].saturation[0]);
-
-  // Derivative of density wrt pressure
-  std::vector<Real> ddensities_dp;
-
-  ddensities_dp.push_back(dDensity_dP(_fsp[node].pressure[0], _temperature[_qp], 0));
-  _fsp[node].ddensity_dp = ddensities_dp;
-
-  // Derivative of density wrt saturation
-  std::vector<Real> ddensities_ds;
-
-  ddensities_ds.push_back(0.0);
-  _fsp[node].ddensity_ds = ddensities_ds;
-
-  // Derivative of mobility wrt pressure
-  // Note: dViscosity_dP not implemnted yet
-  std::vector<Real> dmobilities_dp(_num_phases);
-
-  for (unsigned int i = 0; i < _num_phases; ++i)
-    dmobilities_dp[i] = _fsp[node].relperm[i] * _fsp[node].ddensity_dp[i]  / _fsp[node].viscosity[i];
-  _fsp[node].dmobility_dp = dmobilities_dp;
-
-  // Derivative of mobility wrt saturation
-  // Note: dDensity_dS and dViscosity_dS not implemnted yet
-  std::vector<Real> dmobilities_ds(_num_phases);
-
-  for (unsigned int i = 0; i < _num_phases; ++i)
-    dmobilities_ds[i] = _fsp[node].drelperm[i] * _fsp[node].density[i]  / _fsp[node].viscosity[i];
-  _fsp[node].dmobility_ds = dmobilities_ds;
-*/
 }
 
 void
@@ -355,7 +283,8 @@ FluidStateSinglePhase::getNodalProperty(std::string property, unsigned int nodei
   if (node_it != _nodal_properties.end())
     fsp = node_it->second;
   else
-    mooseError("Node id "<< nodeid << " out of range in FluidStateTwoPhase::getNodalProperty");
+    return value; // Return zero if the node is out of range initially
+  //  mooseError("Node id "<< nodeid << " out of range in FluidStateTwoPhase::getNodalProperty");
 
   // Now access the property and phase index
   if (property == "pressure")
