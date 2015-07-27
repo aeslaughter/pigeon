@@ -14,6 +14,7 @@ InputParameters validParams<ComponentDiffusiveFlux>()
   params.addRequiredCoupledVar("fluid_density_variable", "The fluid density auxiallary variable for this phase.");
   params.addRequiredCoupledVar("component_mass_fraction_variable", "The mass fraction of the kernels component in this phase.");
   params.addParam<unsigned int>("phase_index", 0, "The index corresponding to the fluid phase eg: 0 for liquid, 1 for gas");
+  params.addParam<unsigned int>("component_index", 0, "The index corresponding to the component for this kernel");
   params.addRequiredParam<UserObjectName>("fluid_state_uo", "Name of the User Object defining the fluid state");
   params.addClassDescription("Component Diffusive flux for component k in phase alpha");
   return params;
@@ -21,11 +22,12 @@ InputParameters validParams<ComponentDiffusiveFlux>()
 
 ComponentDiffusiveFlux::ComponentDiffusiveFlux(const InputParameters & parameters) :
   Kernel(parameters),
-  _diffusivity(getMaterialProperty<RealVectorValue>("diffusivity")),
+  _diffusivity(getMaterialProperty<std::vector<Real> >("diffusivity")),
   _fluid_density(coupledValue("fluid_density_variable")),
   _grad_component_mass_fraction(coupledGradient("component_mass_fraction_variable")),
   _fluid_state(getUserObject<FluidState>("fluid_state_uo")),
-  _phase_index(getParam<unsigned int>("phase_index"))
+  _phase_index(getParam<unsigned int>("phase_index")),
+  _component_index(getParam<unsigned int>("component_index"))
 
 {
   if (!_fluid_state.isFluidStateVariable(_var.number()))
@@ -34,11 +36,14 @@ ComponentDiffusiveFlux::ComponentDiffusiveFlux(const InputParameters & parameter
   // Determine the primary variable type
   _primary_variable_type = _fluid_state.variableTypes(_var.number());
 
+  // Calculate the index for the diffusivity for this component in this phase
+  _diffusivity_index = _fluid_state.numPhases() * _component_index + _phase_index;
+
 }
 
 Real ComponentDiffusiveFlux::computeQpResidual()
 {
-  return _grad_test[_i][_qp] * _fluid_density[_qp] * _grad_component_mass_fraction[_qp];
+  return _grad_test[_i][_qp] * _fluid_density[_qp] * _diffusivity[_qp][_diffusivity_index] * _grad_component_mass_fraction[_qp];
 }
 
 
@@ -58,9 +63,11 @@ Real ComponentDiffusiveFlux::computeQpJacobian()
     qpjacobian = _grad_test[_i][_qp] * _phi[_j][_qp] * dDensity_dS * _grad_component_mass_fraction[_qp];
   }
   else if (_primary_variable_type == "mass_fraction")
-    qpjacobian = _grad_test[_i][_qp] * _fluid_density[_qp] * _grad_phi[_j][_qp];
-
-  return qpjacobian;
+  {
+    Real dDensity_dX = _fluid_state.getNodalProperty("ddensity_dx", nodeid, _phase_index, _component_index);
+    qpjacobian = _grad_test[_i][_qp] * (dDensity_dX * _phi[_j][_qp] * _grad_component_mass_fraction[_qp] + _fluid_density[_qp] * _grad_phi[_j][_qp]);
+  }
+  return _diffusivity[_qp][_diffusivity_index] * qpjacobian;
 }
 
 Real ComponentDiffusiveFlux::computeQpOffDiagJacobian(unsigned int jvar)
@@ -87,7 +94,10 @@ Real ComponentDiffusiveFlux::computeQpOffDiagJacobian(unsigned int jvar)
   }
 
   else if (jvar_type == "mass_fraction")
-    qpoffdiagjacobian = _grad_test[_i][_qp] * _fluid_density[_qp] * _grad_phi[_j][_qp];
+  {
+    Real dDensity_dX = _fluid_state.getNodalProperty("ddensity_dx", nodeid, _phase_index, _component_index);
+    qpoffdiagjacobian = _grad_test[_i][_qp] * (dDensity_dX * _phi[_j][_qp] * _grad_component_mass_fraction[_qp] + _fluid_density[_qp] * _grad_phi[_j][_qp]);
+  }
 
-  return qpoffdiagjacobian;
+  return _diffusivity[_qp][_diffusivity_index] * qpoffdiagjacobian;
 }

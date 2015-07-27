@@ -17,6 +17,7 @@ InputParameters validParams<FluidStateMaterial>()
   params.addRequiredCoupledVar("primary_pressure_variable", "The primary pressure variable");
   params.addCoupledVar("temperature_variable", 50., "The temperature variable");
   params.addRequiredCoupledVar("fluid_density_variables", "The density of each fluid phase");
+  params.addParam<std::vector<Real> >("diffusivity", "Vector of diffusivity for each component in each phase. Order is i) component 1 in phase 1; ii) component 1 in phase 2 ...; component 2 in phase 1; ... component n in phase m (m^2/s");
 
   return params;
 }
@@ -26,6 +27,7 @@ FluidStateMaterial::FluidStateMaterial(const InputParameters & parameters) :
 
     // Get gravity from PorousMaterial class
     _gravity(getMaterialProperty<RealVectorValue>("gravity")),
+    _material_diffusivity(getParam<std::vector<Real> >("diffusivity")),
 
     // Declare vector of phase fluxes (without mobility)
     _phase_flux_no_mobility(declareProperty<std::vector<RealGradient> >("phase_flux_no_mobility")),
@@ -34,6 +36,7 @@ FluidStateMaterial::FluidStateMaterial(const InputParameters & parameters) :
     _dpressure_flux_ds(declareProperty<std::vector<Real> >("dpressure_flux_ds")),
     _dgravity_flux_dp(declareProperty<std::vector<RealVectorValue> >("dgravity_flux_dp")),
     _dgravity_flux_ds(declareProperty<std::vector<RealVectorValue> >("dgravity_flux_ds")),
+    _diffusivity(declareProperty<std::vector<Real> >("diffusivity")),
 
     _primary_saturation(coupledValue("primary_saturation_variable")),
     _grad_primary_saturation(coupledGradient("primary_saturation_variable")),
@@ -45,12 +48,18 @@ FluidStateMaterial::FluidStateMaterial(const InputParameters & parameters) :
     _fluid_state(getUserObject<FluidState>("fluid_state_uo"))
 
 {
-  // The number of phases in the given fluid state model
+  // The number of phases in the given FluidState model
   _num_phases = _fluid_state.numPhases();
+  // The number of components in the given FluidState model
+  _num_components = _fluid_state.numComponents();
 
-  // Check that the required number of auxillary variables have been provided
+  // Check that the required number (_num_phases) of auxillary variables have been provided
   if (coupledComponents("fluid_density_variables") != _num_phases)
     mooseError("The number of phase densities provided in FluidStateMaterial is not equal to the number of phases in the FluidState UserObject");
+
+  // Check that the required number (_num_phases + _num_components) of diffusivities have been provided
+  if (_material_diffusivity.size() != _num_phases + _num_components)
+    mooseError("The number of diffivities given in FluidStateMaterial, " << _material_diffusivity.size() <<", is not equal to the required number " << _num_phases + _num_components);
 
   // Determine the phase of the primary variable that this material acts on
   _p_phase = _fluid_state.variablePhase(_pvar);
@@ -62,6 +71,8 @@ void
 FluidStateMaterial::computeQpProperties()
 {
   Real temperature;
+
+  _diffusivity[_qp] = _material_diffusivity;
 
   // Check if the simulation is isothermal
   if (_fluid_state.isIsothermal())

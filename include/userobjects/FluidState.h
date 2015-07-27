@@ -50,6 +50,7 @@ public Coupleable
     std::vector<Real> mobility;
     std::vector<Real> ddensity_dp;
     std::vector<Real> ddensity_ds;
+    std::vector<std::vector<Real> > ddensity_dx;
     std::vector<Real> drelperm;
     std::vector<Real> dmobility_dp;
     std::vector<Real> dmobility_ds;

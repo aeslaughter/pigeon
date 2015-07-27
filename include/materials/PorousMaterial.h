@@ -38,8 +38,6 @@ private:
   RealTensorValue _material_permeability;
   /// Gravity vector specified in input file
   RealVectorValue _material_gravity;
-  /// Diffusivity specified in input file
-  Real _material_diffusivity;
 
   /**
    * Member references that will hold the User Object values for
@@ -51,7 +49,6 @@ private:
   MaterialProperty<Real> & _porosity;
   MaterialProperty<RealTensorValue> & _permeability;
   MaterialProperty<RealVectorValue> & _gravity;
-  MaterialProperty<Real> & _diffusivity;
 //  MaterialProperty<Real> & _gas_relative_permeability;
 //  MaterialProperty<Real> & _liquid_relative_permeability;
 //  MaterialProperty<Real> & _capillary_pressure;

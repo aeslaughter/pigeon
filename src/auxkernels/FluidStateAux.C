@@ -36,32 +36,22 @@ FluidStateAux::computeValue()
   unsigned int node_num = _current_node->id();
 
   if (_state_property_enum == "density")
-  {
       property = _fluid_state.getNodalProperty("density", node_num, _phase_index);
-  }
 
-  if (_state_property_enum == "viscosity")
-  {
+  else if (_state_property_enum == "viscosity")
     property = _fluid_state.getNodalProperty("viscosity", node_num, _phase_index);
-  }
 
-  if (_state_property_enum == "saturation")
-  {
+  else if (_state_property_enum == "saturation")
     property = _fluid_state.getNodalProperty("saturation", node_num, _phase_index);
-  }
-  if (_state_property_enum == "pressure")
-  {
-    property = _fluid_state.getNodalProperty("pressure", node_num, _phase_index);
-  }
-  if (_state_property_enum == "relperm")
-  {
-    property = _fluid_state.getNodalProperty("relperm", node_num, _phase_index);
-  }
 
-  if (_state_property_enum == "mass_fraction")
-  {
+  else if (_state_property_enum == "pressure")
+    property = _fluid_state.getNodalProperty("pressure", node_num, _phase_index);
+
+  else if (_state_property_enum == "relperm")
+    property = _fluid_state.getNodalProperty("relperm", node_num, _phase_index);
+
+  else if (_state_property_enum == "mass_fraction")
     property = _fluid_state.getNodalProperty("mass_fraction", node_num, _phase_index, _component_index);
-  }
 
   return property;
 }

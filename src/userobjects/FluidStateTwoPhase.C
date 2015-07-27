@@ -174,7 +174,7 @@ FluidStateTwoPhase::execute()
       const Node * current_node = current_elem->get_node(i);
       unsigned int nodeid = current_node->id();
 
-      // Check if the properties at this node have already been calcualted, and if so,
+      // Check if the properties at this node have already been calculated, and if so,
       // skip to the next node
       if (_nodal_properties.find(nodeid) == _nodal_properties.end())
       {
@@ -286,6 +286,17 @@ FluidStateTwoPhase::thermophysicalProperties(std::vector<Real> primary_vars, Flu
 
   fsp.ddensity_ds = ddensities_ds;
 
+  // Derivative of density wrt mass fraction
+  std::vector<std::vector<Real> > ddensities_dx;
+  ddensities_dx.resize(numComponents());
+
+  ddensities_dx[0].push_back(0.);
+  ddensities_dx[0].push_back(0.);
+  ddensities_dx[1].push_back(0.);
+  ddensities_dx[1].push_back(0.);
+
+  fsp.ddensity_dx = ddensities_dx;
+
   // Derivative of mobility wrt pressure
   // Note: dViscosity_dP not implemnted yet
   std::vector<Real> dmobilities_dp(_num_phases);
@@ -342,6 +353,8 @@ FluidStateTwoPhase::getNodalProperty(std::string property, unsigned int nodeid, 
     value = fsp.ddensity_dp[phase_index];
   else if (property == "ddensity_ds")
     value = fsp.ddensity_ds[phase_index];
+  else if (property == "ddensity_dx")
+    value = fsp.ddensity_dx[phase_index][component_index];
   else if (property == "drelperm")
     value = fsp.drelperm[phase_index];
   else if (property == "dmobility_dp")

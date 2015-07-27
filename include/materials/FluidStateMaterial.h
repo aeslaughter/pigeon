@@ -30,12 +30,16 @@ protected:
 
 private:
   const MaterialProperty<RealVectorValue> & _gravity;
+  /// Diffusivity specified in input file
+  std::vector<Real> _material_diffusivity;
+
   MaterialProperty<std::vector<RealGradient> > & _phase_flux_no_mobility;
   MaterialProperty<std::vector<Real> > & _phase_mass;
   MaterialProperty<std::vector<Real> > & _dpressure_flux_dp;
   MaterialProperty<std::vector<Real> > & _dpressure_flux_ds;
   MaterialProperty<std::vector<RealVectorValue> > & _dgravity_flux_dp;
   MaterialProperty<std::vector<RealVectorValue> > & _dgravity_flux_ds;
+  MaterialProperty<std::vector<Real> > & _diffusivity;
 
 
   VariableValue & _primary_saturation;
@@ -45,6 +49,7 @@ private:
   VariableValue & _temperature;
   std::vector<VariableValue *> _density;
   unsigned int _num_phases;
+  unsigned int _num_components;
   unsigned int _phase_index;
   unsigned int _pvar;
   unsigned int _svar;

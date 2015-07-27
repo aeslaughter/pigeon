@@ -249,6 +249,14 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
 
   fsp.ddensity_ds = ddensities_ds;
 
+  // Derivative of density wrt mass fraction
+  std::vector<std::vector<Real> > ddensities_dx;
+  ddensities_dx.resize(numComponents());
+
+  ddensities_dx[0].push_back(0.);
+
+  fsp.ddensity_dx = ddensities_dx;
+
   // Derivative of mobility wrt pressure
   // Note: dViscosity_dP not implemnted yet
   std::vector<Real> dmobilities_dp(_num_phases);
@@ -305,6 +313,8 @@ FluidStateSinglePhase::getNodalProperty(std::string property, unsigned int nodei
     value = fsp.ddensity_dp[phase_index];
   else if (property == "ddensity_ds")
     value = fsp.ddensity_ds[phase_index];
+  else if (property == "ddensity_dx")
+    value = fsp.ddensity_dx[phase_index][component_index];
   else if (property == "drelperm")
     value = fsp.drelperm[phase_index];
   else if (property == "dmobility_dp")

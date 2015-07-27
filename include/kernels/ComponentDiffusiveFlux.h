@@ -28,12 +28,9 @@ protected:
   virtual Real computeQpResidual();
   virtual Real computeQpJacobian();
   virtual Real computeQpOffDiagJacobian(unsigned int jvar);
-//  virtual void computeResidual();
-//  virtual void computeJacobian();
-//  virtual void computeOffDiagJacobian(unsigned int jvar);
 
   /// Member reference to the diffusivity of component k in phase alpha material properties
-  const MaterialProperty<RealVectorValue> & _diffusivity;
+  const MaterialProperty<std::vector<Real> > & _diffusivity;
 
 private:
   VariableValue & _fluid_density;
@@ -47,6 +44,10 @@ private:
 
   /// Index of the fluid phase that this kernel acts on
   unsigned int _phase_index;
+  /// Index of the component that this kernel acts on
+  unsigned int _component_index;
+  /// Index of the diffusivity for this component in this phase
+  unsigned int _diffusivity_index;
   /// Primary variable type (used in Jacobian calculations)
   std::string _primary_variable_type;
 
