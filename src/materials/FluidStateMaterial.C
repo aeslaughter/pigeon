@@ -58,8 +58,8 @@ FluidStateMaterial::FluidStateMaterial(const InputParameters & parameters) :
     mooseError("The number of phase densities provided in FluidStateMaterial is not equal to the number of phases in the FluidState UserObject");
 
   // Check that the required number (_num_phases + _num_components) of diffusivities have been provided
-  if (_material_diffusivity.size() != _num_phases + _num_components)
-    mooseError("The number of diffivities given in FluidStateMaterial, " << _material_diffusivity.size() <<", is not equal to the required number " << _num_phases + _num_components);
+  if (_material_diffusivity.size() != _num_phases * _num_components)
+    mooseError("The number of diffivities given in FluidStateMaterial, " << _material_diffusivity.size() <<", is not equal to the required number " << _num_phases * _num_components);
 
   // Determine the phase of the primary variable that this material acts on
   _p_phase = _fluid_state.variablePhase(_pvar);

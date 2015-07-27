@@ -15,6 +15,8 @@ InputParameters validParams<FluidStateSinglePhase>()
   params.addRequiredParam<UserObjectName>("fluid_property_uo", "Name of the User Object defining the fluid properties");
   params.addRequiredCoupledVar("temperature_variable", "The fluid temperature variable. For isothermal simulations, enter the fluid temperature (C)");
   params.addRequiredCoupledVar("pressure_variable", "The fluid pressure variable (Pa)");
+  params.addRequiredCoupledVar("mass_fraction_variable", "The mass fraction of the dissolved component. Set to 0 for no dissolved component");
+  params.addParam<unsigned int>("num_components", 1, "The number of components in this FluidState. Set to 1 if 'mass_fraction_variable' is 0, or 2 otherwise");
   return params;
 }
 
@@ -24,23 +26,30 @@ FluidStateSinglePhase::FluidStateSinglePhase(const InputParameters & parameters)
   _fluid_property(getUserObject<FluidProperties>("fluid_property_uo")),
   _pressure(coupledNodalValue("pressure_variable")),
   _temperature(coupledNodalValue("temperature_variable")),
+  _mass_fraction(coupledNodalValue("mass_fraction_variable")),
+  _num_components(getParam<unsigned int>("num_components")),
   _not_isothermal(isCoupled("temperature_variable")),
   _pvar(coupled("pressure_variable")),
-  _tvar(coupled("temperature_variable"))
+  _tvar(coupled("temperature_variable")),
+  _xvar(coupled("mass_fraction_variable"))
 
 {
-  _num_components = 1;
   _num_phases = 1;
-  _num_vars = _coupled_moose_vars.size() + (1 - _not_isothermal);
+  _num_vars = 3;
 
   _varnums.push_back(_pvar);
   if (_not_isothermal)
-   _varnums.push_back(_tvar);
+    _varnums.push_back(_tvar);
+  if (isCoupled("mass_fraction_variable"))
+    _varnums.push_back(_xvar);
 
-  // The pressure variable must always be coupled
-  _pname = getVar("pressure_variable", 0)->name();
-  if (_not_isothermal) // Check if temperature is coupled
+  // Get the names of the variables
+  if (isCoupled("pressure_variable"))
+    _pname = getVar("pressure_variable", 0)->name();
+  if (isCoupled("temperature_variable"))
     _tname = getVar("temperature_variable", 0)->name();
+  if (isCoupled("mass_fraction_variable"))
+    _xname = getVar("mass_fraction_variable", 0)->name();
 }
 
 unsigned int
@@ -93,6 +102,8 @@ FluidStateSinglePhase::variableNames(unsigned int moose_var) const
     varname = _pname;
   if (moose_var == _tvar)
     varname = _tname;
+  if (moose_var == _xvar)
+      varname = _xname;
 
   return varname;
 }
@@ -105,6 +116,8 @@ FluidStateSinglePhase::variableTypes(unsigned int moose_var) const
     vartype = "pressure";
   if (moose_var == _tvar)
     vartype = "temperature";
+  if (moose_var == _xvar)
+    vartype = "mass_fraction";
 
   return vartype;
 }
@@ -126,13 +139,15 @@ FluidStateSinglePhase::initialize()
 void
 FluidStateSinglePhase::execute()
 {
-  MooseVariable * pvar, * tvar;
+  MooseVariable * pvar, * tvar, * xvar;
   FluidStateProperties nodalfsp;
 
   if (isCoupled("pressure_variable"))
     pvar = getVar("pressure_variable", 0);
   if(isCoupled("temperature_variable"))
     tvar = getVar("temperature_variable", 0);
+  if(isCoupled("mass_fraction_variable"))
+    xvar = getVar("mass_fraction_variable", 0);
 
   // Loop over all elements on current processor
   const MeshBase::element_iterator end = _mesh.getMesh().active_local_elements_end();
@@ -160,6 +175,11 @@ FluidStateSinglePhase::execute()
         else
           _primary_vars[1] = _temperature[_qp];
 
+        if (isCoupled("mass_fraction_variable"))
+          _primary_vars[2] = xvar->getNodalValue(*current_node);
+        else
+          _primary_vars[2] = _mass_fraction[_qp];
+
         // Now calculate all thermophysical properties at the current node
         thermophysicalProperties(_primary_vars, nodalfsp);
 
@@ -176,6 +196,7 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
   // Primary variables at the node
   Real node_pressure = primary_vars[0];
   Real node_temperature = primary_vars[1];
+  Real node_xmass = primary_vars[2];
 
   // Assign the fluid properties
   // Saturation
@@ -208,7 +229,9 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
   std::vector<std::vector<Real> > xmass;
   xmass.resize(numComponents());
 
-  xmass[0].push_back(1.0); // Only liquid component in liquid
+  xmass[0].push_back(1.0 - node_xmass); // mass fraction of liquid component in liquid
+  if (numComponents() == 2)
+    xmass[1].push_back(node_xmass); // FIXME: make this more general for ncomp
 
   fsp.mass_fraction = xmass;
 

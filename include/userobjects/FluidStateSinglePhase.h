@@ -247,6 +247,8 @@ class FluidStateSinglePhase : public FluidState
   VariableValue & _pressure;
   /// Primary temperature variable
   VariableValue & _temperature;
+  /// Primary mass fracion variable (corresponding to the dissolved component)
+  VariableValue & _mass_fraction;
 
   /// Number of components
   unsigned int _num_components;
@@ -259,14 +261,18 @@ class FluidStateSinglePhase : public FluidState
   /// Vector of MOOSE primary variable numbers
   std::vector<unsigned int> _varnums;
 
-  /// Phase index of primary pressure variable
+  /// MOOSE variable number of primary pressure variable
   unsigned int _pvar;
-  /// Phase index of primary temperature variable
+  /// MOOSE variable number  of primary temperature variable
   unsigned int _tvar;
+  /// MOOSE variable number of primary mass fraction variable
+  unsigned int _xvar;
   /// Name of primary pressure variable
   std::string _pname;
   /// Name of primary temperature variable
   std::string _tname;
+  /// Name of primary mass fraction variable
+  std::string _xname;
 
   /// Fluid state properties class to hold thermophysical properties at each node
   std::map<int, FluidStateProperties > _nodal_properties;
