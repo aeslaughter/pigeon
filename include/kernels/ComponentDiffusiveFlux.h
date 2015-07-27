@@ -46,10 +46,18 @@ private:
   unsigned int _phase_index;
   /// Index of the component that this kernel acts on
   unsigned int _component_index;
+  /// Variable number of the mass fraction variable
+  unsigned int _xvar;
   /// Index of the diffusivity for this component in this phase
   unsigned int _diffusivity_index;
   /// Primary variable type (used in Jacobian calculations)
   std::string _primary_variable_type;
+  /**
+   * Sign of gradient in mass fraction: + if the mass fraction is the primary
+   * variable, -1 otherwise
+   */
+  unsigned int _sgn;
+
 
 };
 

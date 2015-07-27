@@ -93,7 +93,6 @@ FluidStateSinglePhase::isFluidStateVariable(unsigned int moose_var) const
   return isvariable;
 }
 
-
 std::string
 FluidStateSinglePhase::variableNames(unsigned int moose_var) const
 {
