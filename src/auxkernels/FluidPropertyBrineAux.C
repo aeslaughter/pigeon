@@ -39,21 +39,23 @@ FluidPropertyBrineAux::computeValue()
 {
   Real property;
 
-  if (brine_property_enum == "density") {
+  if (brine_property_enum == "density")
     property = _brine_property.density(_pressure[_qp], _temperature[_qp], _salt_mass_fraction[_qp]);
-  }
-  if (brine_property_enum == "viscosity") {
+
+  else if (brine_property_enum == "viscosity")
     property = _brine_property.viscosity(_pressure[_qp], _temperature[_qp], _salt_mass_fraction[_qp]);
-  }
-  if (brine_property_enum == "halite_density") {
+
+  else if (brine_property_enum == "halite_density")
     property = _brine_property.haliteDensity(_pressure[_qp], _temperature[_qp]);
-  }
-  if (brine_property_enum == "halite_solubility") {
+
+  else if (brine_property_enum == "halite_solubility")
     property = _brine_property.haliteSolubility(_temperature[_qp]);
-  }
-  if (brine_property_enum == "pSat") {
+
+  else if (brine_property_enum == "pSat")
     property = _brine_property.pSat(_temperature[_qp], _salt_mass_fraction[_qp]);
-  }
+
+  else
+    mooseError("Fluid property specified in " << _short_name << "is not valid");
 
   return property;
 }

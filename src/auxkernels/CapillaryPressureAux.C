@@ -33,19 +33,16 @@ CapillaryPressureAux::computeValue()
   Real pc;
 
   if (_property_enum == "capillary_pressure")
-  {
       pc = _capillary_pressureUO.capillaryPressure(_liquid_saturation[_qp]);
-  }
 
-  if (_property_enum == "dcapillary_pressure")
-  {
+  else if (_property_enum == "dcapillary_pressure")
       pc = _capillary_pressureUO.dCapillaryPressure(_liquid_saturation[_qp]);
-  }
 
-  if (_property_enum == "d2capillary_pressure")
-  {
+  else if (_property_enum == "d2capillary_pressure")
       pc = _capillary_pressureUO.d2CapillaryPressure(_liquid_saturation[_qp]);
-  }
+
+  else
+    mooseError("Fluid property specified in " << _short_name << "is not valid");
 
   return pc;
 }

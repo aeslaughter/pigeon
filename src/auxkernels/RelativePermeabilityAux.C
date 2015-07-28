@@ -32,23 +32,23 @@ RelativePermeabilityAux::RelativePermeabilityAux(const InputParameters & paramet
 Real
 RelativePermeabilityAux::computeValue()
 {
-  Real property;
+  Real property = 0.;
 
   if (property_enum == "relperm")
   {
     if (fluid_phase_enum == "liquid")
       property =  _relative_permeabilityUO.relativePermLiquid(_liquid_saturation[_qp]);
 
-    if (fluid_phase_enum == "gas")
+    else if (fluid_phase_enum == "gas")
      property =  _relative_permeabilityUO.relativePermGas(_liquid_saturation[_qp]);
   }
 
-  if (property_enum == "drelperm")
+  else if (property_enum == "drelperm")
   {
     if (fluid_phase_enum == "liquid")
       property =  _relative_permeabilityUO.dRelativePermLiquid(_liquid_saturation[_qp]);
 
-    if (fluid_phase_enum == "gas")
+    else if (fluid_phase_enum == "gas")
      property =  _relative_permeabilityUO.dRelativePermGas(_liquid_saturation[_qp]);
   }
 

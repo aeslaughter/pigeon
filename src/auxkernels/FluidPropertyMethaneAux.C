@@ -34,13 +34,13 @@ FluidPropertyMethaneAux::computeValue()
   Real property;
 
   if (ch4_property_enum == "density")
-  {
     property = _ch4_property.density(_pressure[_qp], _temperature[_qp]);
-  }
-  if (ch4_property_enum == "viscosity")
-  {
+
+  else if (ch4_property_enum == "viscosity")
     property = _ch4_property.viscosity(_pressure[_qp], _temperature[_qp]);
-  }
+
+  else
+    mooseError("Fluid property specified in " << _short_name << "is not valid");
 
   return property;
 }

@@ -35,7 +35,6 @@ CapillaryPressureVanGenuchten::CapillaryPressureVanGenuchten(const InputParamete
 Real
 CapillaryPressureVanGenuchten::capillaryPressure(Real sat_liq) const
 {
-  Real sat_eff = (sat_liq - _sat_lr)/(_sat_ls - _sat_lr);
   Real cp;
 
  if (sat_liq < 0.0 )
@@ -46,9 +45,6 @@ CapillaryPressureVanGenuchten::capillaryPressure(Real sat_liq) const
   // Check whether liquid saturation is [0,1] - if not, print error message.
   if (sat_liq < 0.0 || sat_liq > 1.0)
     mooseError("CapillaryPressureVanGenuchten: Liquid saturation is outside the range 0 <= Sl <= 1\n");
-
-  if (sat_eff > 1.0)
-    sat_eff = 1.0; // Restrict sat_eff to be less than or equal to unity
 
   // Locate the point where the cubic spline will be used
   Real sat1 = cutoffIntercept();
@@ -85,7 +81,6 @@ CapillaryPressureVanGenuchten::capillaryPressure(Real sat_liq) const
 Real
 CapillaryPressureVanGenuchten::dCapillaryPressure(Real sat_liq) const
 {
-  Real sat_eff = (sat_liq - _sat_lr)/(_sat_ls - _sat_lr);
   Real dcp;
 
  if (sat_liq < 0.0 )
@@ -96,9 +91,6 @@ CapillaryPressureVanGenuchten::dCapillaryPressure(Real sat_liq) const
   // Check whether liquid saturation is [0,1] - if not, print error message.
   if (sat_liq < 0.0 || sat_liq > 1.0)
     mooseError("CapillaryPressureVanGenuchten: Liquid saturation is outside the range 0 <= Sl <= 1\n");
-
-  if (sat_eff > 1.0)
-    sat_eff = 1.0; // Restrict sat_eff to be less than or equal to unity
 
   // Locate the point where the cubic spline will be unsigned
   Real sat1 = cutoffIntercept();
@@ -129,7 +121,6 @@ CapillaryPressureVanGenuchten::dCapillaryPressure(Real sat_liq) const
 Real
 CapillaryPressureVanGenuchten::d2CapillaryPressure(Real sat_liq) const
 {
-  Real sat_eff = (sat_liq - _sat_lr)/(_sat_ls - _sat_lr);
   Real d2cp;
   Real cp  = capillaryPressure(sat_liq);
   Real a;

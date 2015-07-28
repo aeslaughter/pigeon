@@ -36,42 +36,37 @@ FluidPropertyWaterAux::computeValue()
   Real property;
 
   if (fluid_property_enum == "density")
-  {
     property = _fluid_property.density(_pressure[_qp], _temperature[_qp]);
-  }
-  if (fluid_property_enum == "viscosity")
+
+  else if (fluid_property_enum == "viscosity")
   {
     Real density = _fluid_property.density(_pressure[_qp], _temperature[_qp]);
     property = _fluid_property.viscosity(_temperature[_qp], density);
   }
-  if (fluid_property_enum == "tsat")
-  {
+
+  else if (fluid_property_enum == "tsat")
     property = _fluid_property.tSat(_pressure[_qp]);
-  }
-  if (fluid_property_enum == "psat")
-  {
+
+  else if (fluid_property_enum == "psat")
     property = _fluid_property.pSat(_temperature[_qp]);
-  }
-  if (fluid_property_enum == "b23t")
-  {
+
+  else if (fluid_property_enum == "b23t")
     property = _fluid_property.b23t(_pressure[_qp]);
-  }
-  if (fluid_property_enum == "b23p")
-  {
+
+  else if (fluid_property_enum == "b23p")
     property = _fluid_property.b23p(_temperature[_qp]);
-  }
-  if (fluid_property_enum == "region1")
-  {
+
+  else if (fluid_property_enum == "region1")
     property = _fluid_property.densityRegion1(_pressure[_qp], _temperature[_qp]);
-  }
-  if (fluid_property_enum == "region2")
-  {
+
+  else if (fluid_property_enum == "region2")
     property = _fluid_property.densityRegion2(_pressure[_qp], _temperature[_qp]);
-  }
-  if (fluid_property_enum == "dDensity_dP")
-  {
+
+  else if (fluid_property_enum == "dDensity_dP")
     property = _fluid_property.dDensity_dP(_pressure[_qp], _temperature[_qp]);
-  }
+
+  else
+    mooseError("Fluid property specified in " << _short_name << "is not valid");
 
   return property;
 }

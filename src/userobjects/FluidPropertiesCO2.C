@@ -48,7 +48,7 @@ FluidPropertiesCO2::density(Real pressure, Real temperature) const
   if (pressure <= criticalPressure())
     rho = gasDensity(pressure, temperature);
 
-  if (pressure > criticalPressure())
+  else // if (pressure > criticalPressure())
     rho = supercriticalDensity(pressure, temperature);
 
   return rho;
@@ -62,7 +62,7 @@ FluidPropertiesCO2::viscosity(Real pressure, Real temperature) const
   if (pressure <= criticalPressure())
     mu = gasViscosity(pressure, temperature);
 
-  if (pressure > criticalPressure())
+  else //if (pressure > criticalPressure())
     mu = supercriticalViscosity(pressure, temperature);
 
   return mu;
@@ -76,7 +76,7 @@ FluidPropertiesCO2::dDensity_dP(Real pressure, Real temperature) const
   if (pressure <= criticalPressure())
     drho = dGasDensity_dP(pressure, temperature);
 
-  if (pressure > criticalPressure())
+  else //if (pressure > criticalPressure())
     drho = dSupercriticalDensity_dP(pressure, temperature);
 
   return drho;
@@ -90,7 +90,7 @@ FluidPropertiesCO2::dDensity_dT(Real pressure, Real temperature) const
   if (pressure <= criticalPressure())
     drho = dGasDensity_dT(pressure, temperature);
 
-  if (pressure > criticalPressure())
+  else //if (pressure > criticalPressure())
     drho = dSupercriticalDensity_dT(pressure, temperature);
 
   return drho;
@@ -179,7 +179,7 @@ FluidPropertiesCO2::supercriticalViscosity(Real pressure, Real temperature) cons
     a4 = b4[0] + b4[1] * t1 + b4[2] * t2 + b4[3] * t3 + b4[4] * t4;
    }
 
-  if (p1 > 3000)
+  else //if (p1 > 3000)
   {
     a0 = c0[0] + c0[1] * t1 + c0[2] * t2 + c0[3] * t3 + c0[4] * t4;
     a1 = c1[0] + c1[1] * t1 + c1[2] * t2 + c1[3] * t3 + c1[4] * t4;
@@ -252,7 +252,7 @@ FluidPropertiesCO2::supercriticalDensity(Real pressure, Real temperature) const
      a4 = b4[0] + b4[1] * t1 + b4[2] * t2 + b4[3] * t3 + b4[4] * t4;
    }
 
-   if (p1 > 3000)
+   else //if (p1 > 3000)
    {
      a0 = c0[0] + c0[1] * t1 + c0[2] * t2 + c0[3] * t3 + c0[4] * t4;
      a1 = c1[0] + c1[1] * t1 + c1[2] * t2 + c1[3] * t3 + c1[4] * t4;
@@ -310,8 +310,6 @@ FluidPropertiesCO2::dGasDensity_dT(Real pressure, Real temperature) const
 Real
 FluidPropertiesCO2::dSupercriticalDensity_dP(Real pressure, Real temperature) const
 {
-  Real b0[5] = {-2.148322085348e5, 1.168116599408e4, -2.302236659392e2,
-    1.967428940167, -6.184842764145e-3};
   Real b1[5] = {4.757146002428e2, -2.619250287624e1, 5.215134206837e-1,
     -4.494511089838e-3, 1.423058795982e-5};
   Real b2[5] = {-3.713900186613e-1, 2.072488876536e-2, -4.169082831078e-4,
@@ -321,8 +319,6 @@ FluidPropertiesCO2::dSupercriticalDensity_dP(Real pressure, Real temperature) co
   Real b4[5] = {-1.466408011784e-8, 8.338008651366e-10, -1.704242447194e-11,
     1.500878861807e-13, -4.838826574173e-16};
 
-  Real c0[5] = {6.897382693936e2, 2.730479206931, -2.254102364542e-2,
-    -4.651196146917e-3, 3.439702234956e-5};
   Real c1[5] = {2.213692462613e-1, -6.547268255814e-3, 5.982258882656e-5,
     2.274997412526e-6, -1.888361337660e-8};
   Real c2[5] = {-5.118724890479e-5, 2.019697017603e-6, -2.311332097185e-8,
@@ -353,7 +349,7 @@ FluidPropertiesCO2::dSupercriticalDensity_dP(Real pressure, Real temperature) co
      a4 = b4[0] + b4[1] * t1 + b4[2] * t2 + b4[3] * t3 + b4[4] * t4;
    }
 
-   if (p1 > 3000)
+   else // if (p1 > 3000)
    {
      a1 = c1[0] + c1[1] * t1 + c1[2] * t2 + c1[3] * t3 + c1[4] * t4;
      a2 = c2[0] + c2[1] * t1 + c2[2] * t2 + c2[3] * t3 + c2[4] * t4;
@@ -411,7 +407,7 @@ FluidPropertiesCO2::dSupercriticalDensity_dT(Real pressure, Real temperature) co
      a4 = b4[1]  + 2.0 * b4[2] * t1 + 3.0 * b4[3] * t2 + 4.0 * b4[4] * t3;
    }
 
-   if (p1 > 3000)
+   else // if (p1 > 3000)
    {
      a0 = c0[1]  + 2.0 * c0[2] * t1 + 3.0 * c0[3] * t2 + 4.0 * c0[4] * t3;
      a1 = c1[1]  + 2.0 * c1[2] * t1 + 3.0 * c1[3] * t2 + 4.0 * c1[4] * t3;

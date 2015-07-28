@@ -134,7 +134,7 @@ FluidStateTwoPhase::variableTypes(unsigned int moose_var) const
 unsigned int
 FluidStateTwoPhase::variablePhase(unsigned int moose_var) const
 {
-  unsigned int varphase;
+  unsigned int varphase = 0;
 
   if (moose_var == _pvar)
     varphase = _p_phase;
@@ -387,7 +387,7 @@ FluidStateTwoPhase::massFractions(Real pressure, Real temperature) const
 {
   std::vector<std::vector<Real> > xmass;
   unsigned int numcomp = numComponents();
-  unsigned int numphase = numPhases();
+//  unsigned int numphase = numPhases();
 
   xmass.resize(numcomp);
 
@@ -512,7 +512,7 @@ FluidStateTwoPhase::dSaturation_dSl(unsigned int var) const
 Real
 FluidStateTwoPhase::dDensity_dP(Real pressure, Real temperature, unsigned int phase_index) const
 {
-  Real dfluid_density;
+  Real dfluid_density = 0;
 
   if (phase_index == 0) // liquid phase
     dfluid_density = _liquid_property.dDensity_dP(pressure, temperature);

@@ -34,25 +34,22 @@ FluidPropertyCO2Aux::computeValue()
   Real property;
 
   if (co2_property_enum == "density")
-  {
     property = _co2_property.density(_pressure[_qp], _temperature[_qp]);
-  }
-  if (co2_property_enum == "viscosity")
-  {
+
+  else if (co2_property_enum == "viscosity")
     property = _co2_property.viscosity(_pressure[_qp], _temperature[_qp]);
-  }
-  if (co2_property_enum == "dDensity_dP")
-  {
+
+  else if (co2_property_enum == "dDensity_dP")
     property = _co2_property.dDensity_dP(_pressure[_qp], _temperature[_qp]);
-  }
-  if (co2_property_enum == "dDensity_dT")
-  {
+
+  else if (co2_property_enum == "dDensity_dT")
     property = _co2_property.dDensity_dT(_pressure[_qp], _temperature[_qp]);
-  }
-  if (co2_property_enum == "partialDensity")
-  {
+
+  else if (co2_property_enum == "partialDensity")
     property = _co2_property.partialDensity(_temperature[_qp]);
-  }
+
+  else
+    mooseError("Fluid property specified in " << _short_name << "is not valid");
 
   return property;
 }

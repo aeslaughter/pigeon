@@ -350,7 +350,7 @@ FluidStateSinglePhase::massFractions(Real pressure, Real temperature) const
 {
   std::vector<std::vector<Real> > xmass;
   unsigned int numcomp = numComponents();
-  unsigned int numphase = numPhases();
+  // unsigned int numphase = numPhases();
 
   xmass.resize(numcomp);
 
