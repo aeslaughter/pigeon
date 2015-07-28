@@ -11,14 +11,9 @@ template<>
 InputParameters validParams<ComponentAdvectiveFlux>()
 {
   InputParameters params = validParams<Kernel>();
-//  params.addRequiredCoupledVar("fluid_pressure_variable", "The fluid pressure variable for this phase");
-//  params.addRequiredCoupledVar("fluid_saturation_variable", "The fluid saturation variable for this phase");
-//  params.addCoupledVar("temperature_variable", 50, "The temperature variable.");
-//  params.addRequiredCoupledVar("fluid_density_variable", "The fluid density auxiallary variable for this phase.");
-//  params.addRequiredCoupledVar("fluid_viscosity_variable", "The  fluid viscosity auxillary variable for this phase.");
   params.addRequiredCoupledVar("component_mass_fraction_variable", "The mass fraction of the kernels component in this phase.");
-//  params.addRequiredCoupledVar("fluid_relperm_variable", "The relative permeability auxillary variable for this phase.");
   params.addParam<unsigned int>("phase_index", 0, "The index corresponding to the fluid phase eg: 0 for liquid, 1 for gas");
+  params.addParam<unsigned int>("component_index", 0, "The index corresponding to the component for this kernel");
   params.addRequiredParam<UserObjectName>("fluid_state_uo", "Name of the User Object defining the fluid state");
   params.addClassDescription("Component advective flux for component k in phase alpha");
   return params;
@@ -31,25 +26,24 @@ ComponentAdvectiveFlux::ComponentAdvectiveFlux(const InputParameters & parameter
   _phase_flux_no_mobility(getMaterialProperty<std::vector<RealGradient> >("phase_flux_no_mobility")),
   _dgravity_flux_dp(getMaterialProperty<std::vector<RealVectorValue> >("dgravity_flux_dp")),
   _dgravity_flux_ds(getMaterialProperty<std::vector<RealVectorValue> >("dgravity_flux_ds")),
+  _dgravity_flux_dx(getMaterialProperty<std::vector<std::vector<RealVectorValue> > >("dgravity_flux_dx")),
   _dpressure_flux_dp(getMaterialProperty<std::vector<Real> >("dpressure_flux_dp")),
   _dpressure_flux_ds(getMaterialProperty<std::vector<Real> >("dpressure_flux_ds")),
-//  _fluid_pressure(coupledNodalValue("fluid_pressure_variable")),
-//  _fluid_saturation(coupledNodalValue("fluid_saturation_variable")),
-//  _temperature(coupledNodalValue("temperature_variable")),
-//  _fluid_density(coupledNodalValue("fluid_density_variable")),
-//  _fluid_viscosity(coupledNodalValue("fluid_viscosity_variable")),
   _component_mass_fraction(coupledNodalValue("component_mass_fraction_variable")),
-//  _fluid_relperm(coupledNodalValue("fluid_relperm_variable")),
   _fluid_state(getUserObject<FluidState>("fluid_state_uo")),
-  _phase_index(getParam<unsigned int>("phase_index"))
+  _phase_index(getParam<unsigned int>("phase_index")),
+  _component_index(getParam<unsigned int>("component_index")),
+  _xvar(coupled("component_mass_fraction_variable"))
 
 {
   if (!_fluid_state.isFluidStateVariable(_var.number()))
     mooseError("Variable " << _var.name() << " in the " << _name << " kernel is not a FluidState variable");
 
-  // Determine the primary variable type
+  /// Determine the primary variable type
   _primary_variable_type = _fluid_state.variableTypes(_var.number());
 
+  /// Sign of the mass fraction gradient
+  _sgnx = _fluid_state.dMassFraction_dX(_xvar);
 }
 
 Real ComponentAdvectiveFlux::computeQpResidual()
@@ -73,7 +67,7 @@ Real ComponentAdvectiveFlux::computeQpJacobian()
     qpjacobian = _grad_test[_i][_qp] * (_permeability[_qp] * (_grad_phi[_j][_qp] * _dpressure_flux_ds[_qp][_phase_index] + _phi[_j][_qp] * _dgravity_flux_ds[_qp][_phase_index]));
 
   else if (_primary_variable_type == "mass_fraction")
-    qpjacobian = 0.; //TODO
+    qpjacobian = _grad_test[_i][_qp] * (_permeability[_qp] *  _phi[_j][_qp] * _dgravity_flux_dx[_qp][_component_index][_phase_index]);
 
   return qpjacobian;
 }
@@ -100,7 +94,7 @@ Real ComponentAdvectiveFlux::computeQpOffDiagJacobian(unsigned int jvar)
     qpoffdiagjacobian = _grad_test[_i][_qp] * (_permeability[_qp] * (_grad_phi[_j][_qp] * _dpressure_flux_ds[_qp][_phase_index] + _phi[_j][_qp] * _dgravity_flux_ds[_qp][_phase_index]));
 
   else if (jvar_type == "mass_fraction")
-    qpoffdiagjacobian = 0.; //TODO
+    qpoffdiagjacobian = _grad_test[_i][_qp] * (_permeability[_qp] *  _phi[_j][_qp] * _dgravity_flux_dx[_qp][_component_index][_phase_index]);
 
   return qpoffdiagjacobian;
 }
@@ -132,7 +126,6 @@ void ComponentAdvectiveFlux::upwind(bool compute_res, bool compute_jac, unsigned
   for (unsigned int n = 0; n < num_nodes; ++n)
   {
     elem_node_ids[n] = _current_elem->get_node(n)->id();
-//    _console << "node id " << elem_node_ids[n] << " phase index " << _phase_index <<std::endl;
     mobility[n] = _component_mass_fraction[n] * _fluid_state.getNodalProperty("mobility", elem_node_ids[n], _phase_index);
   }
 
@@ -241,8 +234,11 @@ void ComponentAdvectiveFlux::upwind(bool compute_res, bool compute_jac, unsigned
           if (jvar_type == "pressure")
             dmobility = _component_mass_fraction[n] *_fluid_state.getNodalProperty("dmobility_dp", elem_node_ids[n], _phase_index);
 
-          if (jvar_type == "saturation")
+          else if (jvar_type == "saturation")
             dmobility = _component_mass_fraction[n] * _fluid_state.getNodalProperty("dmobility_ds", elem_node_ids[n], _phase_index);
+
+          else if (jvar_type == "mass_fraction")
+            dmobility = _component_mass_fraction[n] * _fluid_state.getNodalProperty("dmobility_dx", elem_node_ids[n], _phase_index, _component_index);
 
           for (_j = 0; _j < _phi.size(); _j++)
             _local_ke(n, _j) *= mobility[n];
@@ -280,15 +276,6 @@ void ComponentAdvectiveFlux::upwind(bool compute_res, bool compute_jac, unsigned
     }
   }
 
-  // Output mass flux at each node
-//  _console << "Variable " << _variable << std::endl;
-//  _console << "density " << _fluid_density[0] << std::endl;
-/*
-  for (unsigned int n = 0; n < num_nodes; ++n)
-  {
-   _console << "node " << n << ", mass flow " << _local_re(n) << std::endl;
-  }
-*/
   // Add results to the Residual or Jacobian
   if (compute_res)
   {

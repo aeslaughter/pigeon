@@ -94,6 +94,12 @@ class FluidStateSinglePhase : public FluidState
   virtual unsigned int variablePhase(unsigned int moose_var) const;
 
   /**
+   * Primary component index of mass fraction variable
+   * @return primary component index
+   */
+  virtual unsigned int primaryComponentIndex() const;
+
+  /**
    * Fluid density
    *
    * @param pressure phase pressure (Pa)
@@ -194,11 +200,21 @@ class FluidStateSinglePhase : public FluidState
    *
    * @param pressure fluid pressure (Pa)
    * @param temperature fluid temperature (C)
-   * @param xmass vector of component mass fractions (kg/kg)
+   * @param phase_index index of phase
    * @return fluid density vector (element for each phase) (kg/m^3)
    */
 
   virtual Real dDensity_dP(Real pressure, Real temperature, unsigned int phase_index = 0) const;
+
+  /**
+   * Derivative of fluid  density with respect to mass fraction.
+   *
+   * @param pressure fluid pressure (Pa)
+   * @param temperature fluid temperature (C)
+   * @param phase_index index of phase
+   * @return fluid density vector (element for each phase) (kg/m^3)
+   */
+  virtual Real dDensity_dX(Real pressure, Real temperature, unsigned int phase_index = 0) const;
 
   /**
    * General formulation for Henry's constant for gas solubility in
@@ -275,6 +291,8 @@ class FluidStateSinglePhase : public FluidState
   unsigned int _tvar;
   /// MOOSE variable number of primary mass fraction variable
   unsigned int _xvar;
+  /// Component index of primary mass fraction component
+  unsigned int _component_index;
   /// Name of primary pressure variable
   std::string _pname;
   /// Name of primary temperature variable

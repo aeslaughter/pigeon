@@ -16,6 +16,7 @@ InputParameters validParams<FluidStateSinglePhase>()
   params.addRequiredCoupledVar("temperature_variable", "The fluid temperature variable. For isothermal simulations, enter the fluid temperature (C)");
   params.addRequiredCoupledVar("pressure_variable", "The fluid pressure variable (Pa)");
   params.addRequiredCoupledVar("mass_fraction_variable", "The mass fraction of the dissolved component. Set to 0 for no dissolved component");
+  params.addParam<unsigned int>("component_index", 1, "The index of the primary mass fraction component");
   params.addParam<unsigned int>("num_components", 1, "The number of components in this FluidState. Set to 1 if 'mass_fraction_variable' is 0, or 2 otherwise");
   return params;
 }
@@ -31,7 +32,8 @@ FluidStateSinglePhase::FluidStateSinglePhase(const InputParameters & parameters)
   _not_isothermal(isCoupled("temperature_variable")),
   _pvar(coupled("pressure_variable")),
   _tvar(coupled("temperature_variable")),
-  _xvar(coupled("mass_fraction_variable"))
+  _xvar(coupled("mass_fraction_variable")),
+  _component_index(getParam<unsigned int>("component_index"))
 
 {
   _num_phases = 1;
@@ -126,6 +128,12 @@ FluidStateSinglePhase::variablePhase(unsigned int moose_var) const
 {
  // Only one phase in this FluidState
   return 0;
+}
+
+unsigned int
+FluidStateSinglePhase::primaryComponentIndex() const
+{
+  return _component_index;
 }
 
 void
@@ -276,7 +284,7 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
   ddensities_dx.resize(numComponents());
 
   for (unsigned int i = 0; i < _num_components; ++i)
-    ddensities_dx[i].push_back(0.); //FIXME
+    ddensities_dx[i].push_back(0.); //FIXME: need sign here as well
 
   fsp.ddensity_dx = ddensities_dx;
 
@@ -299,13 +307,24 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
       fsp.ddensity_ds[i]) / fsp.viscosity[i];
 
   fsp.dmobility_ds = dmobilities_ds;
+
+  // Derivative of mobility wrt saturation
+  // Note: dViscosity_dX not implemnted yet
+  // Note: ddensity_dx is already the correct sign, so don't multiply by sgn
+  std::vector<std::vector<Real> > dmobilities_dx(_num_phases);
+
+  for (unsigned int i = 0; i < _num_components; ++i)
+    for (unsigned int n = 0; n < _num_phases; ++n)
+    dmobilities_dx[i].push_back(fsp.relperm[n] * fsp.ddensity_dx[i][n] / fsp.viscosity[n]);
+
+  fsp.dmobility_dx = dmobilities_dx;
 }
 
 Real
 FluidStateSinglePhase::getNodalProperty(std::string property, unsigned int nodeid, unsigned int phase_index, unsigned int component_index) const
 {
   if (phase_index >= _num_phases)
-    mooseError("Phase index " << phase_index << " out of range in FluidStateTwoPhase::getNodalProperty");
+    mooseError("Phase index " << phase_index << " out of range in FluidStateSinglePhase::getNodalProperty");
   FluidStateProperties fsp;
   Real value=0;
 
@@ -344,8 +363,10 @@ FluidStateSinglePhase::getNodalProperty(std::string property, unsigned int nodei
     value = fsp.dmobility_dp[phase_index];
   else if (property == "dmobility_ds")
     value = fsp.dmobility_ds[phase_index];
+  else if (property == "dmobility_dx")
+    value = fsp.dmobility_dx[component_index][phase_index];
   else
-    mooseError("Property " << property << " in FluidStateTwoPhase::getNodalProperty is not one of the members of the FluidStateProperties class. Check spelling of property.");
+    mooseError("Property " << property << " in FluidStateSinglePhase::getNodalProperty is not one of the members of the FluidStateProperties class. Check spelling of property.");
 
   return value;
 }
@@ -455,6 +476,14 @@ Real
 FluidStateSinglePhase::dDensity_dP(Real pressure, Real temperature, unsigned int phase_index) const
 {
   Real dfluid_density = _fluid_property.dDensity_dP(pressure, temperature);
+
+  return dfluid_density;
+}
+
+Real
+FluidStateSinglePhase::dDensity_dX(Real pressure, Real temperature, unsigned int phase_index) const
+{
+  Real dfluid_density = 0.0;
 
   return dfluid_density;
 }

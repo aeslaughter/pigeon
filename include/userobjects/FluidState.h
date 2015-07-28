@@ -54,6 +54,7 @@ public Coupleable
     std::vector<Real> drelperm;
     std::vector<Real> dmobility_dp;
     std::vector<Real> dmobility_ds;
+    std::vector<std::vector<Real> > dmobility_dx;
   };
 
 
@@ -137,6 +138,12 @@ public Coupleable
    * List of phase index for each variable
    */
   virtual unsigned int variablePhase(unsigned int moose_var) const = 0;
+
+  /**
+   * Primary component index of mass fraction variable
+   * @return primary component index
+   */
+  virtual unsigned int primaryComponentIndex() const = 0;
 
   /**
    * Fluid density must be over-written in all derived classes.
@@ -241,10 +248,20 @@ public Coupleable
    *
    * @param pressure fluid pressure (Pa)
    * @param temperature fluid temperature (C)
-   * @param xmass vector of component mass fractions (kg/kg)
+   * @param phase_index index of phase
    * @return fluid density vector (element for each phase) (kg/m^3)
    */
   virtual Real dDensity_dP(Real pressure, Real temperature, unsigned int phase_index = 0) const = 0;
+
+  /**
+   * Derivative of fluid  density with respect to mass fraction.
+   *
+   * @param pressure fluid pressure (Pa)
+   * @param temperature fluid temperature (C)
+   * @param phase_index index of phase
+   * @return fluid density vector (element for each phase) (kg/m^3)
+   */
+  virtual Real dDensity_dX(Real pressure, Real temperature, unsigned int phase_index = 0) const = 0;
 
   /**
    * General formulation for Henry's constant for gas solubility in

@@ -94,6 +94,12 @@ class FluidStateTwoPhase : public FluidState
   virtual unsigned int variablePhase(unsigned int moose_var) const;
 
   /**
+   * Primary component index of mass fraction variable
+   * @return primary component index
+   */
+  virtual unsigned int primaryComponentIndex() const;
+
+  /**
    * Fluid density for each phase
    *
    * @param pressure phase pressure (Pa)
@@ -192,11 +198,21 @@ class FluidStateTwoPhase : public FluidState
      *
      * @param pressure fluid pressure (Pa)
      * @param temperature fluid temperature (C)
-     * @param xmass vector of component mass fractions (kg/kg)
+     * @param phase_index index of phase
      * @return fluid density vector (element for each phase) (kg/m^3)
      */
 
   virtual Real dDensity_dP(Real pressure, Real temperature, unsigned int phase_index = 0) const;
+
+  /**
+   * Derivative of fluid  density with respect to mass fraction.
+   *
+   * @param pressure fluid pressure (Pa)
+   * @param temperature fluid temperature (C)
+   * @param phase_index index of phase
+   * @return fluid density vector (element for each phase) (kg/m^3)
+   */
+  virtual Real dDensity_dX(Real pressure, Real temperature, unsigned int phase_index = 0) const;
 
   /**
    * Henry's law set to zero for immiscible fluids
@@ -308,6 +324,8 @@ class FluidStateTwoPhase : public FluidState
   unsigned int _svar;
   /// Phase index of primary temperature variable
   unsigned int _tvar;
+  /// Component index of primary mass fraction variable
+  unsigned int _component_index;
   /// Name of primary pressure variable
   std::string _pname;
   /// Name of primary saturation variable

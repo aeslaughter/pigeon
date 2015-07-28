@@ -39,6 +39,7 @@ private:
   MaterialProperty<std::vector<Real> > & _dpressure_flux_ds;
   MaterialProperty<std::vector<RealVectorValue> > & _dgravity_flux_dp;
   MaterialProperty<std::vector<RealVectorValue> > & _dgravity_flux_ds;
+  MaterialProperty<std::vector<std::vector<RealVectorValue> > > & _dgravity_flux_dx;
   MaterialProperty<std::vector<Real> > & _diffusivity;
 
 
@@ -47,12 +48,14 @@ private:
   VariableValue & _primary_pressure;
   VariableGradient & _grad_primary_pressure;
   VariableValue & _temperature;
+  VariableValue & _primary_mass_fraction;
   std::vector<VariableValue *> _density;
   unsigned int _num_phases;
   unsigned int _num_components;
   unsigned int _phase_index;
   unsigned int _pvar;
   unsigned int _svar;
+  unsigned int _xvar;
 
  /**
    * This is the member reference that will hold the User Object

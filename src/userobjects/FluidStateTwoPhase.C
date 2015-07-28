@@ -21,6 +21,7 @@ InputParameters validParams<FluidStateTwoPhase>()
   params.addRequiredCoupledVar("saturation_variable", "The primary saturation variable");
   params.addParam<unsigned int>("pressure_variable_phase", 0, "The phase corresponding to the pressure variable");
   params.addParam<unsigned int>("saturation_variable_phase", 0, "The phase corresponding to the saturation variable");
+  params.addParam<unsigned int>("component_index", 1, "The index of the primary mass fraction component");
   return params;
 }
 
@@ -39,7 +40,8 @@ FluidStateTwoPhase::FluidStateTwoPhase(const InputParameters & parameters) :
   _s_phase(getParam<unsigned int>("saturation_variable_phase")),
   _pvar(coupled("pressure_variable")),
   _svar(coupled("saturation_variable")),
-  _tvar(coupled("temperature_variable"))
+  _tvar(coupled("temperature_variable")),
+  _component_index(getParam<unsigned int>("component_index"))
 
 {
   _num_components = 2;
@@ -140,6 +142,12 @@ FluidStateTwoPhase::variablePhase(unsigned int moose_var) const
     varphase = _s_phase;
 
   return varphase;
+}
+
+unsigned int
+FluidStateTwoPhase::primaryComponentIndex() const
+{
+  return _component_index;
 }
 
 void
@@ -316,6 +324,17 @@ FluidStateTwoPhase::thermophysicalProperties(std::vector<Real> primary_vars, Flu
       fsp.ddensity_ds[i]) / fsp.viscosity[i];
 
   fsp.dmobility_ds = dmobilities_ds;
+
+  // Derivative of mobility wrt saturation
+  // Note: dViscosity_dX not implemnted yet
+  // Note: ddensity_dx is already the correct sign, so don't multiply by sgn
+  std::vector<std::vector<Real> > dmobilities_dx(_num_phases);
+
+  for (unsigned int i = 0; i < _num_components; ++i)
+    for (unsigned int n = 0; n < _num_phases; ++n)
+    dmobilities_dx[i].push_back(fsp.relperm[n] * fsp.ddensity_dx[i][n] / fsp.viscosity[n]);
+
+  fsp.dmobility_dx = dmobilities_dx;
 }
 
 Real
@@ -346,7 +365,7 @@ FluidStateTwoPhase::getNodalProperty(std::string property, unsigned int nodeid, 
   else if (property == "relperm")
     value = fsp.relperm[phase_index];
   else if (property == "mass_fraction")
-    value = fsp.mass_fraction[phase_index][component_index];
+    value = fsp.mass_fraction[component_index][phase_index];
   else if (property == "mobility")
     value = fsp.mobility[phase_index];
   else if (property == "ddensity_dp")
@@ -354,13 +373,15 @@ FluidStateTwoPhase::getNodalProperty(std::string property, unsigned int nodeid, 
   else if (property == "ddensity_ds")
     value = fsp.ddensity_ds[phase_index];
   else if (property == "ddensity_dx")
-    value = fsp.ddensity_dx[phase_index][component_index];
+    value = fsp.ddensity_dx[component_index][phase_index];
   else if (property == "drelperm")
     value = fsp.drelperm[phase_index];
   else if (property == "dmobility_dp")
     value = fsp.dmobility_dp[phase_index];
   else if (property == "dmobility_ds")
     value = fsp.dmobility_ds[phase_index];
+  else if (property == "dmobility_dx")
+    value = fsp.dmobility_dx[component_index][phase_index];
   else
     mooseError("Property " << property << " in FluidStateTwoPhase::getNodalProperty is not one of the members of the FluidStateProperties class. Check spelling of property.");
 
@@ -548,6 +569,14 @@ FluidStateTwoPhase::dDensity_dP(Real pressure, Real temperature, unsigned int ph
     dfluid_density = _liquid_property.dDensity_dP(pressure, temperature);
   else if (phase_index == 1) //gas phase
     dfluid_density = _gas_property.dDensity_dP(pressure, temperature);
+
+  return dfluid_density;
+}
+
+Real
+FluidStateTwoPhase::dDensity_dX(Real pressure, Real temperature, unsigned int phase_index) const
+{
+  Real dfluid_density = 0.0;
 
   return dfluid_density;
 }
