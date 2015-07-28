@@ -287,7 +287,7 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
   std::vector<std::vector<Real> > ddensities_dx;
   ddensities_dx.resize(numComponents());
 //FIXME: need to fix this up properly
-  Real ddx = - _density_increase * fsp.density[0] / (density0 + _density_increase - node_xmass * _density_increase);
+  Real ddx = _density_increase * fsp.density[0] / (density0 + _density_increase - node_xmass * _density_increase);
   //for (unsigned int i = 0; i < _num_components; ++i)
     ddensities_dx[0].push_back(- ddx);
     ddensities_dx[1].push_back(ddx);
@@ -317,8 +317,7 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
   // Derivative of mobility wrt saturation
   // Note: dViscosity_dX not implemnted yet
   // Note: ddensity_dx is already the correct sign, so don't multiply by sgn
-  std::vector<std::vector<Real> > dmobilities_dx(_num_phases);
-  dmobilities_dx.resize(_num_components);
+  std::vector<std::vector<Real> > dmobilities_dx(_num_components);
 
   for (unsigned int i = 0; i < _num_components; ++i)
     for (unsigned int n = 0; n < _num_phases; ++n)

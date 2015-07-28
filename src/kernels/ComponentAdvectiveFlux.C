@@ -238,7 +238,7 @@ void ComponentAdvectiveFlux::upwind(bool compute_res, bool compute_jac, unsigned
             dmobility = _component_mass_fraction[n] * _fluid_state.getNodalProperty("dmobility_ds", elem_node_ids[n], _phase_index);
 
           else if (jvar_type == "mass_fraction")
-            dmobility = _component_mass_fraction[n] * _fluid_state.getNodalProperty("dmobility_dx", elem_node_ids[n], _phase_index, _component_index);
+            dmobility = _sgnx * _fluid_state.getNodalProperty("mobility", elem_node_ids[n], _phase_index) + _component_mass_fraction[n] * _fluid_state.getNodalProperty("dmobility_dx", elem_node_ids[n], _phase_index, _component_index);
 
           for (_j = 0; _j < _phi.size(); _j++)
             _local_ke(n, _j) *= mobility[n];
