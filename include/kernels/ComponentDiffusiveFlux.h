@@ -53,10 +53,10 @@ private:
   /// Primary variable type (used in Jacobian calculations)
   std::string _primary_variable_type;
   /**
-   * Sign of gradient in mass fraction: + if the mass fraction is the primary
-   * variable, -1 otherwise
+  * The sign of the derivative of the mass fraction variable that this kernel
+  * acts on wrt the primary mass fraction variable
    */
-  unsigned int _sgn;
+  unsigned int _sgnx;
 
 
 };

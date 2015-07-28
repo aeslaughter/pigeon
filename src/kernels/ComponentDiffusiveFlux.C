@@ -41,12 +41,12 @@ ComponentDiffusiveFlux::ComponentDiffusiveFlux(const InputParameters & parameter
   _diffusivity_index = _fluid_state.numPhases() * _component_index + _phase_index;
 
   /// Sign of the mass fraction gradient
-  _sgn = (_fluid_state.isFluidStateVariable(_xvar) ? 1.0 : -1.0);
+  _sgnx = _fluid_state.dMassFraction_dX(_xvar);
 }
 
 Real ComponentDiffusiveFlux::computeQpResidual()
 {
-  return _grad_test[_i][_qp] * _fluid_density[_qp] * _diffusivity[_qp][_diffusivity_index] * _sgn * _grad_component_mass_fraction[_qp];
+  return _grad_test[_i][_qp] * _fluid_density[_qp] * _diffusivity[_qp][_diffusivity_index] * _sgnx * _grad_component_mass_fraction[_qp];
 }
 
 
@@ -58,18 +58,19 @@ Real ComponentDiffusiveFlux::computeQpJacobian()
   if (_primary_variable_type == "pressure")
   {
     Real dDensity_dP = _fluid_state.getNodalProperty("ddensity_dp", nodeid, _phase_index);
-    qpjacobian = _grad_test[_i][_qp] * _phi[_j][_qp] * dDensity_dP * _sgn * _grad_component_mass_fraction[_qp];
+    qpjacobian = _grad_test[_i][_qp] * _phi[_j][_qp] * dDensity_dP * _sgnx * _grad_component_mass_fraction[_qp];
   }
   else if (_primary_variable_type == "saturation")
   {
     Real dDensity_dS = _fluid_state.getNodalProperty("ddensity_ds", nodeid, _phase_index);
-    qpjacobian = _grad_test[_i][_qp] * _phi[_j][_qp] * dDensity_dS * _sgn * _grad_component_mass_fraction[_qp];
+    qpjacobian = _grad_test[_i][_qp] * _phi[_j][_qp] * dDensity_dS * _sgnx * _grad_component_mass_fraction[_qp];
   }
   else if (_primary_variable_type == "mass_fraction")
   {
     Real dDensity_dX = _fluid_state.getNodalProperty("ddensity_dx", nodeid, _phase_index, _component_index);
-    qpjacobian = _grad_test[_i][_qp] * (dDensity_dX * _phi[_j][_qp] * _sgn * _grad_component_mass_fraction[_qp] + _fluid_density[_qp] * _grad_phi[_j][_qp]);
+    qpjacobian = _grad_test[_i][_qp] * (dDensity_dX * _phi[_j][_qp] * _sgnx * _grad_component_mass_fraction[_qp] + _fluid_density[_qp] * _grad_phi[_j][_qp]);
   }
+
   return _diffusivity[_qp][_diffusivity_index] * qpjacobian;
 }
 
@@ -87,19 +88,19 @@ Real ComponentDiffusiveFlux::computeQpOffDiagJacobian(unsigned int jvar)
   if (jvar_type == "pressure")
   {
     Real dDensity_dP = _fluid_state.getNodalProperty("ddensity_dp", nodeid, _phase_index);
-    qpoffdiagjacobian = _grad_test[_i][_qp] * _phi[_j][_qp] * dDensity_dP * _sgn * _grad_component_mass_fraction[_qp];
+    qpoffdiagjacobian = _grad_test[_i][_qp] * _phi[_j][_qp] * dDensity_dP * _sgnx * _grad_component_mass_fraction[_qp];
   }
 
   else if (jvar_type == "saturation")
   {
     Real dDensity_dS = _fluid_state.getNodalProperty("ddensity_ds", nodeid, _phase_index);
-    qpoffdiagjacobian = _grad_test[_i][_qp] * _phi[_j][_qp] * dDensity_dS * _sgn * _grad_component_mass_fraction[_qp];
+    qpoffdiagjacobian = _grad_test[_i][_qp] * _phi[_j][_qp] * dDensity_dS * _sgnx * _grad_component_mass_fraction[_qp];
   }
 
   else if (jvar_type == "mass_fraction")
   {
     Real dDensity_dX = _fluid_state.getNodalProperty("ddensity_dx", nodeid, _phase_index, _component_index);
-    qpoffdiagjacobian = _grad_test[_i][_qp] * (dDensity_dX * _phi[_j][_qp] * _sgn * _grad_component_mass_fraction[_qp] + _fluid_density[_qp] * _grad_phi[_j][_qp]);
+    qpoffdiagjacobian = _grad_test[_i][_qp] * (dDensity_dX * _phi[_j][_qp] * _sgnx * _grad_component_mass_fraction[_qp] + _fluid_density[_qp] * _grad_phi[_j][_qp]);
   }
 
   return _diffusivity[_qp][_diffusivity_index] * qpoffdiagjacobian;

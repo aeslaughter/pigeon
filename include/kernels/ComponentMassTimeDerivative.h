@@ -55,9 +55,18 @@ private:
    * The sign of the derivative of the saturation variable that this kernel
    * acts on wrt the liquid phase saturation
    */
-  Real _dsaturation;
+  Real _sgns;
+  /**
+   * The sign of the derivative of the mass fraction variable that this kernel
+   * acts on wrt the primary mass fraction variable
+   */
+  Real _sgnx;
+  /// MOOOSE variable number of mass fraction variable
+  unsigned int _xvar;
   /// Index of the fluid phase that this kernel acts on
   unsigned int _phase_index;
+  /// Index of the component that this kernel acts on
+  unsigned int _component_index;
   /// Primary variable type (used in Jacobian calculations)
   std::string _primary_variable_type;
 };

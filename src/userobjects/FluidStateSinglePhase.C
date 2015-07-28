@@ -226,7 +226,7 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
 
   // Mass fraction of each component
   std::vector<std::vector<Real> > xmass;
-  xmass.resize(numComponents());
+  xmass.resize(_num_components);
 
   xmass[0].push_back(1.0 - node_xmass); // mass fraction of liquid component in liquid
   if (numComponents() == 2)
@@ -275,7 +275,8 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
   std::vector<std::vector<Real> > ddensities_dx;
   ddensities_dx.resize(numComponents());
 
-  ddensities_dx[0].push_back(0.);
+  for (unsigned int i = 0; i < _num_components; ++i)
+    ddensities_dx[i].push_back(0.); //FIXME
 
   fsp.ddensity_dx = ddensities_dx;
 
@@ -328,7 +329,7 @@ FluidStateSinglePhase::getNodalProperty(std::string property, unsigned int nodei
   else if (property == "relperm")
     value = fsp.relperm[phase_index];
   else if (property == "mass_fraction")
-    value = fsp.mass_fraction[phase_index][component_index];
+    value = fsp.mass_fraction[component_index][phase_index];
   else if (property == "mobility")
     value = fsp.mobility[phase_index];
   else if (property == "ddensity_dp")
@@ -336,7 +337,7 @@ FluidStateSinglePhase::getNodalProperty(std::string property, unsigned int nodei
   else if (property == "ddensity_ds")
     value = fsp.ddensity_ds[phase_index];
   else if (property == "ddensity_dx")
-    value = fsp.ddensity_dx[phase_index][component_index];
+    value = fsp.ddensity_dx[component_index][phase_index];
   else if (property == "drelperm")
     value = fsp.drelperm[phase_index];
   else if (property == "dmobility_dp")
@@ -442,6 +443,12 @@ Real
 FluidStateSinglePhase::dSaturation_dS(unsigned int var) const
 {
   return 1.0;
+}
+
+Real
+FluidStateSinglePhase::dMassFraction_dX(unsigned int var) const
+{
+  return (isFluidStateVariable(var) ? 1.0 : -1.0);
 }
 
 Real

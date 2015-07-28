@@ -228,7 +228,15 @@ public Coupleable
 
   virtual Real dSaturation_dS(unsigned int var) const = 0;
 
-/**
+  /**
+   * Sign of the derivative of a mass fraction variable with respect to
+   * the primary mass fraction variable. Used in Jacobian calculations
+   *
+   * @return sign of derivative
+   */
+  virtual Real dMassFraction_dX(unsigned int var) const = 0;
+
+  /**
    * Derivative of fluid  density with respect to fluid pressure.
    *
    * @param pressure fluid pressure (Pa)
@@ -238,16 +246,16 @@ public Coupleable
    */
   virtual Real dDensity_dP(Real pressure, Real temperature, unsigned int phase_index = 0) const = 0;
 
-/**
- * General formulation for Henry's constant for gas solubility in
- * water. Eq. (3) from Guidelines on the Henry's constant and vapour
- * liquid distribution constant for gases in H20 and D20 at high
- * temperatures, IAPWS (2004).
- *
- * @param temperature water temperature (C)
- * @return Kh Henry's constant (MPa)
- */
-virtual Real henry(Real temperature) const = 0;
+  /**
+   * General formulation for Henry's constant for gas solubility in
+   * water. Eq. (3) from Guidelines on the Henry's constant and vapour
+   * liquid distribution constant for gases in H20 and D20 at high
+   * temperatures, IAPWS (2004).
+   *
+   * @param temperature water temperature (C)
+   * @return Kh Henry's constant (MPa)
+   */
+  virtual Real henry(Real temperature) const = 0;
 
 protected:
   MooseMesh & _mesh;

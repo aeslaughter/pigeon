@@ -179,6 +179,14 @@ class FluidStateTwoPhase : public FluidState
     */
   virtual Real dSaturation_dS(unsigned int var) const;
 
+  /**
+   * Sign of the derivative of a mass fraction variable with respect to
+   * the primary mass fraction variable. Used in Jacobian calculations
+   *
+   * @return sign of derivative
+   */
+  virtual Real dMassFraction_dX(unsigned int var) const;
+
     /**
      * Derivative of fluid  density with respect to fluid pressure.
      *
