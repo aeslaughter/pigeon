@@ -254,16 +254,6 @@ class FluidStateTwoPhase : public FluidState
   virtual void thermophysicalProperties(std::vector<Real> primary_vars, FluidStateProperties & fsp);
 
   /**
-   * Retrieves properties at node
-   *
-   * @param property property name (string)
-   * @param nodeid id of node where properties are required
-   * @param phase_index index of phase
-   * @param component_index index of component (used for mass fraction)
-   */
-  virtual Real getNodalProperty(std::string property, unsigned int nodeid, unsigned int phase_index, unsigned int component_index = 0) const;
-
-  /**
    * Retrieve the primary saturation variable
    *
    * @return primary saturation variable number
@@ -332,11 +322,12 @@ class FluidStateTwoPhase : public FluidState
   std::string _sname;
   /// Name of primary temperature variable
   std::string _tname;
-
+/*
   /// Fluid state properties class to hold thermophysical properties at each node
   std::map<int, FluidStateProperties > _nodal_properties;
   ///  Vector of primary variable values at a node
   std::vector<Real> _primary_vars;
+  */
 };
 
 #endif // FLUIDSTATETWOPHASE_H

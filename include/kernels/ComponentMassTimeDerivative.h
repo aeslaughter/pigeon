@@ -41,8 +41,6 @@ private:
   VariableValue & _fluid_saturation_old;
   VariableValue & _component_mass_fraction;
   VariableValue & _component_mass_fraction_old;
-  VariableValue & _fluid_pressure;
-  VariableValue & _fluid_pressure_old;
   VariableValue & _temperature;
 
   /**

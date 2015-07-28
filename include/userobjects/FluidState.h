@@ -79,7 +79,7 @@ public Coupleable
    * @param phase_index index of phase
    * @param component_index index of component (used for mass fraction)
    */
-  virtual Real getNodalProperty(std::string property, unsigned int nodeid, unsigned int phase_index, unsigned int component_index = 0) const = 0;
+  virtual Real getNodalProperty(std::string property, unsigned int nodeid, unsigned int phase_index, unsigned int component_index = 0) const;
 
   /**
    * Number of fluid phases
@@ -122,7 +122,6 @@ public Coupleable
    * @return bool
    */
   virtual bool isFluidStateVariable(unsigned int moose_var) const = 0;
-
 
   /**
    * List of primary variable names
@@ -278,6 +277,11 @@ protected:
   MooseMesh & _mesh;
 
   const unsigned int _qp;
+
+  /// Fluid state properties class to hold thermophysical properties at each node
+  std::map<int, FluidStateProperties > _nodal_properties;
+  ///  Vector of primary variable values at a node
+  std::vector<Real> _primary_vars;
 };
 
 #endif // FLUIDSTATE_H

@@ -54,6 +54,7 @@ FluidStateMaterial::FluidStateMaterial(const InputParameters & parameters) :
 {
   /// The number of phases in the given FluidState model
   _num_phases = _fluid_state.numPhases();
+
   /// The number of components in the given FluidState model
   _num_components = _fluid_state.numComponents();
 
@@ -146,7 +147,8 @@ FluidStateMaterial::computeQpProperties()
   /// Loop over all components and phases and calculate derivative of the flux wrt mass fraction
   for (unsigned int i = 0; i < _num_components; ++i)
   {
-    sgnx = _fluid_state.dMassFraction_dX(i);
+    // Check if the compnent index is the primary component index and set the sign of the derivative appropriately
+    sgnx = (i == _fluid_state.primaryComponentIndex() ? 1.0 : -1.0);
 
     for (unsigned int n = 0; n < _num_phases; ++n)
       _dgravity_flux_dx[_qp][i].push_back(sgnx * _fluid_state.dDensity_dX(pressure[n], temperature, n));

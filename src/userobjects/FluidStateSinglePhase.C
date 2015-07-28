@@ -18,6 +18,7 @@ InputParameters validParams<FluidStateSinglePhase>()
   params.addRequiredCoupledVar("mass_fraction_variable", "The mass fraction of the dissolved component. Set to 0 for no dissolved component");
   params.addParam<unsigned int>("component_index", 1, "The index of the primary mass fraction component");
   params.addParam<unsigned int>("num_components", 1, "The number of components in this FluidState. Set to 1 if 'mass_fraction_variable' is 0, or 2 otherwise");
+  params.addParam<Real>("component_density_increase", 0., "The increase in density with dissolved component 1");
   return params;
 }
 
@@ -33,7 +34,8 @@ FluidStateSinglePhase::FluidStateSinglePhase(const InputParameters & parameters)
   _pvar(coupled("pressure_variable")),
   _tvar(coupled("temperature_variable")),
   _xvar(coupled("mass_fraction_variable")),
-  _component_index(getParam<unsigned int>("component_index"))
+  _component_index(getParam<unsigned int>("component_index")),
+  _density_increase(getParam<Real>("component_density_increase"))
 
 {
   _num_phases = 1;
@@ -52,6 +54,7 @@ FluidStateSinglePhase::FluidStateSinglePhase(const InputParameters & parameters)
     _tname = getVar("temperature_variable", 0)->name();
   if (isCoupled("mass_fraction_variable"))
     _xname = getVar("mass_fraction_variable", 0)->name();
+
 }
 
 unsigned int
@@ -213,10 +216,11 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
   // Pressure (takes liquid saturation for capillary pressure calculation)
   fsp.pressure = pressure(node_pressure, fsp.saturation[0]);
 
-  // Density
+  // Density FIXME: Need to generalise density of saturated mixture
   std::vector<Real> densities(_num_phases);
-
-  densities[0] = _fluid_property.density(fsp.pressure[0], node_temperature);
+  Real density0 = _fluid_property.density(fsp.pressure[0], node_temperature);
+  /// Now add increase due to dissolved component 1
+  densities[0] = density0 * (density0 + _density_increase) / (density0 + _density_increase - node_xmass * _density_increase);
 
   fsp.density = densities;
 
@@ -282,9 +286,11 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
   // Derivative of density wrt mass fraction
   std::vector<std::vector<Real> > ddensities_dx;
   ddensities_dx.resize(numComponents());
-
-  for (unsigned int i = 0; i < _num_components; ++i)
-    ddensities_dx[i].push_back(0.); //FIXME: need sign here as well
+//FIXME: need to fix this up properly
+  Real ddx = - _density_increase * fsp.density[0] / (density0 + _density_increase - node_xmass * _density_increase);
+  //for (unsigned int i = 0; i < _num_components; ++i)
+    ddensities_dx[0].push_back(- ddx);
+    ddensities_dx[1].push_back(ddx);
 
   fsp.ddensity_dx = ddensities_dx;
 
@@ -312,63 +318,13 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
   // Note: dViscosity_dX not implemnted yet
   // Note: ddensity_dx is already the correct sign, so don't multiply by sgn
   std::vector<std::vector<Real> > dmobilities_dx(_num_phases);
+  dmobilities_dx.resize(_num_components);
 
   for (unsigned int i = 0; i < _num_components; ++i)
     for (unsigned int n = 0; n < _num_phases; ++n)
-    dmobilities_dx[i].push_back(fsp.relperm[n] * fsp.ddensity_dx[i][n] / fsp.viscosity[n]);
+      dmobilities_dx[i].push_back(fsp.relperm[n] * fsp.ddensity_dx[i][n] / fsp.viscosity[n]);
 
   fsp.dmobility_dx = dmobilities_dx;
-}
-
-Real
-FluidStateSinglePhase::getNodalProperty(std::string property, unsigned int nodeid, unsigned int phase_index, unsigned int component_index) const
-{
-  if (phase_index >= _num_phases)
-    mooseError("Phase index " << phase_index << " out of range in FluidStateSinglePhase::getNodalProperty");
-  FluidStateProperties fsp;
-  Real value=0;
-
-  std::map<int, FluidStateProperties>::const_iterator node_it = _nodal_properties.find(nodeid);
-
-  if (node_it != _nodal_properties.end())
-    fsp = node_it->second;
-  else
-    return value; // Return zero if the node is out of range initially
-  //  mooseError("Node id "<< nodeid << " out of range in FluidStateTwoPhase::getNodalProperty");
-
-  // Now access the property and phase index
-  if (property == "pressure")
-    value = fsp.pressure[phase_index];
-  else if (property == "saturation")
-    value = fsp.saturation[phase_index];
-  else if (property == "density")
-    value = fsp.density[phase_index];
-  else if (property == "viscosity")
-    value = fsp.viscosity[phase_index];
-  else if (property == "relperm")
-    value = fsp.relperm[phase_index];
-  else if (property == "mass_fraction")
-    value = fsp.mass_fraction[component_index][phase_index];
-  else if (property == "mobility")
-    value = fsp.mobility[phase_index];
-  else if (property == "ddensity_dp")
-    value = fsp.ddensity_dp[phase_index];
-  else if (property == "ddensity_ds")
-    value = fsp.ddensity_ds[phase_index];
-  else if (property == "ddensity_dx")
-    value = fsp.ddensity_dx[component_index][phase_index];
-  else if (property == "drelperm")
-    value = fsp.drelperm[phase_index];
-  else if (property == "dmobility_dp")
-    value = fsp.dmobility_dp[phase_index];
-  else if (property == "dmobility_ds")
-    value = fsp.dmobility_ds[phase_index];
-  else if (property == "dmobility_dx")
-    value = fsp.dmobility_dx[component_index][phase_index];
-  else
-    mooseError("Property " << property << " in FluidStateSinglePhase::getNodalProperty is not one of the members of the FluidStateProperties class. Check spelling of property.");
-
-  return value;
 }
 
 Real

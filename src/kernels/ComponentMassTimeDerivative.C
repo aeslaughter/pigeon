@@ -13,7 +13,6 @@ InputParameters validParams<ComponentMassTimeDerivative>()
   InputParameters params = validParams<TimeKernel>();
   params.addRequiredCoupledVar("fluid_density_variable", "The fluid density variable for this phase.");
   params.addRequiredCoupledVar("fluid_saturation_variable", "The fluid saturation variable for this phase.");
-  params.addRequiredCoupledVar("fluid_pressure_variable", "The fluid pressure variable for this phase.");
   params.addCoupledVar("temperature_variable", 50,  "The temperature variable.");
   params.addCoupledVar("component_mass_fraction_variable", 1.0, "The component mass fraction variable for this phase.");
   params.addParam<unsigned int>("phase_index", 0, "The index corresponding to the fluid phase eg: 0 for liquid, 1 for gas");
@@ -32,8 +31,6 @@ ComponentMassTimeDerivative::ComponentMassTimeDerivative(const InputParameters &
   _fluid_saturation_old(coupledNodalValueOld("fluid_saturation_variable")),
   _component_mass_fraction(coupledNodalValue("component_mass_fraction_variable")),
   _component_mass_fraction_old(coupledNodalValueOld("component_mass_fraction_variable")),
-  _fluid_pressure(coupledNodalValue("fluid_pressure_variable")),
-  _fluid_pressure_old(coupledNodalValueOld("fluid_pressure_variable")),
   _temperature(coupledNodalValue("temperature_variable")),
   _fluid_state(getUserObject<FluidState>("fluid_state_uo")),
   _xvar(coupled("component_mass_fraction_variable")),
@@ -101,7 +98,7 @@ ComponentMassTimeDerivative::computeQpJacobian() // TODO: Jacobians need further
     else if (_primary_variable_type == "mass_fraction")
     {
       Real dDensity_dX = _fluid_state.getNodalProperty("ddensity_dx", elem_node_ids[_i], _phase_index, _component_index);
-      qpjacobian = _sgnx * (_fluid_density[_i] * _fluid_saturation[_i] + _component_mass_fraction[_i] * _fluid_saturation[_i] * dDensity_dX);
+      qpjacobian = _sgnx * _fluid_density[_i] * _fluid_saturation[_i] + _component_mass_fraction[_i] * _fluid_saturation[_i] * dDensity_dX;
     }
 
   return _test[_i][_qp] * _porosity[_qp] * qpjacobian / _dt;
@@ -143,7 +140,7 @@ ComponentMassTimeDerivative::computeQpOffDiagJacobian(unsigned int jvar)
     if (jvar_type == "mass_fraction")
     {
       Real dDensity_dX = _fluid_state.getNodalProperty("ddensity_dx", elem_node_ids[_i], _phase_index, _component_index);
-      qpoffdiagjacobian = _sgnx * (_fluid_density[_i] * _fluid_saturation[_i] + _component_mass_fraction[_i] * _fluid_saturation[_i] * dDensity_dX);
+      qpoffdiagjacobian = (_sgnx * _fluid_density[_i] * _fluid_saturation[_i] + _component_mass_fraction[_i] * _fluid_saturation[_i] * dDensity_dX);
 
     }
 
