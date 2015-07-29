@@ -68,7 +68,7 @@ Real ComponentDiffusiveFlux::computeQpJacobian()
   else if (_primary_variable_type == "mass_fraction")
   {
     Real dDensity_dX = _fluid_state.getNodalProperty("ddensity_dx", nodeid, _phase_index, _component_index);
-    qpjacobian = _grad_test[_i][_qp] * (dDensity_dX * _phi[_j][_qp] * _grad_component_mass_fraction[_qp] + _sgnx * _fluid_density[_qp] * _grad_phi[_j][_qp]);
+    qpjacobian = _grad_test[_i][_qp] * (dDensity_dX * _phi[_j][_qp] * _grad_component_mass_fraction[_qp] + _fluid_density[_qp] * _grad_phi[_j][_qp]);
   }
 
   return _diffusivity[_qp][_diffusivity_index] * qpjacobian;

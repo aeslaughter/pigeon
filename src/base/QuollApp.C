@@ -22,6 +22,8 @@
 #include "FluidPropertyMethaneAux.h"
 #include "RelativePermeabilityAux.h"
 #include "FluidStateAux.h"
+#include "FluidStateTestAux.h"
+
 
 // Materials
 #include "PorousMaterial.h"
@@ -122,6 +124,7 @@ QuollApp::registerObjects(Factory & factory)
    registerAux(FluidPropertyCO2Aux);
    registerAux(FluidPropertyMethaneAux);
    registerAux(FluidStateAux);
+   registerAux(FluidStateTestAux);
 
    // Register the materials
    registerMaterial(PorousMaterial);
