@@ -1,0 +1,10 @@
+[Tests]
+  [./diffusive_flux1]
+    type = 'AnalyzeJacobian'
+    input = 'SinglePhase1c.i'
+  [../]
+  [./diffusive_flux2]
+    type = 'AnalyzeJacobian'
+    input = 'SinglePhase2c.i'
+  [../]
+[]

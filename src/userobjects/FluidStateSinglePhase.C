@@ -16,7 +16,7 @@ InputParameters validParams<FluidStateSinglePhase>()
   params.addRequiredCoupledVar("temperature_variable", "The fluid temperature variable. For isothermal simulations, enter the fluid temperature (C)");
   params.addRequiredCoupledVar("pressure_variable", "The fluid pressure variable (Pa)");
   params.addRequiredCoupledVar("mass_fraction_variable", "The mass fraction of the dissolved component. Set to 0 for no dissolved component");
-  params.addParam<unsigned int>("component_index", 1, "The index of the primary mass fraction component");
+  params.addParam<unsigned int>("component_index", 0, "The index of the primary mass fraction component");
   params.addParam<unsigned int>("num_components", 1, "The number of components in this FluidState. Set to 1 if 'mass_fraction_variable' is 0, or 2 otherwise");
   params.addParam<Real>("component_density_increase", 0., "The increase in density with dissolved component 1");
   return params;
