@@ -191,9 +191,10 @@ class FluidStateSinglePhase : public FluidState
    * Sign of the derivative of a mass fraction variable with respect to
    * the primary mass fraction variable. Used in Jacobian calculations
    *
+   * @param component_index index of mass fraction component
    * @return sign of derivative
    */
-  virtual Real dMassFraction_dX(unsigned int var) const;
+  virtual Real dMassFraction_dX(unsigned int component_index) const;
 
   /**
    * Derivative of fluid density with respect to fluid pressure.

@@ -240,17 +240,18 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
   std::vector<std::vector<Real> > xmass;
   xmass.resize(_num_components);
 
-  xmass[0].push_back(1.0 - node_xmass); // mass fraction of liquid component in liquid
-  if (numComponents() == 2)
-    xmass[1].push_back(node_xmass); // FIXME: make this more general for ncomp
+  xmass[_component_index].push_back(node_xmass); // primary mass fraction
+  for (unsigned int i = 0; i < _num_components; ++i)
+    if (i != _component_index)
+      xmass[i].push_back(1.0 - node_xmass); // Other mass fraction
 
   fsp.mass_fraction = xmass;
 
   // Mobility
   std::vector<Real> mobilities(_num_phases);
 
-  for (unsigned int i = 0; i < _num_phases; ++i)
-    mobilities[i] = fsp.relperm[i] * fsp.density[i]  / fsp.viscosity[i];
+  for (unsigned int n = 0; n < _num_phases; ++n)
+    mobilities[n] = fsp.relperm[n] * fsp.density[n]  / fsp.viscosity[n];
 
   fsp.mobility = mobilities;
 
@@ -262,44 +263,52 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
   // Derivative of relative permeability wrt liquid_saturation
   std::vector<Real> drelperm(_num_phases);
 
-  for (unsigned int i = 0; i < _num_phases; ++i)
-    drelperm[i] = sgn * dRelativePermeability(fsp.saturation[0])[i];
+  for (unsigned int n = 0; n < _num_phases; ++n)
+    drelperm[n] = sgn * dRelativePermeability(fsp.saturation[0])[n];
 
   fsp.drelperm = drelperm;
 
   // Derivative of density wrt pressure
   std::vector<Real> ddensities_dp(_num_phases);
 
-  for (unsigned int i = 0; i < _num_phases; ++i)
-    ddensities_dp[i] = dDensity_dP(fsp.pressure[i], node_temperature, i);
+  for (unsigned int n = 0; n < _num_phases; ++n)
+    ddensities_dp[n] = dDensity_dP(fsp.pressure[n], node_temperature, n);
 
   fsp.ddensity_dp = ddensities_dp;
 
   // Derivative of density wrt saturation
   std::vector<Real> ddensities_ds(_num_phases);
 
-  for (unsigned int i = 0; i < _num_phases; ++i)
-    ddensities_ds[i] = sgn * dCapillaryPressure(fsp.saturation[0])[i] * fsp.ddensity_dp[i];
+  for (unsigned int n = 0; n < _num_phases; ++n)
+    ddensities_ds[n] = sgn * dCapillaryPressure(fsp.saturation[0])[n] * fsp.ddensity_dp[n];
 
   fsp.ddensity_ds = ddensities_ds;
 
   // Derivative of density wrt mass fraction
   std::vector<std::vector<Real> > ddensities_dx;
+  Real sgnx;
   ddensities_dx.resize(numComponents());
 //FIXME: need to fix this up properly
   Real ddx = _density_increase * fsp.density[0] / (density0 + _density_increase - node_xmass * _density_increase);
-  //for (unsigned int i = 0; i < _num_components; ++i)
-    ddensities_dx[0].push_back(- ddx);
-    ddensities_dx[1].push_back(ddx);
+  for (unsigned int i = 0; i < _num_components; ++i)
+  {
+    sgnx = dMassFraction_dX(i);
+    ddensities_dx[i].push_back(sgnx * ddx);
+  }
 
   fsp.ddensity_dx = ddensities_dx;
 
   // Derivative of mobility wrt pressure
   // Note: dViscosity_dP not implemnted yet
   std::vector<Real> dmobilities_dp(_num_phases);
+  Real dmdp;
 
-  for (unsigned int i = 0; i < _num_phases; ++i)
-    dmobilities_dp[i] = fsp.relperm[i] * fsp.ddensity_dp[i]  / fsp.viscosity[i];
+  for (unsigned int n = 0; n < _num_phases; ++n)
+  {
+    dmdp = (fsp.relperm[n] * fsp.ddensity_dp[n] / fsp.viscosity[n]) * (1.0 - (fsp.density[n] / fsp.viscosity[n]) *
+      dViscosity_dDensity(fsp.density[n], node_temperature, n));
+    dmobilities_dp[n] = dmdp;
+  }
 
   fsp.dmobility_dp = dmobilities_dp;
 
@@ -307,10 +316,13 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
   // Note: dViscosity_dS not implemnted yet
   // Note: drelperm and ddensity_ds are already the correct sign, so don't multiply by sgn
   std::vector<Real> dmobilities_ds(_num_phases);
-
-  for (unsigned int i = 0; i < _num_phases; ++i)
-    dmobilities_ds[i] = (fsp.drelperm[i] * fsp.density[i] + fsp.relperm[i] *
-      fsp.ddensity_ds[i]) / fsp.viscosity[i];
+  Real dmds;
+  for (unsigned int n = 0; n < _num_phases; ++n)
+  {
+    dmds = fsp.drelperm[n] * fsp.density[n] / fsp.viscosity[n] + (fsp.relperm[n] * fsp.ddensity_ds[n] / fsp.viscosity[n]) * (1.0 - (fsp.density[n] / fsp.viscosity[n]) *
+      dViscosity_dDensity(fsp.density[n], node_temperature, n));
+    dmobilities_ds[n] = dmds;
+  }
 
   fsp.dmobility_ds = dmobilities_ds;
 
@@ -424,9 +436,9 @@ FluidStateSinglePhase::dSaturation_dS(unsigned int var) const
 }
 
 Real
-FluidStateSinglePhase::dMassFraction_dX(unsigned int var) const
+FluidStateSinglePhase::dMassFraction_dX(unsigned int component_index) const
 {
-  return (isFluidStateVariable(var) ? 1.0 : -1.0);
+  return (component_index == _component_index ? 1.0 : -1.0);
 }
 
 Real
