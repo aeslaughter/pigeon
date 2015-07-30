@@ -43,7 +43,7 @@ ComponentAdvectiveFlux::ComponentAdvectiveFlux(const InputParameters & parameter
   _primary_variable_type = _fluid_state.variableTypes(_var.number());
 
   /// Sign of the mass fraction gradient
-  _sgnx = _fluid_state.dMassFraction_dX(_xvar);
+  _sgnx = _fluid_state.dMassFraction_dX(_component_index);
 }
 
 Real ComponentAdvectiveFlux::computeQpResidual()

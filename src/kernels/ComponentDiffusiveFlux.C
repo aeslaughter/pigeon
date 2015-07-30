@@ -41,7 +41,7 @@ ComponentDiffusiveFlux::ComponentDiffusiveFlux(const InputParameters & parameter
   _diffusivity_index = _fluid_state.numPhases() * _component_index + _phase_index;
 
   /// Sign of the mass fraction gradient
-  _sgnx = _fluid_state.dMassFraction_dX(_xvar);
+  _sgnx = _fluid_state.dMassFraction_dX(_component_index);
 
 }
 
@@ -67,7 +67,7 @@ Real ComponentDiffusiveFlux::computeQpJacobian()
     qpjacobian = _grad_test[_i][_qp] * _phi[_j][_qp] * dDensity_dS * _sgnx * _grad_component_mass_fraction[_qp];
   }
   else if (_primary_variable_type == "mass_fraction")
-  {
+  { /// Note: the sign of dDensity_dX obtained from the FluidState is already correct, so we don't need to multiply by _sgnx
     Real dDensity_dX = _fluid_state.getNodalProperty("ddensity_dx", nodeid, _phase_index, _component_index);
     qpjacobian = _grad_test[_i][_qp] * (dDensity_dX * _phi[_j][_qp] * _grad_component_mass_fraction[_qp] + _fluid_density[_qp] * _grad_phi[_j][_qp]);
   }
@@ -99,9 +99,9 @@ Real ComponentDiffusiveFlux::computeQpOffDiagJacobian(unsigned int jvar)
   }
 
   else if (jvar_type == "mass_fraction")
-  {
+  { /// Note: the sign of dDensity_dX obtained from the FluidState is already correct, so we don't need to multiply by _sgnx
     Real dDensity_dX = _fluid_state.getNodalProperty("ddensity_dx", nodeid, _phase_index, _component_index);
-    qpoffdiagjacobian = _grad_test[_i][_qp] * (dDensity_dX * _phi[_j][_qp] * _grad_component_mass_fraction[_qp] + _sgnx * _fluid_density[_qp] * _grad_phi[_j][_qp]);
+    qpoffdiagjacobian = _grad_test[_i][_qp] * (dDensity_dX * _phi[_j][_qp] * _grad_component_mass_fraction[_qp] + _fluid_density[_qp] * _grad_phi[_j][_qp]);
   }
 
   return _diffusivity[_qp][_diffusivity_index] * qpoffdiagjacobian;

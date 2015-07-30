@@ -47,7 +47,7 @@ ComponentMassTimeDerivative::ComponentMassTimeDerivative(const InputParameters &
   // Sign of derivative of saturation wrt primary saturation
   _sgns = _fluid_state.dSaturation_dS(_phase_index);
   /// Sign of the mass fraction gradient
-  _sgnx = _fluid_state.dMassFraction_dX(_xvar);
+  _sgnx = _fluid_state.dMassFraction_dX(_component_index);
 
 }
 
