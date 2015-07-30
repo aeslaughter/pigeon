@@ -72,3 +72,10 @@ FluidProperties::dDensity_dT(Real pressure, Real temperature) const
   mooseError("FluidProperties::dDensity_dT(Real pressure, Real temperature) unimplemented in derived fluid properties class");
   return 0.;
 }
+
+Real
+FluidProperties::dViscosity_dDensity(Real pressure, Real temperature) const
+{
+  mooseError("FluidProperties::dViscosity_dDensity(Real density, Real temperature) unimplemented in derived fluid properties class");
+  return 0.;
+}

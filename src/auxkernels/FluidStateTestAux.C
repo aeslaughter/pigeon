@@ -12,7 +12,7 @@ InputParameters validParams<FluidStateTestAux>()
 {
   InputParameters params = validParams<AuxKernel>();
   params.addRequiredParam<UserObjectName>("fluid_state_uo", "Name of the User Object defining the fluid state");
-  MooseEnum state_property_enum("density viscosity mass_fraction saturation pressure relperm ddensity_dp ddensity_ds ddensity_dx drelperm dmobility_dp dmobility_ds dmobility_dx");
+  MooseEnum state_property_enum("density viscosity mass_fraction saturation pressure relperm ddensity_dp ddensity_ds ddensity_dx drelperm mobility dmobility_dp dmobility_ds dmobility_dx");
   params.addRequiredParam<MooseEnum>("state_property_enum", state_property_enum, "The fluid property that this auxillary kernel is to calculate");
   params.addParam<unsigned int>("phase_index", 0, "The index of the phase this auxillary kernel acts on");
   params.addParam<unsigned int>("component_index", 0, "The index of the component this auxillary kernel acts on");
@@ -61,6 +61,12 @@ FluidStateTestAux::computeValue()
 
   else if (_state_property_enum == "ddensity_dx")
     property = _fluid_state.getNodalProperty("ddensity_dx", node_num, _phase_index, _component_index);
+
+  else if (_state_property_enum == "drelperm")
+    property = _fluid_state.getNodalProperty("drelperm", node_num, _phase_index);
+
+  else if (_state_property_enum == "mobility")
+    property = _fluid_state.getNodalProperty("mobility", node_num, _phase_index);
 
   else if (_state_property_enum == "dmobility_dp")
     property = _fluid_state.getNodalProperty("dmobility_dp", node_num, _phase_index);

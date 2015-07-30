@@ -67,6 +67,16 @@ virtual Real dDensity_dP(Real pressure, Real temperature) const;
  * @return derivative of fluid density with respect to temperature
  */
 virtual Real dDensity_dT(Real pressure, Real temperature) const;
+
+/**
+ * The derivative of fluid viscosity with respect to density must be over-written
+ *  in all derived classes.
+ *
+ * @param density fluid density (kg/m^3)
+ * @param temperature fluid temperature (C)
+ * @return derivative of fluid viscosity with respect to density
+ */
+virtual Real dViscosity_dDensity(Real density, Real temperature) const;
 };
 
 #endif // FLUIDPROPERTIES_H

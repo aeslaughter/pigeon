@@ -196,25 +196,35 @@ class FluidStateSinglePhase : public FluidState
   virtual Real dMassFraction_dX(unsigned int var) const;
 
   /**
-   * Derivative of fluid  density with respect to fluid pressure.
+   * Derivative of fluid density with respect to fluid pressure.
    *
    * @param pressure fluid pressure (Pa)
    * @param temperature fluid temperature (C)
    * @param phase_index index of phase
-   * @return fluid density vector (element for each phase) (kg/m^3)
+   * @return derivative of density wrt pressure
    */
 
   virtual Real dDensity_dP(Real pressure, Real temperature, unsigned int phase_index = 0) const;
 
   /**
-   * Derivative of fluid  density with respect to mass fraction.
+   * Derivative of fluid density with respect to mass fraction.
    *
    * @param pressure fluid pressure (Pa)
    * @param temperature fluid temperature (C)
    * @param phase_index index of phase
-   * @return fluid density vector (element for each phase) (kg/m^3)
+   * @return derivative of density wrt mass fraction
    */
   virtual Real dDensity_dX(Real pressure, Real temperature, unsigned int phase_index = 0) const;
+
+  /**
+   * Derivative of fluid viscosity with respect to density.
+   *
+   * @param density fluid density (kg/m^3)
+   * @param temperature fluid temperature (C)
+   * @param phase_index index of phase
+   * @return derivative of viscosity wrt density
+   */
+  virtual Real dViscosity_dDensity(Real density, Real temperature, unsigned int phase_index = 0) const;
 
   /**
    * General formulation for Henry's constant for gas solubility in

@@ -420,5 +420,5 @@ FluidPropertiesWater::dViscosity_dDensity(Real temperature, Real density) const
 
   Real viscosity = FluidPropertiesWater::viscosity(temperature, density);
 
-  return viscosity * rhobar * sum1 * sum2;
+  return viscosity * (sum1 + rhobar * sum2) / _rho_critical;
 }

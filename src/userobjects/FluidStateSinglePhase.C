@@ -315,14 +315,16 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
   fsp.dmobility_ds = dmobilities_ds;
 
   // Derivative of mobility wrt saturation
-  // Note: dViscosity_dX not implemnted yet
   // Note: ddensity_dx is already the correct sign, so don't multiply by sgn
   std::vector<std::vector<Real> > dmobilities_dx(_num_components);
-
+  Real dmdx;
   for (unsigned int i = 0; i < _num_components; ++i)
     for (unsigned int n = 0; n < _num_phases; ++n)
-      dmobilities_dx[i].push_back(fsp.relperm[n] * fsp.ddensity_dx[i][n] / fsp.viscosity[n]);
-
+    {
+      dmdx = (fsp.relperm[n] * fsp.ddensity_dx[i][n] / fsp.viscosity[n]) * (1.0 - (fsp.density[n] / fsp.viscosity[n]) *
+        dViscosity_dDensity(fsp.density[n], node_temperature, n));
+      dmobilities_dx[i].push_back(dmdx);
+    }
   fsp.dmobility_dx = dmobilities_dx;
 }
 
@@ -441,4 +443,12 @@ FluidStateSinglePhase::dDensity_dX(Real pressure, Real temperature, unsigned int
   Real dfluid_density = 0.0;
 
   return dfluid_density;
+}
+
+Real
+FluidStateSinglePhase::dViscosity_dDensity(Real density, Real temperature, unsigned int phase_index) const
+{
+  Real dviscosity_ddensity = _fluid_property.dViscosity_dDensity(temperature, density);
+
+  return dviscosity_ddensity;
 }
