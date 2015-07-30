@@ -15,11 +15,11 @@ InputParameters validParams<FluidStateMaterial>()
   params.addRequiredParam<UserObjectName>("fluid_state_uo", "Name of the User Object defining the fluid state model");
   params.addRequiredCoupledVar("primary_saturation_variable", "The primary saturation variable");
   params.addRequiredCoupledVar("primary_pressure_variable", "The primary pressure variable");
-  params.addRequiredCoupledVar("primary_mass_fraction_variable", "The primary mass fraction variable");
+  params.addCoupledVar("primary_mass_fraction_variable", 1.0, "The primary mass fraction variable");
   params.addRequiredCoupledVar("temperature_variable", "The temperature variable");
   params.addRequiredCoupledVar("fluid_density_variables", "The density of each fluid phase");
   params.addParam<std::vector<Real> >("diffusivity", "Vector of diffusivity for each component in each phase. Order is i) component 1 in phase 1; ii) component 1 in phase 2 ...; component 2 in phase 1; ... component n in phase m (m^2/s");
-
+  params.addParam<bool>("has_diffusion", false, "Is diffusion being modelled?");
   return params;
 }
 
@@ -49,6 +49,7 @@ FluidStateMaterial::FluidStateMaterial(const InputParameters & parameters) :
     _pvar(coupled("primary_pressure_variable")),
     _svar(coupled("primary_saturation_variable")),
     _xvar(coupled("primary_mass_fraction_variable")),
+    _has_diffusion(getParam<bool>("has_diffusion")),
     _fluid_state(getUserObject<FluidState>("fluid_state_uo"))
 
 {
@@ -62,9 +63,13 @@ FluidStateMaterial::FluidStateMaterial(const InputParameters & parameters) :
   if (coupledComponents("fluid_density_variables") != _num_phases)
     mooseError("The number of phase densities provided in FluidStateMaterial is not equal to the number of phases in the FluidState UserObject");
 
-  /// Check that the required number (_num_phases * _num_components) of diffusivities have been provided
-  if (_material_diffusivity.size() != _num_phases * _num_components)
-    mooseError("The number of diffivities given in FluidStateMaterial, " << _material_diffusivity.size() <<", is not equal to the required number " << _num_phases * _num_components);
+  /**
+   * Check that the required number (_num_phases * _num_components) of diffusivities have been provided if the
+   * has_diffusion flag is set to true. FIXME: Find way to not need flag to check size in all cases
+   */
+   if(_has_diffusion)
+    if (_material_diffusivity.size() != _num_phases * _num_components)
+      mooseError("The number of diffivities given in FluidStateMaterial, " << _material_diffusivity.size() <<", is not equal to the required number " << _num_phases * _num_components);
 
   /// Determine the phase of the primary variable that this material acts on
   _p_phase = _fluid_state.variablePhase(_pvar);

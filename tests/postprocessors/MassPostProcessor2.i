@@ -49,7 +49,7 @@
 
 [Kernels]
   [./H2OLiquidFlux]
-    type = ComponentFlux
+    type = ComponentAdvectiveFlux
     variable = gas_pressure
     fluid_state_uo = FluidState
     fluid_density_variable = liquid_density
@@ -60,7 +60,7 @@
     component_mass_fraction_variable = xh2oliquid
   [../]
   [./CO2MassFlux]
-    type = ComponentFlux
+    type = ComponentAdvectiveFlux
     variable = liquid_saturation
     fluid_state_uo = FluidState
     fluid_density_variable = gas_density
@@ -188,6 +188,7 @@
     fluid_state_uo = FluidState
     primary_pressure_variable = gas_pressure
     primary_saturation_variable = liquid_saturation
+    primary_mass_fraction_variable = 1
     temperature_variable = 100
     fluid_density_variables = 'liquid_density gas_density'
   [../]

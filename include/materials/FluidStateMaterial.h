@@ -56,6 +56,7 @@ private:
   unsigned int _pvar;
   unsigned int _svar;
   unsigned int _xvar;
+  bool _has_diffusion;
 
  /**
    * This is the member reference that will hold the User Object

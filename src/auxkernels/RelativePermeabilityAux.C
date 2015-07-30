@@ -15,7 +15,7 @@ InputParameters validParams<RelativePermeabilityAux>()
   params.addRequiredCoupledVar("liquid_saturation_variable", "The liquid saturation variable.");
   MooseEnum fluid_phase_enum("liquid gas");
   params.addRequiredParam<MooseEnum>("fluid_phase_enum", fluid_phase_enum, "The fluid phase that this auxillary kernel is to act on (liquid or gas)");
-  MooseEnum property_enum("relperm drelperm");
+  MooseEnum property_enum("relperm drelperm", "relperm");
   params.addRequiredParam<MooseEnum>("property_enum", property_enum, "The relative permeability property that this auxillary kernel is to act on");
   return params;
 }

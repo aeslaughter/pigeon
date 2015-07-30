@@ -42,6 +42,7 @@ ComponentDiffusiveFlux::ComponentDiffusiveFlux(const InputParameters & parameter
 
   /// Sign of the mass fraction gradient
   _sgnx = _fluid_state.dMassFraction_dX(_xvar);
+
 }
 
 Real ComponentDiffusiveFlux::computeQpResidual()

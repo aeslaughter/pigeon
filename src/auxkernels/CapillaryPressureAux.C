@@ -13,7 +13,7 @@ InputParameters validParams<CapillaryPressureAux>()
   InputParameters params = validParams<AuxKernel>();
   params.addRequiredParam<UserObjectName>("capillary_pressure_uo", "Name of the User Object defining the capillary pressure function");
   params.addRequiredCoupledVar("liquid_saturation_variable", "The liquid saturation variable.");
-  MooseEnum property_enum("capillary_pressure dcapillary_pressure d2capillary_pressure");
+  MooseEnum property_enum("capillary_pressure dcapillary_pressure d2capillary_pressure", "capillary_pressure");
   params.addRequiredParam<MooseEnum>("property_enum", property_enum, "The capillary pressure that this auxillary kernel is to calculate");
 
   return params;
