@@ -287,6 +287,8 @@ protected:
   VariableValue & _pressure;
   /// Primary temperature variable
   VariableValue & _temperature;
+  /// Primary saturation VariableValue
+  VariableValue & _saturation;
   /// Primary mass fracion variable (corresponding to the dissolved component)
   VariableValue & _mass_fraction;
 

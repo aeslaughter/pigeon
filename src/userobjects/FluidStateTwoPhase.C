@@ -11,17 +11,13 @@ template<>
 InputParameters validParams<FluidStateTwoPhase>()
 {
   InputParameters params = validParams<FluidState>();
-  params.addClassDescription("Thermophysical fluid state of two-phase sliquid and gas.");
+  params.addClassDescription("Thermophysical fluid state of two-phase liquid and gas system");
   params.addRequiredParam<UserObjectName>("liquid_property_uo", "Name of the User Object defining the liquid properties");
   params.addRequiredParam<UserObjectName>("gas_property_uo", "Name of the User Object defining the gas properties");
   params.addRequiredParam<UserObjectName>("relative_permeability_uo", "Name of the User Object defining the relative permeabilities");
   params.addRequiredParam<UserObjectName>("capillary_pressure_uo", "Name of the User Object defining the capillary pressure");
-  params.addRequiredCoupledVar("pressure_variable",  "The primary pressure variable");
-  params.addRequiredCoupledVar("temperature_variable", "The primary temperature variable.");
-  params.addRequiredCoupledVar("saturation_variable", "The primary saturation variable");
   params.addParam<unsigned int>("pressure_variable_phase", 0, "The phase corresponding to the pressure variable");
   params.addParam<unsigned int>("saturation_variable_phase", 0, "The phase corresponding to the saturation variable");
-  params.addParam<unsigned int>("component_index", 1, "The index of the primary mass fraction component");
   return params;
 }
 
@@ -32,103 +28,18 @@ FluidStateTwoPhase::FluidStateTwoPhase(const InputParameters & parameters) :
   _gas_property(getUserObject<FluidProperties>("gas_property_uo")),
   _relative_permeability(getUserObject<RelativePermeability>("relative_permeability_uo")),
   _capillary_pressure(getUserObject<CapillaryPressure>("capillary_pressure_uo")),
-  _pressure(coupledNodalValue("pressure_variable")),
-  _temperature(coupledNodalValue("temperature_variable")),
-  _saturation(coupledNodalValue("saturation_variable")),
-  _not_isothermal(isCoupled("temperature_variable")),
   _p_phase(getParam<unsigned int>("pressure_variable_phase")),
-  _s_phase(getParam<unsigned int>("saturation_variable_phase")),
-  _pvar(coupled("pressure_variable")),
-  _svar(coupled("saturation_variable")),
-  _tvar(coupled("temperature_variable")),
-  _component_index(getParam<unsigned int>("component_index"))
+  _s_phase(getParam<unsigned int>("saturation_variable_phase"))
 
 {
   _num_components = 2;
   _num_phases = 2;
-  _num_vars = _coupled_moose_vars.size() + (1 - _not_isothermal);
-
-  _varnums.push_back(_pvar);
-  _varnums.push_back(_svar);
-  if (_not_isothermal)
-   _varnums.push_back(_tvar);
-
-  // The pressure variable must always be coupled
-  _pname = getVar("pressure_variable", 0)->name();
-  // The saturation variable must always be coupled
-  _sname = getVar("saturation_variable", 0)->name();
-  if (_not_isothermal) // Check if temperature is coupled
-    _tname = getVar("temperature_variable", 0)->name();
 }
 
 unsigned int
 FluidStateTwoPhase::numPhases() const
 {
   return _num_phases;
-}
-
-unsigned int
-FluidStateTwoPhase::numComponents() const
-{
-  return _num_components;
-}
-
-bool
-FluidStateTwoPhase::isIsothermal() const
-{
-   return 1 - _not_isothermal;  // Returns true if isothermal
-}
-
-Real
-FluidStateTwoPhase::isothermalTemperature() const
-{
-  // For isothermal simulations
-  return _temperature[_qp];
-}
-
-unsigned int
-FluidStateTwoPhase::temperatureVar() const
-{
-  return _tvar;
-}
-
-bool
-FluidStateTwoPhase::isFluidStateVariable(unsigned int moose_var) const
-{
-  bool isvariable = true;
-  if (std::find(_varnums.begin(), _varnums.end(), moose_var) == _varnums.end())
-    isvariable = false;
-
-  return isvariable;
-}
-std::string
-FluidStateTwoPhase::variableNames(unsigned int moose_var) const
-{
-  std::string varname;
-
-  if (moose_var == _pvar)
-    varname = _pname;
-  if (moose_var == _svar)
-    varname = _sname;
-  if (moose_var == _tvar)
-    varname = _tname;
-
-  return varname;
-}
-
-std::string
-FluidStateTwoPhase::variableTypes(unsigned int moose_var) const
-{
-  std::string vartype;
-
-  if (moose_var == _pvar)
-    vartype = "pressure";
-  if (moose_var == _svar)
-    vartype = "saturation";
-  if (moose_var == _tvar)
-    vartype = "temperature";
-
-  return vartype;
 }
 
 unsigned int
@@ -142,19 +53,6 @@ FluidStateTwoPhase::variablePhase(unsigned int moose_var) const
     varphase = _s_phase;
 
   return varphase;
-}
-
-unsigned int
-FluidStateTwoPhase::primaryComponentIndex() const
-{
-  return _component_index;
-}
-
-void
-FluidStateTwoPhase::initialize()
-{
-  _nodal_properties.clear();
-  _primary_vars.resize(_num_vars);
 }
 
 void
@@ -361,7 +259,7 @@ FluidStateTwoPhase::density(Real pressure, Real temperature, unsigned int phase_
 }
 
 Real
-FluidStateTwoPhase::viscosity(Real pressure, Real temperature, unsigned int phase_index) const
+FluidStateTwoPhase::viscosity(Real pressure, Real temperature, Real density, unsigned int phase_index) const
 {
   Real fluid_viscosity;
 
@@ -540,4 +438,18 @@ Real
 FluidStateTwoPhase::dissolved(Real pressure, Real temperature) const
 {
   return 0.;
+}
+
+Real
+FluidStateTwoPhase::dViscosity_dDensity(Real pressure, Real temperature, Real density, unsigned int phase_index) const
+{
+  Real dviscosity_ddensity;
+
+  if (phase_index == 0) // liquid phase
+    dviscosity_ddensity = _liquid_property.dViscosity_dDensity(pressure, temperature, density);
+  else if (phase_index == 1) //gas phase
+    dviscosity_ddensity = _gas_property.dViscosity_dDensity(pressure, temperature, density);
+
+
+  return dviscosity_ddensity;
 }

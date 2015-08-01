@@ -9,7 +9,6 @@
 #define FLUIDSTATESINGLEPHASE_H
 
 #include "FluidState.h"
-//#include "FluidStateVariables.h"
 #include "FluidProperties.h"
 
 
@@ -213,48 +212,9 @@ class FluidStateSinglePhase : public FluidState
    */
   const FluidProperties & _fluid_property;
 
-
-  // /// Primary pressure variable
-  // VariableValue & _pressure;
-  // /// Primary temperature variable
-  // VariableValue & _temperature;
-  // /// Primary mass fracion variable (corresponding to the dissolved component)
-  // VariableValue & _mass_fraction;
-  //
-  // /// Number of components
-  // unsigned int _num_components;
-  // /// Number of phases (1 in this FluidState UserObject)
-  // unsigned int _num_phases;
-  // /// Number of primary variables
-  // unsigned int _num_vars;
-  // /// Bool to flag if the simulation is isothermal
-  // bool _not_isothermal;
-  // /// Vector of MOOSE primary variable numbers
-  // std::vector<unsigned int> _varnums;
-  //
-  // /// MOOSE variable number of primary pressure variable
-  // unsigned int _pvar;
-  // /// MOOSE variable number  of primary temperature variable
-  // unsigned int _tvar;
-  // /// MOOSE variable number of primary mass fraction variable
-  // unsigned int _xvar;
-  // /// Component index of primary mass fraction component
-  // unsigned int _component_index;
   // /// Density increase of fluid with dissolved component 1
   Real _density_increase;
-  /// Name of primary pressure variable
-  std::string _pname;
-  /// Name of primary temperature variable
-  std::string _tname;
-  /// Name of primary mass fraction variable
-  std::string _xname;
 
-/*
-  /// Fluid state properties class to hold thermophysical properties at each node
-  std::map<int, FluidStateProperties > _nodal_properties;
-  ///  Vector of primary variable values at a node
-  std::vector<Real> _primary_vars;
-  */
 };
 
 #endif // FLUIDSTATESINGLEPHASE_H

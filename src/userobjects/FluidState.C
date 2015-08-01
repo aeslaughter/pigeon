@@ -29,6 +29,7 @@ FluidState::FluidState(const InputParameters & parameters) :
   _qp(0),
   _pressure(coupledNodalValue("pressure_variable")),
   _temperature(coupledNodalValue("temperature_variable")),
+  _saturation(coupledNodalValue("saturation_variable")),
   _mass_fraction(coupledNodalValue("mass_fraction_variable")),
   _num_components(getParam<unsigned int>("num_components")),
   _not_isothermal(isCoupled("temperature_variable")),
