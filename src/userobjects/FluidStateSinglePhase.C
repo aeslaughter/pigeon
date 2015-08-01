@@ -26,7 +26,6 @@ FluidStateSinglePhase::FluidStateSinglePhase(const InputParameters & parameters)
 {
   /// Only one phase in this FluidState
   _num_phases = 1;
-
 }
 
 unsigned int
@@ -38,7 +37,7 @@ FluidStateSinglePhase::numPhases() const
 unsigned int
 FluidStateSinglePhase::variablePhase(unsigned int moose_var) const
 {
- // Only one phase in this FluidState
+ /// Only one phase in this FluidState
   return 0;
 }
 
@@ -55,20 +54,20 @@ FluidStateSinglePhase::execute()
   if(isCoupled("mass_fraction_variable"))
     xvar = getVar("mass_fraction_variable", 0);
 
-  // Loop over all elements on current processor
+  /// Loop over all elements on current processor
   const MeshBase::element_iterator end = _mesh.getMesh().active_local_elements_end();
   for (MeshBase::element_iterator el = _mesh.getMesh().active_local_elements_begin(); el != end; ++el)
   {
     const Elem * current_elem = *el;
 
-    // Loop over all nodes on each element
+    /// Loop over all nodes on each element
     for (unsigned int i = 0; i < current_elem->n_vertices(); ++i)
     {
       const Node * current_node = current_elem->get_node(i);
       unsigned int nodeid = current_node->id();
 
-      // Check if the properties at this node have already been calcualted, and if so,
-      // skip to the next node
+      /// Check if the properties at this node have already been calcualted, and if so,
+      /// skip to the next node
       if (_nodal_properties.find(nodeid) == _nodal_properties.end())
       {
         if (isCoupled("pressure_variable"))
@@ -86,10 +85,10 @@ FluidStateSinglePhase::execute()
         else
           _primary_vars[2] = _mass_fraction[_qp];
 
-        // Now calculate all thermophysical properties at the current node
+        /// Now calculate all thermophysical properties at the current node
         thermophysicalProperties(_primary_vars, nodalfsp);
 
-        // Now insert these properties into the _nodal_properties map
+        /// Now insert these properties into the _nodal_properties map
         _nodal_properties.insert( std::pair<int, FluidStateProperties>(nodeid, nodalfsp));
       }
     }
@@ -99,20 +98,20 @@ FluidStateSinglePhase::execute()
 void
 FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, FluidStateProperties & fsp)
 {
-  // Primary variables at the node
+  /// Primary variables at the node
   Real node_pressure = primary_vars[0];
   Real node_temperature = primary_vars[1];
   Real node_xmass = primary_vars[2];
 
-  // Assign the fluid properties
-  // Saturation
+  /// Assign the fluid properties
+  /// Saturation
   Real node_saturation = 1.0;
   fsp.saturation = saturation(node_saturation);
 
-  // Pressure (takes liquid saturation for capillary pressure calculation)
+  /// Pressure (takes liquid saturation for capillary pressure calculation)
   fsp.pressure = pressure(node_pressure, fsp.saturation[0]);
 
-  // Density FIXME: Need to generalise density of saturated mixture
+  /// Density FIXME: Need to generalise density of saturated mixture
   std::vector<Real> densities(_num_phases);
   Real density0 = _fluid_property.density(fsp.pressure[0], node_temperature);
   /// Now add increase due to dissolved component 1
@@ -120,19 +119,19 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
 
   fsp.density = densities;
 
-  // Viscosity
+  /// Viscosity
   std::vector<Real> viscosities(_num_phases);
 
-  // Water viscosity uses water density in calculation.
-  // FIXME: make this general for temp, pressure, density
+  /// Water viscosity uses water density in calculation.
+  /// FIXME: make this general for temp, pressure, density
   viscosities[0] = _fluid_property.viscosity(node_pressure, node_temperature, fsp.density[0]);
 
   fsp.viscosity = viscosities;
 
-  // Relative permeability (Equal to 1)
+  /// Relative permeability (Equal to 1)
   fsp.relperm = relativePermeability(fsp.saturation[0]);
 
-  // Mass fraction of each component
+  /// Mass fraction of each component
   std::vector<std::vector<Real> > xmass;
   xmass.resize(_num_components);
 
@@ -143,7 +142,7 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
 
   fsp.mass_fraction = xmass;
 
-  // Mobility
+  /// Mobility
   std::vector<Real> mobilities(_num_phases);
 
   for (unsigned int n = 0; n < _num_phases; ++n)
@@ -151,12 +150,12 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
 
   fsp.mobility = mobilities;
 
-  // For derivatives wrt saturation, the sign of the derivative depends on whether the primary
-  // saturation variable is liquid or not. This can be accounted for by multiplying all derivatives
-  // wrt S by dS/dSl
+  /// For derivatives wrt saturation, the sign of the derivative depends on whether the primary
+  /// saturation variable is liquid or not. This can be accounted for by multiplying all derivatives
+  /// wrt S by dS/dSl
   Real sgn = 1.0;
 
-  // Derivative of relative permeability wrt liquid_saturation
+  /// Derivative of relative permeability wrt liquid_saturation
   std::vector<Real> drelperm(_num_phases);
 
   for (unsigned int n = 0; n < _num_phases; ++n)
@@ -164,7 +163,7 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
 
   fsp.drelperm = drelperm;
 
-  // Derivative of density wrt pressure
+  /// Derivative of density wrt pressure
   std::vector<Real> ddensities_dp(_num_phases);
 
   for (unsigned int n = 0; n < _num_phases; ++n)
@@ -172,7 +171,7 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
 
   fsp.ddensity_dp = ddensities_dp;
 
-  // Derivative of density wrt saturation
+  /// Derivative of density wrt saturation
   std::vector<Real> ddensities_ds(_num_phases);
 
   for (unsigned int n = 0; n < _num_phases; ++n)
@@ -180,11 +179,11 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
 
   fsp.ddensity_ds = ddensities_ds;
 
-  // Derivative of density wrt mass fraction
+  /// Derivative of density wrt mass fraction
   std::vector<std::vector<Real> > ddensities_dx;
   Real sgnx;
   ddensities_dx.resize(numComponents());
-//FIXME: need to fix this up properly
+  //FIXME: need to fix this up properly
   Real ddx = _density_increase * fsp.density[0] / (density0 + _density_increase - node_xmass * _density_increase);
   for (unsigned int i = 0; i < _num_components; ++i)
   {
@@ -194,7 +193,7 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
 
   fsp.ddensity_dx = ddensities_dx;
 
-  // Derivative of mobility wrt pressure
+  /// Derivative of mobility wrt pressure
   std::vector<Real> dmobilities_dp(_num_phases);
   Real dmdp;
 
@@ -207,8 +206,8 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
 
   fsp.dmobility_dp = dmobilities_dp;
 
-  // Derivative of mobility wrt saturation
-  // Note: drelperm and ddensity_ds are already the correct sign, so don't multiply by sgn
+  /// Derivative of mobility wrt saturation
+  /// Note: drelperm and ddensity_ds are already the correct sign, so don't multiply by sgn
   std::vector<Real> dmobilities_ds(_num_phases);
   Real dmds;
   for (unsigned int n = 0; n < _num_phases; ++n)
@@ -220,8 +219,8 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
 
   fsp.dmobility_ds = dmobilities_ds;
 
-  // Derivative of mobility wrt saturation
-  // Note: ddensity_dx is already the correct sign, so don't multiply by sgn
+  /// Derivative of mobility wrt saturation
+  /// Note: ddensity_dx is already the correct sign, so don't multiply by sgn
   std::vector<std::vector<Real> > dmobilities_dx(_num_components);
   Real dmdx;
   for (unsigned int i = 0; i < _num_components; ++i)

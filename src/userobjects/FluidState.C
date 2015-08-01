@@ -138,10 +138,12 @@ FluidState::variableTypes(unsigned int moose_var) const
   std::string vartype;
   if (moose_var == _pvar)
     vartype = "pressure";
-  if (moose_var == _tvar)
+  else if (moose_var == _tvar)
     vartype = "temperature";
-  if (moose_var == _xvar)
+  else if (moose_var == _xvar)
     vartype = "mass_fraction";
+  else
+    mooseError("Variable " << moose_var << " is not a FluidState variable");
 
   return vartype;
 }
@@ -166,7 +168,8 @@ Real
 FluidState::getNodalProperty(std::string property, unsigned int nodeid, unsigned int phase_index, unsigned int component_index) const
 {
   if (phase_index >= numPhases())
-    mooseError("Phase index " << phase_index << " out of range in FluidStateSinglePhase::getNodalProperty");
+    mooseError("Phase index " << phase_index << " out of range in FluidState::getNodalProperty");
+
   FluidStateProperties fsp;
   Real value=0;
 
@@ -208,7 +211,7 @@ FluidState::getNodalProperty(std::string property, unsigned int nodeid, unsigned
   else if (property == "dmobility_dx")
     value = fsp.dmobility_dx[component_index][phase_index];
   else
-    mooseError("Property " << property << " in FluidStateSinglePhase::getNodalProperty is not one of the members of the FluidStateProperties class. Check spelling of property.");
+    mooseError("Property " << property << " in FluidState::getNodalProperty is not one of the members of the FluidStateProperties class. Check spelling of property.");
 
   return value;
 }
