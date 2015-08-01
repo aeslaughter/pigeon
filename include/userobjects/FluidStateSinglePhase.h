@@ -37,67 +37,11 @@ class FluidStateSinglePhase : public FluidState
   virtual unsigned int numPhases() const;
 
   /**
-   * Number of components
-   *
-   * @return number of components
-   */
-  virtual unsigned int numComponents() const;
-
- /**
-   * Is the simulation isothermal?
-   *
-   * @return boolean isIsothermal
-   */
-  virtual bool isIsothermal() const;
-
-  /**
-   * Temperature for isothermal simulations
-   *
-   * @return temperature (C)
-   */
-  virtual Real isothermalTemperature() const;
-
-  /**
-   * Temperature variable number for nonisothermal simulations
-   *
-   * @return MOOSE variable number corresponding to the temperature variable
-   */
-  virtual unsigned int temperatureVar() const;
-
-  /**
-   * Checks if the MOOSE variable number is a primary FluidState variable
-   * @param moose_var MOOSE variable number
-   * @return bool
-   */
-  virtual bool isFluidStateVariable(unsigned int moose_var) const;
-
-  /**
-    * Primary variable name corresponding to MOOSE variable number
-    * @param moose_var MOOSE variable number
-    * @return variable name
-   */
-  virtual std::string variableNames(unsigned int moose_var) const;
-
-
-  /**
-    * Primary variable type corresponding to MOOSE variable number
-    * @param moose_var MOOSE variable number
-    * @return variable type
-   */
-  virtual std::string variableTypes(unsigned int moose_var) const;
-
-  /**
    * Primary variable phase index of MOOSE variable number
    * @param moose_var MOOSE variable number
    * @return variable phase
    */
   virtual unsigned int variablePhase(unsigned int moose_var) const;
-
-  /**
-   * Primary component index of mass fraction variable
-   * @return primary component index
-   */
-  virtual unsigned int primaryComponentIndex() const;
 
   /**
    * Fluid density
@@ -114,10 +58,11 @@ class FluidStateSinglePhase : public FluidState
    *
    * @param pressure phase pressure (Pa)
    * @param temperature temperature (C)
+   * @param density phase density (kg/m^3)
    * @param phase_index phase index (not used)
    * @return fluid viscosity (Pa.s)
    */
-  virtual Real viscosity(Real pressure, Real temperature, unsigned int phase_index) const;
+  virtual Real viscosity(Real pressure, Real temperature, Real density, unsigned int phase_index) const;
 
   /**
    * Mass fractions for each component in each phase.
@@ -220,12 +165,13 @@ class FluidStateSinglePhase : public FluidState
   /**
    * Derivative of fluid viscosity with respect to density.
    *
-   * @param density fluid density (kg/m^3)
+   * @param pressure phase pressure (Pa)
    * @param temperature fluid temperature (C)
+   * @param density phase density (kg/m^3)
    * @param phase_index index of phase
    * @return derivative of viscosity wrt density
    */
-  virtual Real dViscosity_dDensity(Real density, Real temperature, unsigned int phase_index = 0) const;
+  virtual Real dViscosity_dDensity(Real pressure, Real temperature, Real density, unsigned int phase_index = 0) const;
 
   /**
    * General formulation for Henry's constant for gas solubility in
@@ -242,7 +188,7 @@ class FluidStateSinglePhase : public FluidState
   /**
    * Initialize the property map each time this UserObject is called
    */
-  virtual void initialize();
+  //virtual void initialize();
 
   /**
    * Loop over all nodes on each processor and calculates the thermophysical
@@ -268,33 +214,33 @@ class FluidStateSinglePhase : public FluidState
   const FluidProperties & _fluid_property;
 
 
-  /// Primary pressure variable
-  VariableValue & _pressure;
-  /// Primary temperature variable
-  VariableValue & _temperature;
-  /// Primary mass fracion variable (corresponding to the dissolved component)
-  VariableValue & _mass_fraction;
-
-  /// Number of components
-  unsigned int _num_components;
-  /// Number of phases (1 in this FluidState UserObject)
-  unsigned int _num_phases;
-  /// Number of primary variables
-  unsigned int _num_vars;
-  /// Bool to flag if the simulation is isothermal
-  bool _not_isothermal;
-  /// Vector of MOOSE primary variable numbers
-  std::vector<unsigned int> _varnums;
-
-  /// MOOSE variable number of primary pressure variable
-  unsigned int _pvar;
-  /// MOOSE variable number  of primary temperature variable
-  unsigned int _tvar;
-  /// MOOSE variable number of primary mass fraction variable
-  unsigned int _xvar;
-  /// Component index of primary mass fraction component
-  unsigned int _component_index;
-  /// Density increase of fluid with dissolved component 1
+  // /// Primary pressure variable
+  // VariableValue & _pressure;
+  // /// Primary temperature variable
+  // VariableValue & _temperature;
+  // /// Primary mass fracion variable (corresponding to the dissolved component)
+  // VariableValue & _mass_fraction;
+  //
+  // /// Number of components
+  // unsigned int _num_components;
+  // /// Number of phases (1 in this FluidState UserObject)
+  // unsigned int _num_phases;
+  // /// Number of primary variables
+  // unsigned int _num_vars;
+  // /// Bool to flag if the simulation is isothermal
+  // bool _not_isothermal;
+  // /// Vector of MOOSE primary variable numbers
+  // std::vector<unsigned int> _varnums;
+  //
+  // /// MOOSE variable number of primary pressure variable
+  // unsigned int _pvar;
+  // /// MOOSE variable number  of primary temperature variable
+  // unsigned int _tvar;
+  // /// MOOSE variable number of primary mass fraction variable
+  // unsigned int _xvar;
+  // /// Component index of primary mass fraction component
+  // unsigned int _component_index;
+  // /// Density increase of fluid with dissolved component 1
   Real _density_increase;
   /// Name of primary pressure variable
   std::string _pname;

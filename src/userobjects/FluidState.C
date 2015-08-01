@@ -11,7 +11,14 @@ template<>
 InputParameters validParams<FluidState>()
 {
   InputParameters params = validParams<GeneralUserObject>();
-  params.addClassDescription("Fluid state base class.  Override properties in your class");
+  params.addClassDescription("Fluid state base class. Override properties in your class");
+  params.addRequiredCoupledVar("temperature_variable", "The fluid temperature variable. For isothermal simulations, enter the fluid temperature (C)");
+  params.addRequiredCoupledVar("pressure_variable", "The fluid pressure variable (Pa)");
+  params.addCoupledVar("saturation_variable", 1.0, "The primary saturation variable");
+  params.addCoupledVar("mass_fraction_variable", 1.0, "The primary mass fraction variable");
+  params.addParam<unsigned int>("component_index", 0, "The index of the primary mass fraction component");
+  params.addParam<unsigned int>("num_components", 1, "The number of components in this FluidState. Set to 1 if 'mass_fraction_variable' is 0, or 2 otherwise");
+
   return params;
 }
 
@@ -19,15 +26,131 @@ FluidState::FluidState(const InputParameters & parameters) :
   GeneralUserObject(parameters),
   Coupleable(parameters, false),
   _mesh(_subproblem.mesh()),
-  _qp(0)
+  _qp(0),
+  _pressure(coupledNodalValue("pressure_variable")),
+  _temperature(coupledNodalValue("temperature_variable")),
+  _mass_fraction(coupledNodalValue("mass_fraction_variable")),
+  _num_components(getParam<unsigned int>("num_components")),
+  _not_isothermal(isCoupled("temperature_variable")),
+  _pvar(coupled("pressure_variable")),
+  _tvar(coupled("temperature_variable")),
+  _svar(coupled("saturation_variable")),
+  _xvar(coupled("mass_fraction_variable")),
+  _component_index(getParam<unsigned int>("component_index"))
 
 {
+  /// Determine the number of primary variables required to fully represent
+  /// the fluid system.
+  /// Pressure and temperature variables are always required
+  _num_vars = 2;
+  /// If saturation is coupled, increment _num_vars
+  if (isCoupled("saturation_variable"))
+    _num_vars ++;
+  /// If mass fraction is coupled, increment _num_vars
+  if (isCoupled("mass_fraction_variable"))
+    _num_vars ++;
+
+  /// Vector of FLuidState variable numbers. Pressure is always a primary variable
+  _varnums.push_back(_pvar);
+  /// If temperature is coupled, add tvar
+  if (_not_isothermal)
+    _varnums.push_back(_tvar);
+  /// If saturation is coupled, add svar
+  if (isCoupled("saturation_variable"))
+    _varnums.push_back(_svar);
+  /// If mass fraction is coupled, add xvar
+  if (isCoupled("mass_fraction_variable"))
+    _varnums.push_back(_xvar);
+
+  // Get the names of the variables corresponding to the FluidState variables
+  _pname = getVar("pressure_variable", 0)->name();
+  if (isCoupled("temperature_variable"))
+    _tname = getVar("temperature_variable", 0)->name();
+  if (isCoupled("saturation_variable"))
+    _sname = getVar("saturation_variable", 0)->name();
+  if (isCoupled("mass_fraction_variable"))
+    _xname = getVar("mass_fraction_variable", 0)->name();
+}
+
+unsigned int
+FluidState::numComponents() const
+{
+  return _num_components;
+}
+
+bool
+FluidState::isIsothermal() const
+{
+   return 1 - _not_isothermal;  // Returns true if isothermal
+}
+
+Real
+FluidState::isothermalTemperature() const
+{
+  // For isothermal simulations
+  return _temperature[_qp];
+}
+
+unsigned int
+FluidState::primaryComponentIndex() const
+{
+  return _component_index;
+}
+
+bool
+FluidState::isFluidStateVariable(unsigned int moose_var) const
+{
+  bool isvariable = true;
+  if (std::find(_varnums.begin(), _varnums.end(), moose_var) == _varnums.end())
+    isvariable = false;
+
+  return isvariable;
+}
+
+unsigned int
+FluidState::temperatureVar() const
+{
+  return _tvar;
+}
+
+std::string
+FluidState::variableNames(unsigned int moose_var) const
+{
+  std::string varname;
+  if (moose_var == _pvar)
+    varname = _pname;
+  else if (moose_var == _tvar)
+    varname = _tname;
+  else if (moose_var == _svar)
+    varname = _sname;
+  else if (moose_var == _xvar)
+      varname = _xname;
+  else
+    mooseError("Variable " << moose_var << " is not a FluidState variable");
+
+  return varname;
+}
+
+std::string
+FluidState::variableTypes(unsigned int moose_var) const
+{
+  std::string vartype;
+  if (moose_var == _pvar)
+    vartype = "pressure";
+  if (moose_var == _tvar)
+    vartype = "temperature";
+  if (moose_var == _xvar)
+    vartype = "mass_fraction";
+
+  return vartype;
 }
 
 
 void
 FluidState::initialize()
 {
+  _nodal_properties.clear();
+  _primary_vars.resize(_num_vars);
 }
 
 void

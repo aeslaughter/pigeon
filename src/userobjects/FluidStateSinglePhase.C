@@ -13,11 +13,6 @@ InputParameters validParams<FluidStateSinglePhase>()
   InputParameters params = validParams<FluidState>();
   params.addClassDescription("Thermophysical fluid state of single phase fluid");
   params.addRequiredParam<UserObjectName>("fluid_property_uo", "Name of the User Object defining the fluid properties");
-  params.addRequiredCoupledVar("temperature_variable", "The fluid temperature variable. For isothermal simulations, enter the fluid temperature (C)");
-  params.addRequiredCoupledVar("pressure_variable", "The fluid pressure variable (Pa)");
-  params.addRequiredCoupledVar("mass_fraction_variable", "The mass fraction of the dissolved component. Set to 0 for no dissolved component");
-  params.addParam<unsigned int>("component_index", 0, "The index of the primary mass fraction component");
-  params.addParam<unsigned int>("num_components", 1, "The number of components in this FluidState. Set to 1 if 'mass_fraction_variable' is 0, or 2 otherwise");
   params.addParam<Real>("component_density_increase", 0., "The increase in density with dissolved component 1");
   return params;
 }
@@ -26,34 +21,11 @@ FluidStateSinglePhase::FluidStateSinglePhase(const InputParameters & parameters)
   FluidState(parameters),
 
   _fluid_property(getUserObject<FluidProperties>("fluid_property_uo")),
-  _pressure(coupledNodalValue("pressure_variable")),
-  _temperature(coupledNodalValue("temperature_variable")),
-  _mass_fraction(coupledNodalValue("mass_fraction_variable")),
-  _num_components(getParam<unsigned int>("num_components")),
-  _not_isothermal(isCoupled("temperature_variable")),
-  _pvar(coupled("pressure_variable")),
-  _tvar(coupled("temperature_variable")),
-  _xvar(coupled("mass_fraction_variable")),
-  _component_index(getParam<unsigned int>("component_index")),
   _density_increase(getParam<Real>("component_density_increase"))
 
 {
+  /// Only one phase in this FluidState
   _num_phases = 1;
-  _num_vars = 3;
-
-  _varnums.push_back(_pvar);
-  if (_not_isothermal)
-    _varnums.push_back(_tvar);
-  if (isCoupled("mass_fraction_variable"))
-    _varnums.push_back(_xvar);
-
-  // Get the names of the variables
-  if (isCoupled("pressure_variable"))
-    _pname = getVar("pressure_variable", 0)->name();
-  if (isCoupled("temperature_variable"))
-    _tname = getVar("temperature_variable", 0)->name();
-  if (isCoupled("mass_fraction_variable"))
-    _xname = getVar("mass_fraction_variable", 0)->name();
 
 }
 
@@ -64,86 +36,10 @@ FluidStateSinglePhase::numPhases() const
 }
 
 unsigned int
-FluidStateSinglePhase::numComponents() const
-{
-  return _num_components;
-}
-
-bool
-FluidStateSinglePhase::isIsothermal() const
-{
-   return 1 - _not_isothermal;  // Returns true if isothermal
-}
-
-Real
-FluidStateSinglePhase::isothermalTemperature() const
-{
-  // For isothermal simulations
-  return _temperature[_qp];
-}
-
-unsigned int
-FluidStateSinglePhase::temperatureVar() const
-{
-  return _tvar;
-}
-
-bool
-FluidStateSinglePhase::isFluidStateVariable(unsigned int moose_var) const
-{
-  bool isvariable = true;
-  if (std::find(_varnums.begin(), _varnums.end(), moose_var) == _varnums.end())
-    isvariable = false;
-
-  return isvariable;
-}
-
-std::string
-FluidStateSinglePhase::variableNames(unsigned int moose_var) const
-{
-  std::string varname;
-  if (moose_var == _pvar)
-    varname = _pname;
-  if (moose_var == _tvar)
-    varname = _tname;
-  if (moose_var == _xvar)
-      varname = _xname;
-
-  return varname;
-}
-
-std::string
-FluidStateSinglePhase::variableTypes(unsigned int moose_var) const
-{
-  std::string vartype;
-  if (moose_var == _pvar)
-    vartype = "pressure";
-  if (moose_var == _tvar)
-    vartype = "temperature";
-  if (moose_var == _xvar)
-    vartype = "mass_fraction";
-
-  return vartype;
-}
-
-unsigned int
 FluidStateSinglePhase::variablePhase(unsigned int moose_var) const
 {
  // Only one phase in this FluidState
   return 0;
-}
-
-unsigned int
-FluidStateSinglePhase::primaryComponentIndex() const
-{
-  return _component_index;
-}
-
-void
-FluidStateSinglePhase::initialize()
-{
-  _nodal_properties.clear();
-  _primary_vars.resize(_num_vars);
 }
 
 void
@@ -229,7 +125,7 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
 
   // Water viscosity uses water density in calculation.
   // FIXME: make this general for temp, pressure, density
-  viscosities[0] = _fluid_property.viscosity(node_temperature, fsp.density[0]);
+  viscosities[0] = _fluid_property.viscosity(node_pressure, node_temperature, fsp.density[0]);
 
   fsp.viscosity = viscosities;
 
@@ -299,7 +195,6 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
   fsp.ddensity_dx = ddensities_dx;
 
   // Derivative of mobility wrt pressure
-  // Note: dViscosity_dP not implemnted yet
   std::vector<Real> dmobilities_dp(_num_phases);
   Real dmdp;
 
@@ -313,7 +208,6 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
   fsp.dmobility_dp = dmobilities_dp;
 
   // Derivative of mobility wrt saturation
-  // Note: dViscosity_dS not implemnted yet
   // Note: drelperm and ddensity_ds are already the correct sign, so don't multiply by sgn
   std::vector<Real> dmobilities_ds(_num_phases);
   Real dmds;
@@ -349,11 +243,9 @@ FluidStateSinglePhase::density(Real pressure, Real temperature, unsigned int pha
 }
 
 Real
-FluidStateSinglePhase::viscosity(Real pressure, Real temperature, unsigned int phase_index) const
+FluidStateSinglePhase::viscosity(Real pressure, Real temperature, Real density, unsigned int phase_index) const
 {
-  // TODO: Fix this so that density isn't calculated twice.
-  Real fluid_density = _fluid_property.density(pressure, temperature);
-  Real fluid_viscosity = _fluid_property.viscosity(temperature, fluid_density);
+  Real fluid_viscosity = _fluid_property.viscosity(pressure, temperature, density);
 
   return fluid_viscosity;
 }
@@ -458,9 +350,9 @@ FluidStateSinglePhase::dDensity_dX(Real pressure, Real temperature, unsigned int
 }
 
 Real
-FluidStateSinglePhase::dViscosity_dDensity(Real density, Real temperature, unsigned int phase_index) const
+FluidStateSinglePhase::dViscosity_dDensity(Real pressure, Real temperature, Real density, unsigned int phase_index) const
 {
-  Real dviscosity_ddensity = _fluid_property.dViscosity_dDensity(temperature, density);
+  Real dviscosity_ddensity = _fluid_property.dViscosity_dDensity(pressure, temperature, density);
 
   return dviscosity_ddensity;
 }
