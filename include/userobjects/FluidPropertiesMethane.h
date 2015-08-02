@@ -36,7 +36,7 @@ class FluidPropertiesMethane : public FluidPropertiesIdealGas
    * @param temperature fluid temperature (C)
    * @return density (kg/m^3)
    */
-  Real density(Real pressure, Real temperature) const;
+  virtual Real density(Real pressure, Real temperature, Real xmass = 0) const;
 
   /**
    * CH4 gas viscosity as a function of  pressure and temperature.
@@ -47,7 +47,7 @@ class FluidPropertiesMethane : public FluidPropertiesIdealGas
    * @param temperature fluid temperature (C)
    * @return viscosity (Pa.s)
    */
-  Real viscosity(Real pressure, Real temperature) const;
+  virtual Real viscosity(Real pressure, Real temperature, Real density = 0, Real xmass = 0) const;
 
   /**
    * Derivative of the density of gaseous CH4 as a function of
@@ -55,9 +55,29 @@ class FluidPropertiesMethane : public FluidPropertiesIdealGas
    *
    * @param pressure gas pressure (Pa)
    * @param temperature gas temperature (C)
-   * @return derivative of CO2 density (kg/m^3) with respect to pressure
+   * @return derivative of CH4 density (kg/m^3) with respect to pressure
    */
-  Real dDensity_dP(Real temperature) const;
+  virtual Real dDensity_dP(Real pressure, Real temperature, Real xmass = 0) const;
+
+  /**
+   * Derivative of the density of gaseous CH4 as a function of
+   * temperature.
+   *
+   * @param pressure gas pressure (Pa)
+   * @param temperature gas temperature (C)
+   * @return derivative of CH4 density (kg/m^3) with respect to temperature
+   */
+  virtual Real dDensity_dT(Real pressure, Real temperature, Real xmass = 0) const;
+
+  /**
+   * Derivative of the viscosity of gaseous CH4 as a function of
+   * pressure.
+   *
+   * @param pressure gas pressure (Pa)
+   * @param temperature gas temperature (C)
+   * @return derivative of CH4 viscosity wrt pressure (/s)
+   */
+  virtual Real dViscosity_dP(Real pressure, Real temperature, Real density = 0, Real xmass = 0) const;
 
   /**
    * Henry's law constant coefficients for dissolution of CH4 into water.

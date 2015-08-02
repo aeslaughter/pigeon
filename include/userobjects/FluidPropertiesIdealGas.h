@@ -29,7 +29,7 @@ class FluidPropertiesIdealGas : public FluidProperties
    * @param molar mass gas molar mass (kg/mol)
    * @return density (kg/m^3)
    */
-  Real density(Real pressure, Real temperature, Real molar_mass) const;
+  virtual Real density(Real pressure, Real temperature, Real molar_mass) const;
 
   /**
    * Derivative of the density of an ideal gas as a function of
@@ -39,7 +39,7 @@ class FluidPropertiesIdealGas : public FluidProperties
    * @param molar mass gas molar mass (kg/mol)
    * @return derivative of CO2 density (kg/m^3) with respect to pressure
    */
-  Real dDensity_dP(Real temperature, Real molar_mass) const;
+  virtual Real dDensity_dP(Real pressure, Real temperature, Real molar_mass) const;
 
   /**
    * Derivative of the density of an ideal gas as a function of
@@ -50,8 +50,11 @@ class FluidPropertiesIdealGas : public FluidProperties
    * @param molar mass gas molar mass (kg/mol)
    * @return derivative of CO2 density (kg/m^3) with respect to pressure
    */
-  Real dDensity_dT(Real pressure, Real temperature, Real molar_mass) const;
+  virtual Real dDensity_dT(Real pressure, Real temperature, Real molar_mass) const;
 
+  virtual Real viscosity(Real pressure, Real temperature, Real molar_mass, Real xmass = 0) const;
+
+  virtual Real dViscosity_dP(Real pressure, Real temperature, Real molar_mass, Real xmass = 0) const;
 
 
  protected:

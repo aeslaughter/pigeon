@@ -74,7 +74,7 @@ FluidPropertiesBrine::density(Real pressure, Real temperature, Real xnacl) const
 }
 
 Real
-FluidPropertiesBrine::viscosityDens(Real temperature, Real density, Real xnacl) const
+FluidPropertiesBrine::viscosity(Real pressure, Real temperature, Real density, Real xnacl) const
 {
   // Correlation requires molar concentration (mol/kg)
   Real mol = xnacl / ((1.0 - xnacl) * _Mnacl);
@@ -88,16 +88,8 @@ FluidPropertiesBrine::viscosityDens(Real temperature, Real density, Real xnacl) 
   // that the density is the density of pure water.
   // TODO: In EOS code, add water viscosity as an input parameter so that it is not calculated
   // more than once per qp per iteration.
-  return a * _water_property.viscosity(temperature, density);
-}
-
-Real
-FluidPropertiesBrine::viscosity(Real pressure, Real temperature, Real xnacl) const
-{
-  // Calculate the water density
-  Real water_density = _water_property.density(pressure, temperature);
-
-  return viscosityDens(temperature, water_density, xnacl);
+  // FIXME: dummy pressure variable
+  return a * _water_property.viscosity(pressure, temperature, density);
 }
 
 Real
@@ -150,6 +142,18 @@ FluidPropertiesBrine::pSat(Real temperature, Real xnacl) const
 
 Real
 FluidPropertiesBrine::dDensity_dP(Real pressure, Real temperature, Real xnacl) const
+{
+  return 0.; //TODO: implement brine density derivative wrt P
+}
+
+Real
+FluidPropertiesBrine::dDensity_dT(Real pressure, Real temperature, Real xnacl) const
+{
+  return 0.; //TODO: implement brine density derivative wrt P
+}
+
+Real
+FluidPropertiesBrine::dViscosity_dP(Real pressure, Real temperature, Real density, Real xnacl) const
 {
   return 0.; //TODO: implement brine density derivative wrt P
 }

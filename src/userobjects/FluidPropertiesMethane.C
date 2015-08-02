@@ -30,14 +30,14 @@ FluidPropertiesMethane::molarMass() const
 }
 
 Real
-FluidPropertiesMethane::density(Real pressure, Real temperature) const
+FluidPropertiesMethane::density(Real pressure, Real temperature, Real xmass) const
 
 {
   return FluidPropertiesIdealGas::density(pressure, temperature, _Mch4);
 }
 
 Real
-FluidPropertiesMethane::viscosity(Real pressure, Real temperature) const
+FluidPropertiesMethane::viscosity(Real pressure, Real temperature, Real density, Real xmass) const
 {
   Real a[6] = {2.968267e-1, 3.711201e-2, 1.218298e-5, -7.02426e-8, 7.543269e-11,
     -2.7237166e-14};
@@ -55,9 +55,21 @@ FluidPropertiesMethane::viscosity(Real pressure, Real temperature) const
 }
 
 Real
-FluidPropertiesMethane::dDensity_dP(Real temperature) const
+FluidPropertiesMethane::dDensity_dP(Real pressure, Real temperature, Real xmass) const
 {
-  return FluidPropertiesIdealGas::dDensity_dP(temperature, _Mch4);
+  return FluidPropertiesIdealGas::dDensity_dP(pressure, temperature, _Mch4);
+}
+
+Real
+FluidPropertiesMethane::dDensity_dT(Real pressure, Real temperature, Real xmass) const
+{
+  return 0.; // FIXME not implemented yet
+}
+
+Real
+FluidPropertiesMethane::dViscosity_dP(Real pressure, Real temperature, Real density, Real xmass) const
+{
+  return 0.; // FIXME not implemented yet
 }
 
 std::vector<Real>

@@ -47,7 +47,7 @@ class FluidPropertiesBrine : public FluidProperties
    * @param xnacl salt mass fraction (-)
    * @return water density (kg/m^3)
    */
-  Real density(Real pressure, Real temperature, Real xnacl) const;
+  virtual Real density(Real pressure, Real temperature, Real xnacl) const;
 
   /**
    * Viscosity of brine.
@@ -59,18 +59,7 @@ class FluidPropertiesBrine : public FluidProperties
    * @param xnacl salt mass fraction (-)
    * @return viscosity (Pa.s)
    */
-  Real viscosityDens(Real temperature, Real density, Real xnacl) const;
-
-  /**
-   * Viscosity of brine using pressure instead of density.
-   * Calls viscosityDens.
-   *
-   * @param pressure pressure (Pa)
-   * @param temperature brine temperature (C)
-   * @param xnacl salt mass fraction (-)
-   * @return viscosity (Pa.s)
-   */
-  Real viscosity(Real pressure, Real density, Real xnacl) const;
+  virtual Real viscosity(Real pressure, Real temperature, Real density, Real xnacl) const;
 
   /**
    * Density of halite (solid NaCl)
@@ -119,11 +108,30 @@ class FluidPropertiesBrine : public FluidProperties
    * @param pressure brine pressure (Pa)
    * @param temperature brine temperature (C)
    * @param xnacl salt mass fraction (-)
-   * @return water density (kg/m^3)
+   * @return derivative of brine density wrt pressure (kg/m^3/Pa)
    */
-  Real dDensity_dP(Real pressure, Real temperature, Real xnacl) const;
+  virtual Real dDensity_dP(Real pressure, Real temperature, Real xnacl) const;
 
+  /**
+   * Derivative of brine density with respect to temperature
+   *
+   * @param pressure brine pressure (Pa)
+   * @param temperature brine temperature (C)
+   * @param xnacl salt mass fraction (-)
+   * @return derivative of brine density wrt temperature (kg/m^3/C)
+   */
+  virtual Real dDensity_dT(Real pressure, Real temperature, Real xnacl) const;
 
+  /**
+   * Derivative of brine viscosity with respect to temperature
+   *
+   * @param pressure brine pressure (Pa)
+   * @param temperature brine temperature (C)
+   * @param density brine density (kg/m^3)
+   * @param xnacl salt mass fraction (-)
+   * @return derivative of brine viscosity with respect to pressure
+   */
+  virtual Real dViscosity_dP(Real pressure, Real temperature, Real density, Real xnacl) const;
 
  protected:
 

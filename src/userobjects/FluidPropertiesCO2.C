@@ -41,7 +41,7 @@ FluidPropertiesCO2::criticalTemperature() const
 }
 
 Real
-FluidPropertiesCO2::density(Real pressure, Real temperature) const
+FluidPropertiesCO2::density(Real pressure, Real temperature, Real xmass) const
 {
   Real rho;
 
@@ -55,12 +55,12 @@ FluidPropertiesCO2::density(Real pressure, Real temperature) const
 }
 
 Real
-FluidPropertiesCO2::viscosity(Real pressure, Real temperature) const
+FluidPropertiesCO2::viscosity(Real pressure, Real temperature, Real density, Real xmass) const
 {
   Real mu;
 
   if (pressure <= criticalPressure())
-    mu = gasViscosity(pressure, temperature);
+    mu = gasViscosity(pressure, temperature, density);
 
   else //if (pressure > criticalPressure())
     mu = supercriticalViscosity(pressure, temperature);
@@ -69,7 +69,7 @@ FluidPropertiesCO2::viscosity(Real pressure, Real temperature) const
 }
 
 Real
-FluidPropertiesCO2::dDensity_dP(Real pressure, Real temperature) const
+FluidPropertiesCO2::dDensity_dP(Real pressure, Real temperature, Real xmass) const
 {
   Real drho;
 
@@ -83,7 +83,7 @@ FluidPropertiesCO2::dDensity_dP(Real pressure, Real temperature) const
 }
 
 Real
-FluidPropertiesCO2::dDensity_dT(Real pressure, Real temperature) const
+FluidPropertiesCO2::dDensity_dT(Real pressure, Real temperature, Real xmass) const
 {
   Real drho;
 
@@ -97,7 +97,7 @@ FluidPropertiesCO2::dDensity_dT(Real pressure, Real temperature) const
 }
 
 Real
-FluidPropertiesCO2::gasViscosity(Real pressure, Real temperature) const
+FluidPropertiesCO2::gasViscosity(Real pressure, Real temperature, Real density) const
 {
   Real tk = temperature + _t_c2k;
   Real tstar = tk / 251.196;
@@ -119,14 +119,11 @@ FluidPropertiesCO2::gasViscosity(Real pressure, Real temperature) const
   for (unsigned int n = 0; n < 5; ++n)
     b[n] = d[n] /  std::pow(tstar, j[n] - 1);
 
-  // Calculate the density of the CO2 - gas phase only
-  Real rho = gasDensity(pressure, temperature);
-
   // Excess viscosity due to density
   Real mu = 0.0;
 
   for (unsigned int n = 0; n < 5; ++n)
-    mu += b[n] * std::pow(rho, i[n]);
+    mu += b[n] * std::pow(density, i[n]);
 
   return (mu0 + mu) * 1e-6; // convert to Pa.s
 }
@@ -419,6 +416,11 @@ FluidPropertiesCO2::dSupercriticalDensity_dT(Real pressure, Real temperature) co
   return a0 + a1 * p1 + a2 * p2 + a3 * p3 + a4 * p4;
 }
 
+Real
+FluidPropertiesCO2::dViscosity_dP(Real pressure, Real temperature, Real ddensity_dp, Real xmass) const
+{
+  return 0.; // FIXME not implemented yet
+}
 
 
 std::vector<Real>

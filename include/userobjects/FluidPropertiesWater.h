@@ -5,14 +5,6 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 
-/****************************************************************/
-/* Fluid properties of water.                                   */
-/*                                                              */
-/*                                                              */
-/* Chris Green 2015                                             */
-/* chris.green@csiro.au                                         */
-/****************************************************************/
-
 #ifndef FLUIDPROPERTIESWATER_H
 #define FLUIDPROPERTIESWATER_H
 
@@ -48,18 +40,19 @@ class FluidPropertiesWater : public FluidProperties
    * @param temperature water temperature (C)
    * @return water density (kg/m^3)
    */
-  Real density(Real pressure, Real temperature) const;
+  Real density(Real pressure, Real temperature, Real xmass = 0) const;
 
   /**
    * Viscosity of water.
    * Eq. (10) from Release on the IAPWS Formulation 2008 for the
    * Viscosity of Ordinary Water Substance.
    *
+   * @param pressure water pressure (Pa)
    * @param temperature water temperature (C)
    * @param density water density (kg/m^3)
    * @return viscosity (Pa.s)
    */
-  Real viscosity(Real temperature, Real density) const;
+  Real viscosity(Real pressure, Real temperature, Real density, Real xmass = 0) const;
 
   /** Saturation pressure as a function of temperature.
    *
@@ -160,7 +153,7 @@ class FluidPropertiesWater : public FluidProperties
    * @param temperature water temperature (C)
    * @return derivative of water density (kg/m^3) with respect to pressure
    */
-  Real dDensity_dP(Real pressure, Real temperature) const;
+  Real dDensity_dP(Real pressure, Real temperature, Real xmass = 0) const;
 
   /**
    * Derivative of density function for Region 1 - single phase liquid region
@@ -187,15 +180,18 @@ class FluidPropertiesWater : public FluidProperties
   Real dDensityRegion2_dP(Real pressure, Real temperature) const;
 
   /**
-   * Derivative of viscosity with respect to density. Derived from
+   * Derivative of viscosity with respect to pressure. Derived from
    * Eq. (10) from Release on the IAPWS Formulation 2008 for the
    * Viscosity of Ordinary Water Substance.
    *
+   * @param pressure water pressure (Pa)
    * @param temperature water temperature (C)
    * @param density water density (kg/m^3)
-   * @return dViscosity_dDensity
+   * @return dViscosity_dpressure
    */
-  Real dViscosity_dDensity(Real temperature, Real density) const;
+  Real dViscosity_dP(Real pressure, Real temperature, Real density, Real xmass = 0) const;
+
+  Real dDensity_dT(Real pressure, Real temperature, Real xmass = 0) const;
 
 
 

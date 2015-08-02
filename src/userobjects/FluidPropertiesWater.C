@@ -98,7 +98,7 @@ FluidPropertiesWater::molarMass() const
 }
 
 Real
-FluidPropertiesWater::density(Real pressure, Real temperature) const
+FluidPropertiesWater::density(Real pressure, Real temperature, Real xmass) const
 
 {
   // Valid for 273.15 K <= T <= 1073.15 K, p <= 100 MPa
@@ -129,8 +129,9 @@ FluidPropertiesWater::density(Real pressure, Real temperature) const
 }
 
 Real
-FluidPropertiesWater::viscosity(Real temperature, Real density) const
+FluidPropertiesWater::viscosity(Real pressure, Real temperature, Real density, Real xmass) const
 {
+  // Note: water viscosity correlation does not use pressure parameter
   Real t0[4], t1[6], d1[7];
 
   Real mu_star = 1.e-6;
@@ -306,7 +307,7 @@ FluidPropertiesWater::densityRegion3(Real pressure, Real temperature) const
 }
 
 Real
-FluidPropertiesWater::dDensity_dP(Real pressure, Real temperature) const
+FluidPropertiesWater::dDensity_dP(Real pressure, Real temperature, Real xmass) const
 {
   // Valid for 273.15 K <= T <= 1073.15 K, p <= 100 MPa
   //          1073.15 K <= T <= 2273.15 K, p <= 50 Mpa
@@ -385,7 +386,7 @@ FluidPropertiesWater::dDensityRegion2_dP(Real pressure, Real temperature) const
 }
 
 Real
-FluidPropertiesWater::dViscosity_dDensity(Real temperature, Real density) const
+FluidPropertiesWater::dViscosity_dP(Real pressure, Real temperature, Real density, Real xmass) const
 {
   Real t1[6], d1[7];
 
@@ -418,7 +419,17 @@ FluidPropertiesWater::dViscosity_dDensity(Real temperature, Real density) const
     sum2 += t1[_iv[i]] * _jv[i] * _h1v[i] * d1[_jv[i]] / (rhobar - 1.0);
   }
 
-  Real viscosity = FluidPropertiesWater::viscosity(temperature, density);
+  Real viscosity = FluidPropertiesWater::viscosity(pressure, temperature, density);
 
-  return viscosity * (sum1 + rhobar * sum2) / _rho_critical;
+  /// The derivative of viscosity wrt density is then
+  Real dviscosity_ddensity =  viscosity * (sum1 + rhobar * sum2) / _rho_critical;
+
+  /// The derivative of viscosity wrt pressure is given by the chain rule
+  return dviscosity_ddensity * dDensity_dP(pressure, temperature);
+}
+
+Real
+FluidPropertiesWater::dDensity_dT(Real pressure, Real temperature, Real xmass) const
+{
+  return 0.; // FIXME: not implemented yet
 }

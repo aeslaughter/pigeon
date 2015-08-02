@@ -45,15 +45,17 @@ class FluidPropertiesCO2 : public FluidProperties
    * @param temperature fluid temperature (C)
    * @return density (kg/m^3)
    */
-  Real density(Real pressure, Real temperature) const;
+  virtual Real density(Real pressure, Real temperature, Real xmass = 0) const;
 
   /**
    * CO2 viscosity as a function of  pressure and temperature.
+   *
    * @param pressure fluid pressure (Pa)
    * @param temperature fluid temperature (C)
+   * @param density phase density (kg/m^3)
    * @return viscosity (Pa.s)
    */
-  Real viscosity(Real pressure, Real temperature) const;
+  virtual Real viscosity(Real pressure, Real temperature, Real density, Real xmass = 0) const;
 
   /**
    * Henry's law constant coefficients for dissolution of CO2 into water.
@@ -104,9 +106,10 @@ class FluidPropertiesCO2 : public FluidProperties
    *
    * @param pressure fluid pressure (Pa)
    * @param temperature fluid temperature (C)
+   * @param density fluid density (kg/m^3)
    * @return viscosity (Pa.s)
    */
-  Real gasViscosity(Real pressure, Real temperature) const;
+  Real gasViscosity(Real pressure, Real temperature, Real density) const;
 
   /**
    * Viscosity of supercritical CO2. From Ouyang, New correlations for predicting
@@ -128,7 +131,7 @@ class FluidPropertiesCO2 : public FluidProperties
    * @param temperature fluid temperature (C)
    * @return derivative of CO2 density (kg/m^3) with respect to pressure (Pa)
    */
-  Real dDensity_dP(Real pressure, Real temperature) const;
+  Real dDensity_dP(Real pressure, Real temperature, Real xmass = 0) const;
 
   /**
    * Derivative of the density of CO2 as a function of
@@ -138,7 +141,7 @@ class FluidPropertiesCO2 : public FluidProperties
    * @param temperature fluid temperature (C)
    * @return derivative of CO2 density (kg/m^3) with respect to temperature (C)
    */
-  Real dDensity_dT(Real pressure, Real temperature) const;
+  Real dDensity_dT(Real pressure, Real temperature, Real xmass = 0) const;
 
   /**
    * Derivative of the density of gaseous CO2 as a function of
@@ -179,6 +182,17 @@ class FluidPropertiesCO2 : public FluidProperties
    * @return derivative of CO2 density (kg/m^3) with respect to temperature (C)
    */
   Real dSupercriticalDensity_dT(Real pressure, Real temperature) const;
+
+  /**
+   * The derivative of CO2 viscosity with respect to pressure.
+   *
+   * @param density fluid density (kg/m^3)
+   * @param temperature fluid temperature (C)
+   * @param ddensity_dp derivative of fluid density wrt pressure (kg/m^3/Pa)
+   * @return derivative of CO2 viscosity with respect to pressure
+   */
+  virtual Real dViscosity_dP(Real pressure, Real temperature, Real ddensity_dp, Real xmass = 0) const;
+
 
  protected:
   /// Conversion of temperature from Celcius to Kelvin

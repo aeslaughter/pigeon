@@ -31,7 +31,7 @@ FluidPropertiesIdealGas::density(Real pressure, Real temperature, Real molar_mas
 
 
 Real
-FluidPropertiesIdealGas::dDensity_dP(Real temperature, Real molar_mass) const
+FluidPropertiesIdealGas::dDensity_dP(Real pressure, Real temperature, Real molar_mass) const
 {
   return molar_mass / (_R * (temperature + _t_c2k));
 }
@@ -41,4 +41,16 @@ FluidPropertiesIdealGas::dDensity_dT(Real pressure, Real temperature, Real molar
 {
   Real tk = temperature + _t_c2k;
   return - pressure * molar_mass / (_R * tk * tk);
+}
+
+Real
+FluidPropertiesIdealGas::viscosity(Real pressure, Real temperature, Real molar_mass, Real xmass) const
+{ // FIXME: throw error
+  return 0.; // Viscosity not used in ideal gas
+}
+
+Real
+FluidPropertiesIdealGas::dViscosity_dP(Real pressure, Real temperature, Real molar_mass, Real xmass) const
+{
+  return 0.; // Not implemented
 }
