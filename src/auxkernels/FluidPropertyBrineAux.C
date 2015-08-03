@@ -43,8 +43,10 @@ FluidPropertyBrineAux::computeValue()
     property = _brine_property.density(_pressure[_qp], _temperature[_qp], _salt_mass_fraction[_qp]);
 
   else if (brine_property_enum == "viscosity")
-    property = _brine_property.viscosity(_pressure[_qp], _temperature[_qp], _salt_mass_fraction[_qp]);
-
+  {
+    Real density = _water_property.density(_pressure[_qp], _temperature[_qp]);
+    property = _brine_property.viscosity(_pressure[_qp], _temperature[_qp], density, _salt_mass_fraction[_qp]);
+  }
   else if (brine_property_enum == "halite_density")
     property = _brine_property.haliteDensity(_pressure[_qp], _temperature[_qp]);
 

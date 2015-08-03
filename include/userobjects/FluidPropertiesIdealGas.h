@@ -22,6 +22,12 @@ class FluidPropertiesIdealGas : public FluidProperties
   FluidPropertiesIdealGas(const InputParameters & parameters);
 
   /**
+   * Fluid component molar mass.
+   * @return molar mass (kg/mol)
+   */
+  virtual Real molarMass() const;
+
+  /**
    * Ideal gas density as a function of  pressure, temperature and molar mass.
    *
    * @param pressure gas pressure (Pa)

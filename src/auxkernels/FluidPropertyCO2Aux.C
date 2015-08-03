@@ -37,8 +37,10 @@ FluidPropertyCO2Aux::computeValue()
     property = _co2_property.density(_pressure[_qp], _temperature[_qp]);
 
   else if (co2_property_enum == "viscosity")
-    property = _co2_property.viscosity(_pressure[_qp], _temperature[_qp]);
-
+  {
+    Real density = _co2_property.density(_pressure[_qp], _temperature[_qp]);
+    property = _co2_property.viscosity(_pressure[_qp], _temperature[_qp], density);
+  }
   else if (co2_property_enum == "dDensity_dP")
     property = _co2_property.dDensity_dP(_pressure[_qp], _temperature[_qp]);
 

@@ -23,6 +23,12 @@ FluidPropertiesIdealGas::FluidPropertiesIdealGas(const InputParameters & paramet
 }
 
 Real
+FluidPropertiesIdealGas::molarMass() const
+{
+  return 0.;
+}
+
+Real
 FluidPropertiesIdealGas::density(Real pressure, Real temperature, Real molar_mass) const
 
 {

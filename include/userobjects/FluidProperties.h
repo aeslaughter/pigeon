@@ -37,6 +37,12 @@ class FluidProperties : public GeneralUserObject
   void finalize();
 
 /**
+ * Fluid component molar mass.
+ * @return molar mass (kg/mol)
+ */
+virtual Real molarMass() const = 0;
+
+/**
  * Fluid density must be over-written in all derived classes.
  * Note: not all dervied classes will require the optional mass fraction
  * argument xmass
@@ -92,12 +98,14 @@ virtual Real dDensity_dT(Real pressure, Real temperature, Real xmass = 0) const 
  * The derivative of fluid viscosity with respect to pressure must be over-written
  * in all derived classes.
  * Note: some fluid property classes may use density in the viscosty correlation.
+ * Note: some fluid property classes may use d(density)/d(pressure)
  * Note: not all dervied classes will require the optional mass fraction
  * argument xmass
  *
  * @param pressure fluid pressure (Pa)
  * @param temperature fluid temperature (C)
  * @param density fluid density (kg/m^3)
+ * @param ddensity_dp derivative of density wrt pressure
  * @param xmass mass fraction (kg/kg)
  * @return derivative of fluid viscosity with respect to pressure
  */

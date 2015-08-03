@@ -410,7 +410,7 @@ FluidPropertiesWater::dViscosity_dP(Real pressure, Real temperature, Real densit
   d1[5] = d1[4] * d1[1];
   d1[6] = d1[5] * d1[1];
 
-  // Prefactor to derivative of viscosity
+  /// Prefactor to derivative of viscosity
   Real sum1 = 0.;
   Real sum2 = 0.;
   for (unsigned int i = 0; i <= 20; i++)
@@ -419,10 +419,8 @@ FluidPropertiesWater::dViscosity_dP(Real pressure, Real temperature, Real densit
     sum2 += t1[_iv[i]] * _jv[i] * _h1v[i] * d1[_jv[i]] / (rhobar - 1.0);
   }
 
-  Real viscosity = FluidPropertiesWater::viscosity(pressure, temperature, density);
-
   /// The derivative of viscosity wrt density is then
-  Real dviscosity_ddensity =  viscosity * (sum1 + rhobar * sum2) / _rho_critical;
+  Real dviscosity_ddensity =  viscosity(pressure, temperature, density) * (sum1 + rhobar * sum2) / _rho_critical;
 
   /// The derivative of viscosity wrt pressure is given by the chain rule
   return dviscosity_ddensity * dDensity_dP(pressure, temperature);

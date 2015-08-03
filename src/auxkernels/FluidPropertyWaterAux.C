@@ -41,7 +41,7 @@ FluidPropertyWaterAux::computeValue()
   else if (fluid_property_enum == "viscosity")
   {
     Real density = _fluid_property.density(_pressure[_qp], _temperature[_qp]);
-    property = _fluid_property.viscosity(_temperature[_qp], density);
+    property = _fluid_property.viscosity(_pressure[_qp], _temperature[_qp], density);
   }
 
   else if (fluid_property_enum == "tsat")
