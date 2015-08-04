@@ -1,0 +1,14 @@
+[Tests]
+  [./mass_time_derivative1]
+    type = 'AnalyzeJacobian'
+    input = 'singlephase1.i'
+  [../]
+  [./mass_time_derivative2]
+    type = 'AnalyzeJacobian'
+    input = 'singlephase2.i'
+  [../]
+  [./mass_time_derivative3]
+    type = 'AnalyzeJacobian'
+    input = 'twophase1.i'
+  [../]
+[]

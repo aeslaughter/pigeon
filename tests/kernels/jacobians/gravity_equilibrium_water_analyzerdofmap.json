@@ -1,0 +1,2 @@
+{"ndof": 6, "demangled": true, "vars": [{"name": "liquid_pressure", "subdomains": [{"id": 0, "kernels": [{"name": "H2OLiquidFlux", "type": "ComponentFlux"}], "dofs": [0, 1, 2, 3, 4, 5]}]}]}
+

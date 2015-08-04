@@ -1,0 +1,8 @@
+#[Tests]
+#  [./component_flux]
+#    type = 'CSVDiff'
+#    input = 'ComponentFlux.i'
+#    csvdiff = 'ComponentFlux_out.csv'
+#    abs_zero = 1.0E-6
+#  [../]
+#[]
