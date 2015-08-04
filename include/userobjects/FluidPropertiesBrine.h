@@ -123,15 +123,15 @@ class FluidPropertiesBrine : public FluidProperties
   virtual Real dDensity_dT(Real pressure, Real temperature, Real xnacl) const;
 
   /**
-   * Derivative of brine viscosity with respect to temperature
+   * Derivative of brine viscosity with respect to density
    *
    * @param pressure brine pressure (Pa)
    * @param temperature brine temperature (C)
    * @param density brine density (kg/m^3)
    * @param xnacl salt mass fraction (-)
-   * @return derivative of brine viscosity with respect to pressure
+   * @return derivative of brine viscosity wrt density
    */
-  virtual Real dViscosity_dP(Real pressure, Real temperature, Real density, Real xnacl) const;
+  virtual Real dViscosity_dDensity(Real pressure, Real temperature, Real density, Real xnacl) const;
 
  protected:
 

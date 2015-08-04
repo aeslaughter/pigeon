@@ -386,7 +386,7 @@ FluidPropertiesWater::dDensityRegion2_dP(Real pressure, Real temperature) const
 }
 
 Real
-FluidPropertiesWater::dViscosity_dP(Real pressure, Real temperature, Real density, Real xmass) const
+FluidPropertiesWater::dViscosity_dDensity(Real pressure, Real temperature, Real density, Real xmass) const
 {
   Real t1[6], d1[7];
 
@@ -420,10 +420,7 @@ FluidPropertiesWater::dViscosity_dP(Real pressure, Real temperature, Real densit
   }
 
   /// The derivative of viscosity wrt density is then
-  Real dviscosity_ddensity =  viscosity(pressure, temperature, density) * (sum1 + rhobar * sum2) / _rho_critical;
-
-  /// The derivative of viscosity wrt pressure is given by the chain rule
-  return dviscosity_ddensity * dDensity_dP(pressure, temperature);
+  return viscosity(pressure, temperature, density) * (sum1 + rhobar * sum2) / _rho_critical;
 }
 
 Real

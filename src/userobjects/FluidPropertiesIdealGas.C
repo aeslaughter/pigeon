@@ -56,7 +56,7 @@ FluidPropertiesIdealGas::viscosity(Real pressure, Real temperature, Real molar_m
 }
 
 Real
-FluidPropertiesIdealGas::dViscosity_dP(Real pressure, Real temperature, Real molar_mass, Real xmass) const
+FluidPropertiesIdealGas::dViscosity_dDensity(Real pressure, Real temperature, Real molar_mass, Real xmass) const
 {
   return 0.; // Not implemented
 }

@@ -89,7 +89,8 @@ FluidPropertiesBrine::viscosity(Real pressure, Real temperature, Real density, R
   // TODO: In EOS code, add water viscosity as an input parameter so that it is not calculated
   // more than once per qp per iteration.
   // FIXME: dummy pressure variable
-  return a * _water_property.viscosity(pressure, temperature, density);
+  Real water_density = _water_property.density(pressure, temperature);
+  return a * _water_property.viscosity(pressure, temperature, water_density);
 }
 
 Real
@@ -153,7 +154,7 @@ FluidPropertiesBrine::dDensity_dT(Real pressure, Real temperature, Real xnacl) c
 }
 
 Real
-FluidPropertiesBrine::dViscosity_dP(Real pressure, Real temperature, Real density, Real xnacl) const
+FluidPropertiesBrine::dViscosity_dDensity(Real pressure, Real temperature, Real density, Real xnacl) const
 {
   return 0.; //TODO: implement brine density derivative wrt P
 }

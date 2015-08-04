@@ -175,21 +175,21 @@ class FluidPropertiesWater : public FluidProperties
    *
    * @param pressure water pressure (Pa)
    * @param temperature water temperature (C)
-   * @return derivative of density (kg/m^3) in region 2 with respect to pressure
+   * @return derivative of water density (kg/m^3) in region 2 with respect to pressure
    */
   Real dDensityRegion2_dP(Real pressure, Real temperature) const;
 
   /**
-   * Derivative of viscosity with respect to pressure. Derived from
+   * Derivative of viscosity with respect to density. Derived from
    * Eq. (10) from Release on the IAPWS Formulation 2008 for the
    * Viscosity of Ordinary Water Substance.
    *
    * @param pressure water pressure (Pa)
    * @param temperature water temperature (C)
    * @param density water density (kg/m^3)
-   * @return dViscosity_dpressure
+   * @return derivative of water viscosity wrt density
    */
-  virtual Real dViscosity_dP(Real pressure, Real temperature, Real density, Real xmass = 0) const;
+  virtual Real dViscosity_dDensity(Real pressure, Real temperature, Real density, Real xmass = 0) const;
 
   virtual Real dDensity_dT(Real pressure, Real temperature, Real xmass = 0) const;
 

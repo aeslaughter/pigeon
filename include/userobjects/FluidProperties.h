@@ -95,21 +95,21 @@ virtual Real dDensity_dP(Real pressure, Real temperature, Real xmass = 0) const 
 virtual Real dDensity_dT(Real pressure, Real temperature, Real xmass = 0) const = 0;
 
 /**
- * The derivative of fluid viscosity with respect to pressure must be over-written
+ * The derivative of fluid viscosity with respect to density must be over-written
  * in all derived classes.
  * Note: some fluid property classes may use density in the viscosty correlation.
- * Note: some fluid property classes may use d(density)/d(pressure)
+ * Note: some fluid property classes may give d(viscosty)/d(pressure) - use the chain rule
+ * to calculate d(viscosity)/d(density)
  * Note: not all dervied classes will require the optional mass fraction
  * argument xmass
  *
  * @param pressure fluid pressure (Pa)
  * @param temperature fluid temperature (C)
  * @param density fluid density (kg/m^3)
- * @param ddensity_dp derivative of density wrt pressure
  * @param xmass mass fraction (kg/kg)
  * @return derivative of fluid viscosity with respect to pressure
  */
-virtual Real dViscosity_dP(Real pressure, Real temperature, Real density = 0, Real xmass = 0) const = 0;
+virtual Real dViscosity_dDensity(Real pressure, Real temperature, Real density = 0, Real xmass = 0) const = 0;
 };
 
 #endif // FLUIDPROPERTIES_H

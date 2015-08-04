@@ -143,8 +143,8 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
 
   for (unsigned int n = 0; n < _num_phases; ++n)
   {
-    dmdp = (fsp.relperm[n] / fsp.viscosity[n]) * (fsp.ddensity_dp[n] - (fsp.density[n] / fsp.viscosity[n]) *
-      dViscosity_dP(fsp.pressure[n], node_temperature, fsp.density[n], n));
+    dmdp = (fsp.relperm[n] * fsp.ddensity_dp[n] / fsp.viscosity[n]) * (1.0 - (fsp.density[n] / fsp.viscosity[n]) *
+      dViscosity_dDensity(fsp.pressure[n], node_temperature, fsp.density[n], n));
     dmobilities_dp[n] = dmdp;
   }
 
@@ -156,8 +156,8 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
   Real dmds;
   for (unsigned int n = 0; n < _num_phases; ++n)
   {
-    dmds = fsp.drelperm[n] * fsp.density[n] / fsp.viscosity[n] + (fsp.relperm[n]  / fsp.viscosity[n]) * (fsp.ddensity_ds[n] - (fsp.density[n] / fsp.viscosity[n]) *
-      dViscosity_dP(fsp.pressure[n], node_temperature, fsp.density[n], n) *  sgn * dCapillaryPressure(fsp.saturation[0])[n]);
+    dmds = fsp.drelperm[n] * fsp.density[n] / fsp.viscosity[n] + (fsp.relperm[n] * fsp.ddensity_ds[n] / fsp.viscosity[n]) * (1.0 - (fsp.density[n] / fsp.viscosity[n]) *
+      dViscosity_dDensity(fsp.pressure[n], node_temperature, fsp.density[n], n));
     dmobilities_ds[n] = dmds;
   }
 
@@ -169,9 +169,9 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
   Real dmdx;
   for (unsigned int i = 0; i < _num_components; ++i)
     for (unsigned int n = 0; n < _num_phases; ++n)
-    { // FIXME
+    {
       dmdx = (fsp.relperm[n] * fsp.ddensity_dx[i][n] / fsp.viscosity[n]) * (1.0 - (fsp.density[n] / fsp.viscosity[n]) *
-        dViscosity_dP(fsp.pressure[n], node_temperature, fsp.density[n], n));
+        dViscosity_dDensity(fsp.pressure[n], node_temperature, fsp.density[n], n));
       dmobilities_dx[i].push_back(dmdx);
     }
   fsp.dmobility_dx = dmobilities_dx;
@@ -293,9 +293,9 @@ FluidStateSinglePhase::dDensity_dX(Real pressure, Real temperature, unsigned int
 }
 
 Real
-FluidStateSinglePhase::dViscosity_dP(Real pressure, Real temperature, Real density, unsigned int phase_index) const
+FluidStateSinglePhase::dViscosity_dDensity(Real pressure, Real temperature, Real density, unsigned int phase_index) const
 {
-  Real dviscosity_dp = _fluid_property.dViscosity_dP(pressure, temperature, density);
+  Real dviscosity_ddensity = _fluid_property.dViscosity_dDensity(pressure, temperature, density);
 
-  return dviscosity_dp;
+  return dviscosity_ddensity;
 }

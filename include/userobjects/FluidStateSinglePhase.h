@@ -162,7 +162,7 @@ class FluidStateSinglePhase : public FluidState
   virtual Real dDensity_dX(Real pressure, Real temperature, unsigned int phase_index = 0) const;
 
   /**
-   * Derivative of fluid viscosity with respect to pressure.
+   * Derivative of fluid viscosity with respect to density
    *
    * @param pressure phase pressure (Pa)
    * @param temperature fluid temperature (C)
@@ -170,7 +170,7 @@ class FluidStateSinglePhase : public FluidState
    * @param phase_index index of phase
    * @return derivative of viscosity wrt density
    */
-  virtual Real dViscosity_dP(Real pressure, Real temperature, Real density, unsigned int phase_index = 0) const;
+  virtual Real dViscosity_dDensity(Real pressure, Real temperature, Real density, unsigned int phase_index = 0) const;
 
   /**
    * General formulation for Henry's constant for gas solubility in

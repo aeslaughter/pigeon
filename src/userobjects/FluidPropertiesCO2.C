@@ -417,7 +417,7 @@ FluidPropertiesCO2::dSupercriticalDensity_dT(Real pressure, Real temperature) co
 }
 
 Real
-FluidPropertiesCO2::dViscosity_dP(Real pressure, Real temperature, Real density, Real xmass) const
+FluidPropertiesCO2::dViscosity_dDensity(Real pressure, Real temperature, Real density, Real xmass) const
 {
   return 0.; // FIXME not implemented yet
 }

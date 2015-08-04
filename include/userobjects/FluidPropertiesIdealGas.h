@@ -60,7 +60,7 @@ class FluidPropertiesIdealGas : public FluidProperties
 
   virtual Real viscosity(Real pressure, Real temperature, Real molar_mass, Real xmass = 0) const;
 
-  virtual Real dViscosity_dP(Real pressure, Real temperature, Real molar_mass, Real xmass = 0) const;
+  virtual Real dViscosity_dDensity(Real pressure, Real temperature, Real molar_mass, Real xmass = 0) const;
 
 
  protected:

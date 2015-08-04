@@ -398,16 +398,16 @@ FluidStateTwoPhase::dissolved(Real pressure, Real temperature) const
 }
 
 Real
-FluidStateTwoPhase::dViscosity_dP(Real pressure, Real temperature, Real density, unsigned int phase_index) const
+FluidStateTwoPhase::dViscosity_dDensity(Real pressure, Real temperature, Real density, unsigned int phase_index) const
 {
-  Real dviscosity_dp;
+  Real dviscosity_ddensity;
 
   if (phase_index == 0) /// liquid phase
-    dviscosity_dp = _liquid_property.dViscosity_dP(pressure, temperature, density);
+    dviscosity_ddensity = _liquid_property.dViscosity_dDensity(pressure, temperature, density);
   else if (phase_index == 1) /// gas phase
-    dviscosity_dp = _gas_property.dViscosity_dP(pressure, temperature, density);
+    dviscosity_ddensity = _gas_property.dViscosity_dDensity(pressure, temperature, density);
   else
-    mooseError("phase_index " << phase_index << " is out of range in FluidStateTwoPhase::dViscosity_dP");
+    mooseError("phase_index " << phase_index << " is out of range in FluidStateTwoPhase::dViscosity_dDensity");
 
-  return dviscosity_dp;
+  return dviscosity_ddensity;
 }

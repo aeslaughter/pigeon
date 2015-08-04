@@ -67,7 +67,7 @@ FluidPropertiesMethane::dDensity_dT(Real pressure, Real temperature, Real xmass)
 }
 
 Real
-FluidPropertiesMethane::dViscosity_dP(Real pressure, Real temperature, Real density, Real xmass) const
+FluidPropertiesMethane::dViscosity_dDensity(Real pressure, Real temperature, Real density, Real xmass) const
 {
   return 0.; // FIXME not implemented yet
 }
