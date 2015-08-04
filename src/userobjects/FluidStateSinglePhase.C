@@ -163,7 +163,7 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
 
   fsp.dmobility_ds = dmobilities_ds;
 
-  /// Derivative of mobility wrt saturation
+  /// Derivative of mobility wrt mass fraction
   /// Note: ddensity_dx is already the correct sign, so don't multiply by sgn
   std::vector<std::vector<Real> > dmobilities_dx(_num_components);
   Real dmdx;

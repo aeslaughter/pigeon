@@ -149,34 +149,41 @@ FluidStateTwoPhase::thermophysicalProperties(std::vector<Real> primary_vars, Flu
   fsp.ddensity_dx = ddensities_dx;
 
   /// Derivative of mobility wrt pressure
-  /// Note: dViscosity_dP not implemnted yet
   std::vector<Real> dmobilities_dp(_num_phases);
+  Real dmdp;
 
-  for (unsigned int i = 0; i < _num_phases; ++i)
-    dmobilities_dp[i] = fsp.relperm[i] * fsp.ddensity_dp[i]  / fsp.viscosity[i];
-
+  for (unsigned int n = 0; n < _num_phases; ++n)
+  {
+    dmdp = (fsp.relperm[n] * fsp.ddensity_dp[n] / fsp.viscosity[n]) * (1.0 - (fsp.density[n] / fsp.viscosity[n]) *
+      dViscosity_dDensity(fsp.pressure[n], node_temperature, fsp.density[n], n));
+    dmobilities_dp[n] = dmdp;
+  }
   fsp.dmobility_dp = dmobilities_dp;
 
   /// Derivative of mobility wrt saturation
-  /// Note: dViscosity_dS not implemnted yet
   /// Note: drelperm and ddensity_ds are already the correct sign, so don't multiply by sgn
   std::vector<Real> dmobilities_ds(_num_phases);
-
-  for (unsigned int i = 0; i < _num_phases; ++i)
-    dmobilities_ds[i] = (fsp.drelperm[i] * fsp.density[i] + fsp.relperm[i] *
-      fsp.ddensity_ds[i]) / fsp.viscosity[i];
+  Real dmds;
+  for (unsigned int n = 0; n < _num_phases; ++n)
+  {
+    dmds = fsp.drelperm[n] * fsp.density[n] / fsp.viscosity[n] + (fsp.relperm[n] * fsp.ddensity_ds[n] / fsp.viscosity[n]) * (1.0 - (fsp.density[n] / fsp.viscosity[n]) *
+      dViscosity_dDensity(fsp.pressure[n], node_temperature, fsp.density[n], n));
+    dmobilities_ds[n] = dmds;
+  }
 
   fsp.dmobility_ds = dmobilities_ds;
 
-  /// Derivative of mobility wrt saturation
-  /// Note: dViscosity_dX not implemnted yet
+  /// Derivative of mobility wrt mass fraction
   /// Note: ddensity_dx is already the correct sign, so don't multiply by sgn
-  std::vector<std::vector<Real> > dmobilities_dx(_num_phases);
-
+  std::vector<std::vector<Real> > dmobilities_dx(_num_components);
+  Real dmdx;
   for (unsigned int i = 0; i < _num_components; ++i)
     for (unsigned int n = 0; n < _num_phases; ++n)
-    dmobilities_dx[i].push_back(fsp.relperm[n] * fsp.ddensity_dx[i][n] / fsp.viscosity[n]);
-
+    {
+      dmdx = (fsp.relperm[n] * fsp.ddensity_dx[i][n] / fsp.viscosity[n]) * (1.0 - (fsp.density[n] / fsp.viscosity[n]) *
+        dViscosity_dDensity(fsp.pressure[n], node_temperature, fsp.density[n], n));
+      dmobilities_dx[i].push_back(dmdx);
+    }
   fsp.dmobility_dx = dmobilities_dx;
 }
 
