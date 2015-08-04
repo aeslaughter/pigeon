@@ -15,7 +15,7 @@ InputParameters validParams<FluidPropertyWaterAux>()
   params.addCoupledVar("pressure_variable", 1.e6,  "The pressure variable corresponding to the fluid phase.");
   params.addCoupledVar("temperature_variable", 50, "The temperature variable.");
   params.addCoupledVar("saturation_variable", 1.0, "The saturation variable corresponding to the fluid phase.");
-  MooseEnum fluid_property_enum("density viscosity tsat psat b23t b23p region1 region2 dDensity_dP");
+  MooseEnum fluid_property_enum("molar_mass density viscosity tsat psat b23t b23p region1 region2 dDensity_dP dViscosity_dDensity");
   params.addRequiredParam<MooseEnum>("fluid_property_enum", fluid_property_enum, "The fluid property that this auxillary kernel is to calculate");
   return params;
 }
@@ -64,6 +64,12 @@ FluidPropertyWaterAux::computeValue()
 
   else if (fluid_property_enum == "dDensity_dP")
     property = _fluid_property.dDensity_dP(_pressure[_qp], _temperature[_qp]);
+
+  else if (fluid_property_enum == "dViscosity_dDensity")
+  {
+    Real density = _fluid_property.density(_pressure[_qp], _temperature[_qp]);
+    property = _fluid_property.dViscosity_dDensity(_pressure[_qp], _temperature[_qp], density);
+  }
 
   else
     mooseError("Fluid property specified in " << _short_name << "is not valid");
