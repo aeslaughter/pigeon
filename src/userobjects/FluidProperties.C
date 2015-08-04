@@ -30,3 +30,9 @@ FluidProperties::execute()
 void
 FluidProperties::finalize()
 {}
+
+Real
+FluidProperties::dDensity_dX(Real pressure, Real temperature, Real xmass) const
+{
+  return 0.;
+}
