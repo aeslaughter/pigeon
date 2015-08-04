@@ -42,70 +42,15 @@ FluidStateSinglePhase::variablePhase(unsigned int moose_var) const
 }
 
 void
-FluidStateSinglePhase::execute()
-{
-  MooseVariable * pvar, * tvar, * xvar;
-  FluidStateProperties nodalfsp;
-
-  if (isCoupled("pressure_variable"))
-    pvar = getVar("pressure_variable", 0);
-  if(isCoupled("temperature_variable"))
-    tvar = getVar("temperature_variable", 0);
-  if(isCoupled("mass_fraction_variable"))
-    xvar = getVar("mass_fraction_variable", 0);
-
-  /// Loop over all elements on current processor
-  const MeshBase::element_iterator end = _mesh.getMesh().active_local_elements_end();
-  for (MeshBase::element_iterator el = _mesh.getMesh().active_local_elements_begin(); el != end; ++el)
-  {
-    const Elem * current_elem = *el;
-
-    /// Loop over all nodes on each element
-    for (unsigned int i = 0; i < current_elem->n_vertices(); ++i)
-    {
-      const Node * current_node = current_elem->get_node(i);
-      unsigned int nodeid = current_node->id();
-
-      /// Check if the properties at this node have already been calcualted, and if so,
-      /// skip to the next node
-      if (_nodal_properties.find(nodeid) == _nodal_properties.end())
-      {
-        if (isCoupled("pressure_variable"))
-          _primary_vars[0] = pvar->getNodalValue(*current_node);
-        else
-          _primary_vars[0] = _pressure[_qp];
-
-        if (isCoupled("temperature_variable"))
-          _primary_vars[1] = tvar->getNodalValue(*current_node);
-        else
-          _primary_vars[1] = _temperature[_qp];
-
-        if (isCoupled("mass_fraction_variable"))
-          _primary_vars[2] = xvar->getNodalValue(*current_node);
-        else
-          _primary_vars[2] = _mass_fraction[_qp];
-
-        /// Now calculate all thermophysical properties at the current node
-        thermophysicalProperties(_primary_vars, nodalfsp);
-
-        /// Now insert these properties into the _nodal_properties map
-        _nodal_properties.insert( std::pair<int, FluidStateProperties>(nodeid, nodalfsp));
-      }
-    }
-  }
-}
-
-void
 FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, FluidStateProperties & fsp)
 {
   /// Primary variables at the node
   Real node_pressure = primary_vars[0];
   Real node_temperature = primary_vars[1];
-  Real node_xmass = primary_vars[2];
+  Real node_saturation = primary_vars[2];
+  Real node_xmass = primary_vars[3];
 
   /// Assign the fluid properties
-  /// Saturation
-  Real node_saturation = 1.0;
   fsp.saturation = saturation(node_saturation);
 
   /// Pressure (takes liquid saturation for capillary pressure calculation)
@@ -123,7 +68,6 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
   std::vector<Real> viscosities(_num_phases);
 
   /// Water viscosity uses water density in calculation.
-  /// FIXME: make this general for temp, pressure, density
   viscosities[0] = _fluid_property.viscosity(node_pressure, node_temperature, fsp.density[0]);
 
   fsp.viscosity = viscosities;
@@ -146,7 +90,7 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
   std::vector<Real> mobilities(_num_phases);
 
   for (unsigned int n = 0; n < _num_phases; ++n)
-    mobilities[n] = fsp.relperm[n] * fsp.density[n]  / fsp.viscosity[n];
+    mobilities[n] = fsp.relperm[n] * fsp.density[n] / fsp.viscosity[n];
 
   fsp.mobility = mobilities;
 
@@ -199,8 +143,8 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
 
   for (unsigned int n = 0; n < _num_phases; ++n)
   {
-    dmdp = (fsp.relperm[n] * fsp.ddensity_dp[n] / fsp.viscosity[n]) * (1.0 - (fsp.density[n] / fsp.viscosity[n]) *
-      dViscosity_dDensity(fsp.density[n], node_temperature, n));
+    dmdp = (fsp.relperm[n] / fsp.viscosity[n]) * (fsp.ddensity_dp[n] - (fsp.density[n] / fsp.viscosity[n]) *
+      dViscosity_dP(fsp.pressure[n], node_temperature, fsp.density[n], n));
     dmobilities_dp[n] = dmdp;
   }
 
@@ -212,8 +156,8 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
   Real dmds;
   for (unsigned int n = 0; n < _num_phases; ++n)
   {
-    dmds = fsp.drelperm[n] * fsp.density[n] / fsp.viscosity[n] + (fsp.relperm[n] * fsp.ddensity_ds[n] / fsp.viscosity[n]) * (1.0 - (fsp.density[n] / fsp.viscosity[n]) *
-      dViscosity_dDensity(fsp.density[n], node_temperature, n));
+    dmds = fsp.drelperm[n] * fsp.density[n] / fsp.viscosity[n] + (fsp.relperm[n]  / fsp.viscosity[n]) * (fsp.ddensity_ds[n] - (fsp.density[n] / fsp.viscosity[n]) *
+      dViscosity_dP(fsp.pressure[n], node_temperature, fsp.density[n], n) *  sgn * dCapillaryPressure(fsp.saturation[0])[n]);
     dmobilities_ds[n] = dmds;
   }
 
@@ -225,9 +169,9 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
   Real dmdx;
   for (unsigned int i = 0; i < _num_components; ++i)
     for (unsigned int n = 0; n < _num_phases; ++n)
-    {
+    { // FIXME
       dmdx = (fsp.relperm[n] * fsp.ddensity_dx[i][n] / fsp.viscosity[n]) * (1.0 - (fsp.density[n] / fsp.viscosity[n]) *
-        dViscosity_dDensity(fsp.density[n], node_temperature, n));
+        dViscosity_dP(fsp.pressure[n], node_temperature, fsp.density[n], n));
       dmobilities_dx[i].push_back(dmdx);
     }
   fsp.dmobility_dx = dmobilities_dx;
@@ -349,9 +293,9 @@ FluidStateSinglePhase::dDensity_dX(Real pressure, Real temperature, unsigned int
 }
 
 Real
-FluidStateSinglePhase::dViscosity_dDensity(Real pressure, Real temperature, Real density, unsigned int phase_index) const
+FluidStateSinglePhase::dViscosity_dP(Real pressure, Real temperature, Real density, unsigned int phase_index) const
 {
-  Real dviscosity_ddensity = _fluid_property.dViscosity_dDensity(pressure, temperature, density);
+  Real dviscosity_dp = _fluid_property.dViscosity_dP(pressure, temperature, density);
 
-  return dviscosity_ddensity;
+  return dviscosity_dp;
 }

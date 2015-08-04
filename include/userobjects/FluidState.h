@@ -57,9 +57,17 @@ public Coupleable
     std::vector<std::vector<Real> > dmobility_dx;
   };
 
-
+  /**
+   * Initialize the nodal properties object
+   */
   virtual void initialize();
+
+  /**
+   * Loop over all nodes on each processor and calculate the thermophysical
+   * properties at each node.
+   */
   virtual void execute();
+  
   virtual void finalize();
 
   /**
@@ -321,6 +329,10 @@ protected:
   std::string _sname;
   /// Name of primary mass fraction variable
   std::string _xname;
+  /// Phase index of primary pressure variable
+  unsigned int _p_phase;
+  /// Phase index of primary saturation variable
+  unsigned int _s_phase;
 
 };
 

@@ -162,7 +162,7 @@ class FluidStateSinglePhase : public FluidState
   virtual Real dDensity_dX(Real pressure, Real temperature, unsigned int phase_index = 0) const;
 
   /**
-   * Derivative of fluid viscosity with respect to density.
+   * Derivative of fluid viscosity with respect to pressure.
    *
    * @param pressure phase pressure (Pa)
    * @param temperature fluid temperature (C)
@@ -170,7 +170,7 @@ class FluidStateSinglePhase : public FluidState
    * @param phase_index index of phase
    * @return derivative of viscosity wrt density
    */
-  virtual Real dViscosity_dDensity(Real pressure, Real temperature, Real density, unsigned int phase_index = 0) const;
+  virtual Real dViscosity_dP(Real pressure, Real temperature, Real density, unsigned int phase_index = 0) const;
 
   /**
    * General formulation for Henry's constant for gas solubility in
@@ -182,18 +182,6 @@ class FluidStateSinglePhase : public FluidState
    * @return Kh Henry's constant (MPa)
    */
   virtual Real henry(Real temperature) const {return 0.;};
-
-
-  /**
-   * Initialize the property map each time this UserObject is called
-   */
-  //virtual void initialize();
-
-  /**
-   * Loop over all nodes on each processor and calculates the thermophysical
-   * properties at each node.
-   */
-  virtual void execute();
 
   /**
    * Calculate all thermophysical properties given the primary variables provided. This is

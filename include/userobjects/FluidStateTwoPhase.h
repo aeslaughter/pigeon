@@ -163,14 +163,15 @@ class FluidStateTwoPhase : public FluidState
   virtual Real dDensity_dX(Real pressure, Real temperature, unsigned int phase_index = 0) const;
 
   /**
-   * Derivative of fluid viscosity with respect to density.
+   * Derivative of fluid viscosity with respect to pressure
    *
+   * @param pressure fluid pressure (Pa)
    * @param density fluid density (kg/m^3)
    * @param temperature fluid temperature (C)
    * @param phase_index index of phase
-   * @return derivative of viscosity wrt density
+   * @return derivative of viscosity wrt pressure
    */
-  virtual Real dViscosity_dDensity(Real pressure, Real temperature, Real density, unsigned int phase_index = 0) const;
+  virtual Real dViscosity_dP(Real pressure, Real temperature, Real density, unsigned int phase_index = 0) const;
 
   /**
    * Henry's law set to zero for immiscible fluids
@@ -190,12 +191,6 @@ class FluidStateTwoPhase : public FluidState
    * @return dissolved mass fraction (-)
    */
   virtual Real dissolved(Real pressure, Real temperature) const;
-
-  /**
-   * Loop over all nodes on each processor and calculates the thermophysical
-   * properties at each node.
-   */
-  virtual void execute();
 
   /**
    * Calculate all thermophysical properties given the primary variables provided. This is
@@ -241,11 +236,6 @@ class FluidStateTwoPhase : public FluidState
 
     /// Number of phases (can be 1 or 2 in this FluidState UserObject)
   unsigned int _num_phases;
-
-  /// Phase index of primary pressure variable
-  unsigned int _p_phase;
-  /// Phase index of primary saturation variable
-  unsigned int _s_phase;
 
 };
 

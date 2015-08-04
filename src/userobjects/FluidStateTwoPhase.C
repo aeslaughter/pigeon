@@ -16,8 +16,6 @@ InputParameters validParams<FluidStateTwoPhase>()
   params.addRequiredParam<UserObjectName>("gas_property_uo", "Name of the User Object defining the gas properties");
   params.addRequiredParam<UserObjectName>("relative_permeability_uo", "Name of the User Object defining the relative permeabilities");
   params.addRequiredParam<UserObjectName>("capillary_pressure_uo", "Name of the User Object defining the capillary pressure");
-  params.addParam<unsigned int>("pressure_variable_phase", 0, "The phase corresponding to the pressure variable");
-  params.addParam<unsigned int>("saturation_variable_phase", 0, "The phase corresponding to the saturation variable");
   return params;
 }
 
@@ -27,9 +25,7 @@ FluidStateTwoPhase::FluidStateTwoPhase(const InputParameters & parameters) :
   _liquid_property(getUserObject<FluidProperties>("liquid_property_uo")),
   _gas_property(getUserObject<FluidProperties>("gas_property_uo")),
   _relative_permeability(getUserObject<RelativePermeability>("relative_permeability_uo")),
-  _capillary_pressure(getUserObject<CapillaryPressure>("capillary_pressure_uo")),
-  _p_phase(getParam<unsigned int>("pressure_variable_phase")),
-  _s_phase(getParam<unsigned int>("saturation_variable_phase"))
+  _capillary_pressure(getUserObject<CapillaryPressure>("capillary_pressure_uo"))
 
 {
   _num_components = 2;
@@ -58,66 +54,13 @@ FluidStateTwoPhase::variablePhase(unsigned int moose_var) const
 }
 
 void
-FluidStateTwoPhase::execute()
-{
-  MooseVariable * pvar, * svar, * tvar;
-  FluidStateProperties nodalfsp;
-
-  if (isCoupled("pressure_variable"))
-    pvar = getVar("pressure_variable", 0);
-  if (isCoupled("saturation_variable"))
-    svar = getVar("saturation_variable", 0);
-  if(isCoupled("temperature_variable"))
-    tvar = getVar("temperature_variable", 0);
-
-  /// Loop over all elements on current processor
-  const MeshBase::element_iterator end = _mesh.getMesh().active_local_elements_end();
-  for (MeshBase::element_iterator el = _mesh.getMesh().active_local_elements_begin(); el != end; ++el)
-  {
-    const Elem * current_elem = *el;
-
-    /// Loop over all nodes on each element
-    for (unsigned int i = 0; i < current_elem->n_vertices(); ++i)
-    {
-      const Node * current_node = current_elem->get_node(i);
-      unsigned int nodeid = current_node->id();
-
-      /// Check if the properties at this node have already been calculated, and if so,
-      /// skip to the next node
-      if (_nodal_properties.find(nodeid) == _nodal_properties.end())
-      {
-        if (isCoupled("pressure_variable"))
-          _primary_vars[0] = pvar->getNodalValue(*current_node);
-        else
-          _primary_vars[0] = _pressure[_qp];
-
-        if (isCoupled("saturation_variable"))
-          _primary_vars[1] = svar->getNodalValue(*current_node);
-        else
-          _primary_vars[1] = _saturation[_qp];
-
-        if (isCoupled("temperature_variable"))
-          _primary_vars[2] = tvar->getNodalValue(*current_node);
-        else
-          _primary_vars[2] = _temperature[_qp];
-
-        /// Now calculate all thermophysical properties at the current node
-        thermophysicalProperties(_primary_vars, nodalfsp);
-
-        /// Now insert these properties into the _nodal_properties map
-        _nodal_properties.insert( std::pair<int, FluidStateProperties>(nodeid, nodalfsp));
-      }
-    }
-  }
-}
-
-void
 FluidStateTwoPhase::thermophysicalProperties(std::vector<Real> primary_vars, FluidStateProperties & fsp)
 {
   /// Primary variables at the node
   Real node_pressure = primary_vars[0];
-  Real node_saturation = primary_vars[1];
-  Real node_temperature = primary_vars[2];
+  Real node_temperature = primary_vars[1];
+  Real node_saturation = primary_vars[2];
+  Real node_xmass = primary_vars[3];
 
   /// Assign the fluid properties
   /// Saturation
@@ -269,10 +212,10 @@ FluidStateTwoPhase::viscosity(Real pressure, Real temperature, Real density, uns
   if (phase_index == 0)
   {
     Real liquid_density = _liquid_property.density(pressure, temperature);
-    fluid_viscosity = _liquid_property.viscosity(temperature, liquid_density);
+    fluid_viscosity = _liquid_property.viscosity(pressure, temperature, liquid_density);
   }
   else if (phase_index == 1)
-    fluid_viscosity = _gas_property.viscosity(pressure, temperature);
+    fluid_viscosity = _gas_property.viscosity(pressure, temperature, density);
   else
     mooseError("phase_index " << phase_index << " is out of range in FluidStateTwoPhase::viscosity");
 
@@ -455,16 +398,16 @@ FluidStateTwoPhase::dissolved(Real pressure, Real temperature) const
 }
 
 Real
-FluidStateTwoPhase::dViscosity_dDensity(Real pressure, Real temperature, Real density, unsigned int phase_index) const
+FluidStateTwoPhase::dViscosity_dP(Real pressure, Real temperature, Real density, unsigned int phase_index) const
 {
-  Real dviscosity_ddensity;
+  Real dviscosity_dp;
 
   if (phase_index == 0) /// liquid phase
-    dviscosity_ddensity = _liquid_property.dViscosity_dDensity(pressure, temperature, density);
+    dviscosity_dp = _liquid_property.dViscosity_dP(pressure, temperature, density);
   else if (phase_index == 1) /// gas phase
-    dviscosity_ddensity = _gas_property.dViscosity_dDensity(pressure, temperature, density);
+    dviscosity_dp = _gas_property.dViscosity_dP(pressure, temperature, density);
   else
-    mooseError("phase_index " << phase_index << " is out of range in FluidStateTwoPhase::dViscosity_dDensity");
+    mooseError("phase_index " << phase_index << " is out of range in FluidStateTwoPhase::dViscosity_dP");
 
-  return dviscosity_ddensity;
+  return dviscosity_dp;
 }
