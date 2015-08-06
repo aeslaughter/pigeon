@@ -41,17 +41,17 @@ ComponentMassTimeDerivative::ComponentMassTimeDerivative(const InputParameters &
   if (!_fluid_state.isFluidStateVariable(_var.number()))
     mooseError("Variable " << _var.name() << " in the " << _name << " kernel is not a FluidState variable");
 
-  // Determine the primary variable type
+  /// Determine the primary variable type
   _primary_variable_type = _fluid_state.variableTypes(_var.number());
 
-  // Sign of derivative of saturation wrt primary saturation
+  /// Sign of derivative of saturation wrt primary saturation
   _sgns = _fluid_state.dSaturation_dS(_phase_index);
   /// Sign of the mass fraction gradient
   _sgnx = _fluid_state.dMassFraction_dX(_component_index);
 
 }
 
-// Note that this kernel lumps the mass terms to the nodes, so that there is no mass at the qp's.
+/// Note that this kernel lumps the mass terms to the nodes, so that there is no mass at the qp's.
 Real
 ComponentMassTimeDerivative::computeQpResidual()
 {
@@ -74,8 +74,8 @@ ComponentMassTimeDerivative::computeQpJacobian() // TODO: Jacobians need further
 
   Real qpjacobian = 0.0;
 
-  // In order to call the derivatives for the Jacobian from the FluidState UserObject,
-  // determine the node id's of the nodes in this element
+  /// In order to call the derivatives for the Jacobian from the FluidState UserObject,
+  /// determine the node id's of the nodes in this element
 
   unsigned int num_nodes = _test.size();
   std::vector<unsigned int> elem_node_ids;
@@ -86,19 +86,20 @@ ComponentMassTimeDerivative::computeQpJacobian() // TODO: Jacobians need further
 
     if (_primary_variable_type == "saturation")
     {
+      Real ddensity_ds = _fluid_state.getNodalProperty("ddensity_ds", elem_node_ids[_i], _phase_index);
       qpjacobian = _sgns * _component_mass_fraction[_i] * _fluid_density[_i] +
-        _component_mass_fraction[_i] * _fluid_saturation[_i] * _fluid_state.getNodalProperty("ddensity_ds", elem_node_ids[_i], _phase_index);
+        _component_mass_fraction[_i] * _fluid_saturation[_i] * ddensity_ds;
     }
     else if (_primary_variable_type == "pressure")
     {
-      Real dDensity_dP = _fluid_state.getNodalProperty("ddensity_dp", elem_node_ids[_i], _phase_index);
-      qpjacobian = _component_mass_fraction[_i] * _fluid_saturation[_i] * dDensity_dP;
+      Real ddensity_dp = _fluid_state.getNodalProperty("ddensity_dp", elem_node_ids[_i], _phase_index);
+      qpjacobian = _component_mass_fraction[_i] * _fluid_saturation[_i] * ddensity_dp;
     }
 
     else if (_primary_variable_type == "mass_fraction")
     {
-      Real dDensity_dX = _fluid_state.getNodalProperty("ddensity_dx", elem_node_ids[_i], _phase_index, _component_index);
-      qpjacobian = _sgnx * _fluid_density[_i] * _fluid_saturation[_i] + _component_mass_fraction[_i] * _fluid_saturation[_i] * dDensity_dX;
+      Real ddensity_dx = _fluid_state.getNodalProperty("ddensity_dx", elem_node_ids[_i], _phase_index, _component_index);
+      qpjacobian = _sgnx * _fluid_density[_i] * _fluid_saturation[_i] + _component_mass_fraction[_i] * _fluid_saturation[_i] * ddensity_dx;
     }
 
   return _test[_i][_qp] * _porosity[_qp] * qpjacobian / _dt;
@@ -107,9 +108,11 @@ ComponentMassTimeDerivative::computeQpJacobian() // TODO: Jacobians need further
 Real
 ComponentMassTimeDerivative::computeQpOffDiagJacobian(unsigned int jvar)
 {
+  /// As mass is lumped to the nodes, only non-zero terms are for _i==_j
   if (_i != _j)
     return 0.0;
 
+  /// If the variable is not a FluidState variable, the OffDiag Jacobian terms are 0
   if (!_fluid_state.isFluidStateVariable(jvar))
     return 0.0;
 
@@ -120,27 +123,28 @@ ComponentMassTimeDerivative::computeQpOffDiagJacobian(unsigned int jvar)
   for (unsigned int n = 0; n < num_nodes; ++n)
     elem_node_ids[n] = _current_elem->get_node(n)->id();
 
-  // Determine the variable type to take the derivative with respect to
+  /// Determine the variable type to take the derivative with respect to
   std::string jvar_type = _fluid_state.variableTypes(jvar);
 
   Real qpoffdiagjacobian = 0.;
 
     if (jvar_type == "pressure")
     {
-      Real dDensity_dP = _fluid_state.getNodalProperty("ddensity_dp", elem_node_ids[_i], _phase_index);
-      qpoffdiagjacobian = _component_mass_fraction[_i] * _fluid_saturation[_i] * dDensity_dP;
+      Real ddensity_dp = _fluid_state.getNodalProperty("ddensity_dp", elem_node_ids[_i], _phase_index);
+      qpoffdiagjacobian = _component_mass_fraction[_i] * _fluid_saturation[_i] * ddensity_dp;
     }
 
     if (jvar_type == "saturation")
     {
+      Real ddensity_ds = _fluid_state.getNodalProperty("ddensity_ds", elem_node_ids[_i], _phase_index);
       qpoffdiagjacobian = _sgns * _component_mass_fraction[_i] * _fluid_density[_i] +
-        _component_mass_fraction[_i] * _fluid_saturation[_i] * _fluid_state.getNodalProperty("ddensity_ds", elem_node_ids[_i], _phase_index);
+        _component_mass_fraction[_i] * _fluid_saturation[_i] * ddensity_ds;
     }
 
     if (jvar_type == "mass_fraction")
     {
-      Real dDensity_dX = _fluid_state.getNodalProperty("ddensity_dx", elem_node_ids[_i], _phase_index, _component_index);
-      qpoffdiagjacobian = (_sgnx * _fluid_density[_i] * _fluid_saturation[_i] + _component_mass_fraction[_i] * _fluid_saturation[_i] * dDensity_dX);
+      Real ddensity_dx = _fluid_state.getNodalProperty("ddensity_dx", elem_node_ids[_i], _phase_index, _component_index);
+      qpoffdiagjacobian = (_sgnx * _fluid_density[_i] * _fluid_saturation[_i] + _component_mass_fraction[_i] * _fluid_saturation[_i] * ddensity_dx);
 
     }
 

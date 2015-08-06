@@ -58,18 +58,18 @@ Real ComponentDiffusiveFlux::computeQpJacobian()
 
   if (_primary_variable_type == "pressure")
   {
-    Real dDensity_dP = _fluid_state.getNodalProperty("ddensity_dp", nodeid, _phase_index);
-    qpjacobian = _grad_test[_i][_qp] * _phi[_j][_qp] * dDensity_dP * _sgnx * _grad_component_mass_fraction[_qp];
+    Real ddensity_dp = _fluid_state.getNodalProperty("ddensity_dp", nodeid, _phase_index);
+    qpjacobian = _grad_test[_i][_qp] * _phi[_j][_qp] * ddensity_dp * _sgnx * _grad_component_mass_fraction[_qp];
   }
   else if (_primary_variable_type == "saturation")
   {
-    Real dDensity_dS = _fluid_state.getNodalProperty("ddensity_ds", nodeid, _phase_index);
-    qpjacobian = _grad_test[_i][_qp] * _phi[_j][_qp] * dDensity_dS * _sgnx * _grad_component_mass_fraction[_qp];
+    Real ddensity_ds = _fluid_state.getNodalProperty("ddensity_ds", nodeid, _phase_index);
+    qpjacobian = _grad_test[_i][_qp] * _phi[_j][_qp] * ddensity_ds * _sgnx * _grad_component_mass_fraction[_qp];
   }
   else if (_primary_variable_type == "mass_fraction")
   { /// Note: the sign of dDensity_dX obtained from the FluidState is already correct, so we don't need to multiply by _sgnx
-    Real dDensity_dX = _fluid_state.getNodalProperty("ddensity_dx", nodeid, _phase_index, _component_index);
-    qpjacobian = _grad_test[_i][_qp] * (dDensity_dX * _phi[_j][_qp] * _grad_component_mass_fraction[_qp] + _fluid_density[_qp] * _grad_phi[_j][_qp]);
+    Real ddensity_dx = _fluid_state.getNodalProperty("ddensity_dx", nodeid, _phase_index, _component_index);
+    qpjacobian = _grad_test[_i][_qp] * (ddensity_dx * _phi[_j][_qp] * _grad_component_mass_fraction[_qp] + _fluid_density[_qp] * _grad_phi[_j][_qp]);
   }
 
   return _diffusivity[_qp][_diffusivity_index] * qpjacobian;
@@ -83,25 +83,25 @@ Real ComponentDiffusiveFlux::computeQpOffDiagJacobian(unsigned int jvar)
   Real qpoffdiagjacobian = 0.0;
   unsigned int nodeid = _current_elem->get_node(_i)->id();
 
-  // Determine the variable type to take the derivative with respect to
+  /// Determine the variable type to take the derivative with respect to
   std::string jvar_type = _fluid_state.variableTypes(jvar);
 
   if (jvar_type == "pressure")
   {
-    Real dDensity_dP = _fluid_state.getNodalProperty("ddensity_dp", nodeid, _phase_index);
-    qpoffdiagjacobian = _grad_test[_i][_qp] * _phi[_j][_qp] * dDensity_dP * _sgnx * _grad_component_mass_fraction[_qp];
+    Real ddensity_dp = _fluid_state.getNodalProperty("ddensity_dp", nodeid, _phase_index);
+    qpoffdiagjacobian = _grad_test[_i][_qp] * _phi[_j][_qp] * ddensity_dp * _sgnx * _grad_component_mass_fraction[_qp];
   }
 
   else if (jvar_type == "saturation")
   {
-    Real dDensity_dS = _fluid_state.getNodalProperty("ddensity_ds", nodeid, _phase_index);
-    qpoffdiagjacobian = _grad_test[_i][_qp] * _phi[_j][_qp] * dDensity_dS * _sgnx * _grad_component_mass_fraction[_qp];
+    Real ddensity_ds = _fluid_state.getNodalProperty("ddensity_ds", nodeid, _phase_index);
+    qpoffdiagjacobian = _grad_test[_i][_qp] * _phi[_j][_qp] * ddensity_ds * _sgnx * _grad_component_mass_fraction[_qp];
   }
 
   else if (jvar_type == "mass_fraction")
   { /// Note: the sign of dDensity_dX obtained from the FluidState is already correct, so we don't need to multiply by _sgnx
-    Real dDensity_dX = _fluid_state.getNodalProperty("ddensity_dx", nodeid, _phase_index, _component_index);
-    qpoffdiagjacobian = _grad_test[_i][_qp] * (dDensity_dX * _phi[_j][_qp] * _grad_component_mass_fraction[_qp] + _fluid_density[_qp] * _grad_phi[_j][_qp]);
+    Real ddensity_dx = _fluid_state.getNodalProperty("ddensity_dx", nodeid, _phase_index, _component_index);
+    qpoffdiagjacobian = _grad_test[_i][_qp] * (ddensity_dx * _phi[_j][_qp] * _grad_component_mass_fraction[_qp] + _fluid_density[_qp] * _grad_phi[_j][_qp]);
   }
 
   return _diffusivity[_qp][_diffusivity_index] * qpoffdiagjacobian;

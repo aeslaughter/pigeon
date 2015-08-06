@@ -15,7 +15,7 @@ InputParameters validParams<ComponentAdvectiveFlux>()
   params.addParam<unsigned int>("phase_index", 0, "The index corresponding to the fluid phase eg: 0 for liquid, 1 for gas");
   params.addParam<unsigned int>("component_index", 0, "The index corresponding to the component for this kernel");
   params.addRequiredParam<UserObjectName>("fluid_state_uo", "Name of the User Object defining the fluid state");
-  params.addClassDescription("Component advective flux for component k in phase alpha");
+  params.addClassDescription("Advective flux of component i in phase j");
   return params;
 }
 
@@ -84,7 +84,7 @@ Real ComponentAdvectiveFlux::computeQpOffDiagJacobian(unsigned int jvar)
 
   Real qpoffdiagjacobian = 0.0;
 
-  // Determine the variable type to take the derivative with respect to
+  /// Determine the variable type to take the derivative with respect to
   std::string jvar_type = _fluid_state.variableTypes(jvar);
 
   if (jvar_type == "pressure")
@@ -109,12 +109,12 @@ void ComponentAdvectiveFlux::upwind(bool compute_res, bool compute_jac, unsigned
   if (compute_jac && !_fluid_state.isFluidStateVariable(jvar))
     return;
 
-  // Determine the variable type to take the derivative with respect to
+  /// Determine the variable type to take the derivative with respect to
   std::string jvar_type = _fluid_state.variableTypes(jvar);
 
-  // We require the mobility calculated at the nodes of the element. Additionally,
-  // in order to call the derivatives for the Jacobian from the FluidState UserObject,
-  // determine the node id's of the nodes in this element
+  /// We require the mobility calculated at the nodes of the element. Additionally,
+  /// in order to call the derivatives for the Jacobian from the FluidState UserObject,
+  /// determine the node id's of the nodes in this element
 
   unsigned int num_nodes = _test.size();
   std::vector<Real> mobility;
@@ -129,16 +129,15 @@ void ComponentAdvectiveFlux::upwind(bool compute_res, bool compute_jac, unsigned
     mobility[n] = _component_mass_fraction[n] * _fluid_state.getNodalProperty("mobility", elem_node_ids[n], _phase_index);
   }
 
-  // Compute the residual and jacobian without the mobility terms. Even if we are computing the jacobian
-  // we still need this in order to see which nodes are upwind and which are downwind.
+  /// Compute the residual and jacobian without the mobility terms. Even if we are computing the jacobian
+  /// we still need this in order to see which nodes are upwind and which are downwind.
   DenseVector<Number> & re = _assembly.residualBlock(_var.number());
   _local_re.resize(re.size());
   _local_re.zero();
 
   DenseMatrix<Number> & ke = _assembly.jacobianBlock(_var.number(), jvar);
 
-  // Form the _local_re contribution to the residual without the mobility term, but
-  // with the density (used to zero contribution where saturation is zero)
+  /// Form the _local_re contribution to the residual without the mobility term
  for (_i = 0; _i < _test.size(); _i++)
    for (_qp = 0; _qp < _qrule->n_points(); _qp++)
      _local_re(_i) += _JxW[_qp] * _coord[_qp] * computeQpResidual();
@@ -201,13 +200,11 @@ void ComponentAdvectiveFlux::upwind(bool compute_res, bool compute_jac, unsigned
     }
   }
 
-  // Define variables used to ensure mass conservation
-  // total mass out - used for mass conservation
+  /// Define variables used to ensure mass conservation
   Real total_mass_out = 0;
-  // total flux in
   Real total_in = 0;
 
-  // the following holds derivatives of these
+  /// The following holds derivatives of these
   std::vector<Real> dtotal_mass_out;
   std::vector<Real> dtotal_in;
   if (compute_jac)
@@ -222,7 +219,7 @@ void ComponentAdvectiveFlux::upwind(bool compute_res, bool compute_jac, unsigned
     }
   }
 
-  // Perform the upwinding
+  /// Perform the upwinding
     for (unsigned int n = 0; n < num_nodes ; ++n)
     {
       if (_local_re(n) >= 0 || reached_steady) // upstream node
@@ -251,14 +248,14 @@ void ComponentAdvectiveFlux::upwind(bool compute_res, bool compute_jac, unsigned
       }
       else
       {
-        total_in -= _local_re(n); // note the -= means the result is positive
+        total_in -= _local_re(n); /// note the -= means the result is positive
         if (compute_jac)
           for (_j = 0; _j < _phi.size(); _j++)
             dtotal_in[_j] -= _local_ke(n, _j);
       }
     }
 
-  // Conserve mass over all phases by proportioning the total_mass_out mass to the inflow nodes, weighted by their _local_re values
+  /// Conserve mass over all phases by proportioning the total_mass_out mass to the inflow nodes, weighted by their _local_re values
   if (!reached_steady)
   {
     for (unsigned int n = 0; n < num_nodes; ++n)
@@ -276,7 +273,7 @@ void ComponentAdvectiveFlux::upwind(bool compute_res, bool compute_jac, unsigned
     }
   }
 
-  // Add results to the Residual or Jacobian
+  /// Add results to the Residual or Jacobian
   if (compute_res)
   {
     re += _local_re;
