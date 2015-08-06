@@ -51,12 +51,18 @@ FluidPropertiesIdealGas::dDensity_dT(Real pressure, Real temperature, Real molar
 
 Real
 FluidPropertiesIdealGas::viscosity(Real pressure, Real temperature, Real molar_mass, Real xmass) const
-{ // FIXME: throw error
-  return 0.; // Viscosity not used in ideal gas
+{
+  /// Viscosity must be over-written in any class that derives from this class
+  mooseError("FluidProperties UserObject that derives from FluidPropertiesIdealGas must overwrite FluidPropertiesIdealGas::viscosity");
+
+  return 0.;
 }
 
 Real
 FluidPropertiesIdealGas::dViscosity_dDensity(Real pressure, Real temperature, Real molar_mass, Real xmass) const
 {
-  return 0.; // Not implemented
+  /// Viscosity must be over-written in any class that derives from this class
+  mooseError("FluidProperties UserObject that derives from FluidPropertiesIdealGas must overwrite FluidPropertiesIdealGas::dViscosity_dDensity");
+
+  return 0.;
 }

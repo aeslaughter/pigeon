@@ -80,6 +80,15 @@ class FluidPropertiesMethane : public FluidPropertiesIdealGas
   virtual Real dViscosity_dDensity(Real pressure, Real temperature, Real density = 0, Real xmass = 0) const;
 
   /**
+   * Derivative of the viscosity of gaseous CH4 as a function of temperature
+   *
+   * @param pressure gas pressure (Pa)
+   * @param temperature gas temperature (C)
+   * @return derivative of CH4 viscosity wrt temperature
+   */
+  Real dViscosity_dT(Real pressure, Real temperature) const;
+
+  /**
    * Henry's law constant coefficients for dissolution of CH4 into water.
    * From Guidelines on the Henry's constant and vapour
    * liquid distribution constant for gases in H20 and D20 at high

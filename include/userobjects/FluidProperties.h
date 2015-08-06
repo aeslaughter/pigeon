@@ -95,6 +95,17 @@ virtual Real dDensity_dP(Real pressure, Real temperature, Real xmass = 0) const 
 virtual Real dDensity_dT(Real pressure, Real temperature, Real xmass = 0) const = 0;
 
 /**
+ * The derivative of fluid density with respect to mass fraction can be over-written
+ * in derived classes (such as brine, where density depends on NaCl mass fraction)
+ *
+ * @param pressure fluid pressure (Pa)
+ * @param temperature fluid temperature (C)
+ * @param xmass mass fraction (kg/kg)
+ * @return derivative of fluid density with respect to mass fraction
+ */
+virtual Real dDensity_dX(Real pressure, Real temperature, Real xmass = 0) const;
+
+/**
  * The derivative of fluid viscosity with respect to density must be over-written
  * in all derived classes.
  * Note: some fluid property classes may use density in the viscosty correlation.

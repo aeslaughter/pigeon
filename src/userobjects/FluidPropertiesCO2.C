@@ -62,7 +62,7 @@ FluidPropertiesCO2::viscosity(Real pressure, Real temperature, Real density, Rea
   if (pressure <= criticalPressure())
     mu = gasViscosity(pressure, temperature, density);
 
-  else //if (pressure > criticalPressure())
+  else // if (pressure > criticalPressure())
     mu = supercriticalViscosity(pressure, temperature);
 
   return mu;
@@ -76,7 +76,7 @@ FluidPropertiesCO2::dDensity_dP(Real pressure, Real temperature, Real xmass) con
   if (pressure <= criticalPressure())
     drho = dGasDensity_dP(pressure, temperature);
 
-  else //if (pressure > criticalPressure())
+  else // if (pressure > criticalPressure())
     drho = dSupercriticalDensity_dP(pressure, temperature);
 
   return drho;
@@ -90,7 +90,7 @@ FluidPropertiesCO2::dDensity_dT(Real pressure, Real temperature, Real xmass) con
   if (pressure <= criticalPressure())
     drho = dGasDensity_dT(pressure, temperature);
 
-  else //if (pressure > criticalPressure())
+  else // if (pressure > criticalPressure())
     drho = dSupercriticalDensity_dT(pressure, temperature);
 
   return drho;
@@ -176,7 +176,7 @@ FluidPropertiesCO2::supercriticalViscosity(Real pressure, Real temperature) cons
     a4 = b4[0] + b4[1] * t1 + b4[2] * t2 + b4[3] * t3 + b4[4] * t4;
    }
 
-  else //if (p1 > 3000)
+  else // if (p1 > 3000)
   {
     a0 = c0[0] + c0[1] * t1 + c0[2] * t2 + c0[3] * t3 + c0[4] * t4;
     a1 = c1[0] + c1[1] * t1 + c1[2] * t2 + c1[3] * t3 + c1[4] * t4;
@@ -249,7 +249,7 @@ FluidPropertiesCO2::supercriticalDensity(Real pressure, Real temperature) const
      a4 = b4[0] + b4[1] * t1 + b4[2] * t2 + b4[3] * t3 + b4[4] * t4;
    }
 
-   else //if (p1 > 3000)
+   else // if (p1 > 3000)
    {
      a0 = c0[0] + c0[1] * t1 + c0[2] * t2 + c0[3] * t3 + c0[4] * t4;
      a1 = c1[0] + c1[1] * t1 + c1[2] * t2 + c1[3] * t3 + c1[4] * t4;
@@ -419,8 +419,113 @@ FluidPropertiesCO2::dSupercriticalDensity_dT(Real pressure, Real temperature) co
 Real
 FluidPropertiesCO2::dViscosity_dDensity(Real pressure, Real temperature, Real density, Real xmass) const
 {
-  return 0.; // FIXME not implemented yet
+  Real dmu_drho;
+
+  if (pressure <= criticalPressure())
+    dmu_drho = dGasViscosity_dDensity(pressure, temperature, density);
+
+  else // if (pressure > criticalPressure())
+    dmu_drho = dSupercriticalViscosity_dDensity(pressure, temperature);
+
+  return dmu_drho;
 }
+
+Real
+FluidPropertiesCO2::dGasViscosity_dDensity(Real pressure, Real temperature, Real density) const
+{
+  Real tk = temperature + _t_c2k;
+  Real tstar = tk / 251.196;
+  Real d[5] = {0.4071119e-2, 0.7198037e-4, 0.2411697e-16, 0.2971072e-22, -0.1627888e-22};
+  unsigned int j[5] = {1, 1, 4, 1, 2};
+  unsigned int i[5] = {1, 2, 6, 8, 8};
+
+  Real b[5];
+  for (unsigned int n = 0; n < 5; ++n)
+    b[n] = d[n] /  std::pow(tstar, j[n] - 1);
+
+  // Excess viscosity due to density
+  Real dmu = 0.0;
+
+  for (unsigned int n = 0; n < 5; ++n)
+    dmu += b[n] * i[n] * std::pow(density, i[n] - 1);
+
+  return  dmu * 1e-6; // convert to Pa.s
+}
+
+Real
+FluidPropertiesCO2::dSupercriticalViscosity_dDensity(Real pressure, Real temperature) const
+{
+  Real dmu_drho;
+  /**
+   * The correlation for supercritical CO2 gives viscosity as a function of pressure. Therefore, The
+   * derivative of viscosity wrt density is given by the chain rule.
+   * Note that if d(density)/d(pressure) = 0, so should d(viscosity)/d(density)
+   */
+  Real drho_dp = dSupercriticalDensity_dP(pressure, temperature);
+
+  if (drho_dp != 0.0)
+    dmu_drho = dSupercriticalViscosity_dP(pressure, temperature) / drho_dp;
+  else
+    dmu_drho = 0.0;
+
+  return dmu_drho;
+}
+
+Real
+FluidPropertiesCO2::dSupercriticalViscosity_dP(Real pressure, Real temperature) const
+{
+  Real b1[5] = {4.187280585109E-02, -2.425666731623E-03, 5.051177210444E-05,
+    -4.527585394282E-07, 1.483580144144E-09};
+  Real b2[5] = {-3.164424775231E-05, 1.853493293079E-06, -3.892243662924E-08,
+    3.511599795831E-10, -1.156613338683E-12};
+  Real b3[5] = {1.018084854204E-08, -6.013995738056E-10, 1.271924622771E-11,
+    -1.154170663233E-13, 3.819260251596E-16};
+  Real b4[5] = {-1.185834697489E-12, 7.052301533772E-14, -1.500321307714E-15,
+    1.368104294236E-17, -4.545472651918E-20};
+
+  Real c1[5] = {6.519276827948E-05, -3.174897980949E-06, 7.524167185714E-08,
+    -6.141534284471E-10, 1.463896995503E-12};
+  Real c2[5] = {-1.310632653461E-08, 7.702474418324E-10, -1.830098887313E-11,
+    1.530419648245E-13, -3.852361658746E-16};
+  Real c3[5] = {1.335772487425E-12, -8.113168443709E-14, 1.921794651400E-15,
+    -1.632868926659E-17, 4.257160059035E-20};
+  Real c4[5] = {-5.047795395464E-17, 3.115707980951E-18, -7.370406590957E-20,
+    6.333570782917E-22, -1.691344581198E-24};
+
+  Real a0, a1, a2, a3, a4;
+
+  Real t1 = temperature;
+  Real t2 = t1 * t1;
+  Real t3 = t2 * t1;
+  Real t4 = t3 * t1;
+
+  // Correlation uses pressure in psia
+  Real pa2psia = 1.45037738007e-4;
+  Real p1 = pressure * pa2psia;
+  Real p2 = p1 * p1;
+  Real p3 = p2 * p1;
+
+  if (p1 <= 3000)
+  {
+    a1 = b1[0] + b1[1] * t1 + b1[2] * t2 + b1[3] * t3 + b1[4] * t4;
+    a2 = b2[0] + b2[1] * t1 + b2[2] * t2 + b2[3] * t3 + b2[4] * t4;
+    a3 = b3[0] + b3[1] * t1 + b3[2] * t2 + b3[3] * t3 + b3[4] * t4;
+    a4 = b4[0] + b4[1] * t1 + b4[2] * t2 + b4[3] * t3 + b4[4] * t4;
+   }
+
+  else // if (p1 > 3000)
+  {
+    a1 = c1[0] + c1[1] * t1 + c1[2] * t2 + c1[3] * t3 + c1[4] * t4;
+    a2 = c2[0] + c2[1] * t1 + c2[2] * t2 + c2[3] * t3 + c2[4] * t4;
+    a3 = c3[0] + c3[1] * t1 + c3[2] * t2 + c3[3] * t3 + c3[4] * t4;
+    a4 = c4[0] + c4[1] * t1 + c4[2] * t2 + c4[3] * t3 + c4[4] * t4;
+  }
+
+ Real dmu = a1 + 2.0 * a2 * p1 + 3.0 * a3 * p2 + 4.0 * a4 * p3;
+
+ return dmu * 1e-3; // cP to Pa.s
+}
+
 
 
 std::vector<Real>
