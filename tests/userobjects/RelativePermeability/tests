@@ -15,6 +15,12 @@
 #   input = 'RelativePermeabilityPerfectlyMobile.i Functions/initial_saturation/value=x+0.1' 
 #   expect_err = 'RelativePermeabilityPerfectlyMobile: Liquid saturation is outside the range 0 <= Sl <= 1'
 # [../]
+  [./linear1]
+    type = 'CSVDiff'
+    input = 'RelativePermeabilityLinear.i'
+    csvdiff = 'RelativePermeabilityLineaer_vpp_0001.csv'
+    abs_zero = 1.0E-6
+  [../]
   [./van_genuchten1]
     type = 'CSVDiff'
     input = 'RelativePermeabilityVanGenuchten.i'

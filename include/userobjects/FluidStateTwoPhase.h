@@ -109,6 +109,15 @@ class FluidStateTwoPhase : public FluidState
   virtual std::vector<Real> dCapillaryPressure(Real liquid_saturation) const;
 
   /**
+   * Second derivative of capillary pressure for each phase with respect to the
+   * liquid saturation
+   *
+   * @param saturation liquid saturation (-)
+   * @return second derivative of capillary pressure (Pa)
+   */
+  virtual std::vector<Real> d2CapillaryPressure(Real liquid_saturation) const;
+
+  /**
    * Saturation of each phase
    *
    * @param saturation liquid saturation (-)

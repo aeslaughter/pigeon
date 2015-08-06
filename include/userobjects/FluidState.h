@@ -67,7 +67,7 @@ public Coupleable
    * properties at each node.
    */
   virtual void execute();
-  
+
   virtual void finalize();
 
   /**
@@ -214,6 +214,15 @@ public Coupleable
   * @return derivative of capillary pressure (Pa)
   */
   virtual std::vector<Real> dCapillaryPressure(Real liquid_saturation) const = 0;
+
+  /**
+   * Second derivative of capillary pressure for each phase with respect to the
+   * liquid saturation
+   *
+   * @param saturation liquid saturation (-)
+  * @return second derivative of capillary pressure (Pa)
+  */
+  virtual std::vector<Real> d2CapillaryPressure(Real liquid_saturation) const = 0;
 
   /**
    * Saturation of all phases given one saturation.
