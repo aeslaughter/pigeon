@@ -249,6 +249,16 @@ FluidStateSinglePhase::dCapillaryPressure(Real liquid_saturation) const
 }
 
 std::vector<Real>
+FluidStateSinglePhase::d2CapillaryPressure(Real liquid_saturation) const
+{
+  std::vector<Real> d2pc;
+
+  d2pc.push_back(0.0);
+
+  return d2pc;
+}
+
+std::vector<Real>
 FluidStateSinglePhase::saturation(Real saturation) const
 {
   std::vector<Real> saturations;

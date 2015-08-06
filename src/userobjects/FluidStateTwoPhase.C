@@ -258,7 +258,7 @@ FluidStateTwoPhase::dRelativePermeability(Real liquid_saturation) const
   std::vector<Real> drelperm;
 
   drelperm.push_back(_relative_permeability.dRelativePermLiquid(liquid_saturation));
-  drelperm.push_back(_relative_permeability.dRelativePermLiquid(liquid_saturation));
+  drelperm.push_back(_relative_permeability.dRelativePermGas(liquid_saturation));
 
   return drelperm;
 }
@@ -309,6 +309,30 @@ FluidStateTwoPhase::dCapillaryPressure(Real liquid_saturation) const
     mooseError("Shouldn't get here! Error in pressure phase in FluidStateTwoPhase::dCapillaryPressure.");
 
   return dpc;
+}
+
+
+std::vector<Real>
+FluidStateTwoPhase::d2CapillaryPressure(Real liquid_saturation) const
+{
+  std::vector<Real> d2pc;
+
+  /// Primary pressure is liquid: Pg = Pl - Pc
+  if (_p_phase == 0)
+  {
+  d2pc.push_back(0.);
+  d2pc.push_back(- _capillary_pressure.d2CapillaryPressure(liquid_saturation));
+  }
+  /// Primary pressure is gas: Pl = Pg + Pc
+  else if (_p_phase == 1)
+  {
+  d2pc.push_back(_capillary_pressure.d2CapillaryPressure(liquid_saturation));
+  d2pc.push_back(0.);
+  }
+  else
+    mooseError("Shouldn't get here! Error in pressure phase in FluidStateTwoPhase::dCapillaryPressure.");
+
+  return d2pc;
 }
 
 std::vector<Real>
