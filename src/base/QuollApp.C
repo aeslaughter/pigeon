@@ -34,9 +34,11 @@
 #include "RelativePermeabilityVanGenuchten.h"
 #include "RelativePermeabilityCorey.h"
 #include "RelativePermeabilityPerfectlyMobile.h"
+#include "RelativePermeabilityLinear.h"
 // Capillary pressure
 #include "CapillaryPressureVanGenuchten.h"
 #include "CapillaryPressureConstant.h"
+#include "CapillaryPressureLinear.h"
 // Fluid properties
 #include "FluidPropertiesCO2.h"
 #include "FluidPropertiesWater.h"
@@ -136,8 +138,10 @@ QuollApp::registerObjects(Factory & factory)
    registerUserObject(RelativePermeabilityVanGenuchten);
    registerUserObject(RelativePermeabilityCorey);
    registerUserObject(RelativePermeabilityPerfectlyMobile);
+   registerUserObject(RelativePermeabilityLinear);
    registerUserObject(CapillaryPressureVanGenuchten);
    registerUserObject(CapillaryPressureConstant);
+   registerUserObject(CapillaryPressureLinear);
 
    // Register user object for fluid properties
    registerUserObject(FluidPropertiesCO2);

@@ -26,14 +26,14 @@ RelativePermeabilityCorey::RelativePermeabilityCorey(const InputParameters & par
 Real
 RelativePermeabilityCorey::relativePermLiquid(Real sat_liq) const
 {
-  // Check whether liquid saturation is [0,1] - if not, print error message.
+  /// Check whether liquid saturation is [0,1] - if not, print error message.
   if (sat_liq < 0.0 || sat_liq > 1.0)
     mooseError("RelativePermeabilityCorey: Liquid saturation is outside the range 0 <= Sl <= 1\n");
 
   Real sat_eff = (sat_liq - _sat_lr)/(1.0 - _sat_lr - _sat_gr);
   Real krel = std::pow(sat_eff, 4.0);
 
-  // Bound just in case
+  /// Bound just in case
   if (krel < 0) { krel = 0;}
   if (krel > 1) { krel = 1;}
 
@@ -43,14 +43,15 @@ RelativePermeabilityCorey::relativePermLiquid(Real sat_liq) const
 Real
 RelativePermeabilityCorey::relativePermGas(Real sat_liq) const
 {
-  // Check whether liquid saturation is [0,1] - if not, print error message.
+  /// Check whether liquid saturation is [0,1] - if not, print error message.
   if (sat_liq < 0.0 || sat_liq > 1.0)
     mooseError("RelativePermeabilityCorey: Liquid saturation is outside the range 0 <= Sl <= 1\n");
 
   Real sat_eff = (sat_liq - _sat_lr)/(1.0 - _sat_lr - _sat_gr);
   Real krel = std::pow(1.0 - sat_eff, 2.0) * (1.0 - std::pow(sat_eff, 2.0));
 
-  // Bound just in case
+  /// Bound relative permeability in regions where liquid saturation is less than or greater than
+  /// gas and liquid residual values
   if (krel < 0) { krel = 0;}
   if (krel > 1) { krel = 1;}
 
@@ -61,7 +62,13 @@ Real
 RelativePermeabilityCorey::dRelativePermLiquid(Real sat_liq) const
 {
   Real sat_eff = (sat_liq - _sat_lr)/(1.0 - _sat_lr - _sat_gr);
-  Real dkrel = 4.0 * std::pow(sat_eff, 3.0) / (1.0 - _sat_lr - _sat_gr);
+  Real dkrel;
+
+  /// If Sl > 1 - Sgr, or Sl < Slr, krl is horizontal and hence dkrl = 0
+  if (sat_liq > _sat_lr && sat_liq < 1.0 - _sat_gr)
+    dkrel = 4.0 * std::pow(sat_eff, 3.0) / (1.0 - _sat_lr - _sat_gr);
+  else
+    dkrel = 0.0;
 
   return dkrel;
 }
@@ -70,7 +77,13 @@ Real
 RelativePermeabilityCorey::dRelativePermGas(Real sat_liq) const
 {
   Real sat_eff = (sat_liq - _sat_lr)/(1.0 - _sat_lr - _sat_gr);
-  Real dkrel = (-2.0 * (1.0 + 2.0 * sat_eff) * std::pow(1.0 - sat_eff, 2.0)) / (1.0 - _sat_lr - _sat_gr);
+  Real dkrel;
+
+  /// If Sl > 1 - Sgr, or Sl < Slr, krg is horizontal and hence dkrg = 0
+  if (sat_liq > _sat_lr && sat_liq < 1.0 - _sat_gr)
+    dkrel = (-2.0 * (1.0 + 2.0 * sat_eff) * std::pow(1.0 - sat_eff, 2.0)) / (1.0 - _sat_lr - _sat_gr);
+  else
+    dkrel = 0.0;
 
   return dkrel;
 }

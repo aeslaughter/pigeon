@@ -1,6 +1,6 @@
 # #############################################################################
-# Test the RelativePermeabilityPerfectlyMobile UserObject. This relative
-# permeability UserObject returns 1.0 for all liquid saturations.
+# Test the RelativePermeabilityLinear UserObject. This relative
+# permeability UserObject returns 
 #
 # The liquid saturation is initialised to vary linearly from zero at the left
 # end of the 1D mesh, to unity at the right end.
@@ -9,7 +9,7 @@
 
 [UserObjects]
   [./RelativePermeability]
-    type = RelativePermeabilityPerfectlyMobile
+    type = RelativePermeabilityLinear
   [../]
 []
 
@@ -109,7 +109,7 @@
 []
 
 [Outputs]
-  file_base = RelativePermeabilityPerfectlyMobile
+  file_base = RelativePermeabilityLinear
   [./csv]
     type = CSV
   [../]
