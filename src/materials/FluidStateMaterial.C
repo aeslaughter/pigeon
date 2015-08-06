@@ -124,7 +124,7 @@ FluidStateMaterial::computeQpProperties()
   for (unsigned int n = 0; n < _num_phases; ++n)
   {
     /// The sign of the gradient in saturation
-    sgns = _fluid_state.dSaturation_dSl(n);
+    sgns = _fluid_state.dSaturation_dS(n);
 
     /// The pressure gradient of phase n
     grad_pressure = _grad_primary_pressure[_qp] + sgns * _fluid_state.dCapillaryPressure(liquid_saturation)[n] *
@@ -137,12 +137,14 @@ FluidStateMaterial::computeQpProperties()
     _dgravity_flux_dp[_qp][n] = - _fluid_state.dDensity_dP(pressure[n], temperature, n) * _gravity[_qp];
 
     /// Derivative of gravity flux (density * gravity) of phase n wrt saturation
-    _dgravity_flux_ds[_qp][n] = sgns * _fluid_state.dCapillaryPressure(liquid_saturation)[n] * _dgravity_flux_dp[_qp][n];
+    /// Note: add d2(Pc)/dS2 term here, and note that the sign is correct (sgns * sgns = 1 always)
+    _dgravity_flux_ds[_qp][n] = sgns * _fluid_state.dCapillaryPressure(liquid_saturation)[n] * _dgravity_flux_dp[_qp][n] +
+      _fluid_state.d2CapillaryPressure(liquid_saturation)[n] * _grad_primary_saturation[_qp];
 
     /// Derivative of pressure flux (GradP) of phase n wrt pressure
     _dpressure_flux_dp[_qp][n] = 1.0;
 
-    /// Derivative of pressure flux (GradP) of phase n wrt pressure
+    /// Derivative of pressure flux (GradP) of phase n wrt saturation
     _dpressure_flux_ds[_qp][n] = sgns * _fluid_state.dCapillaryPressure(liquid_saturation)[n];
   }
 
@@ -156,7 +158,7 @@ FluidStateMaterial::computeQpProperties()
     sgnx = (i == _fluid_state.primaryComponentIndex() ? 1.0 : -1.0);
 
     for (unsigned int n = 0; n < _num_phases; ++n)
-      _dgravity_flux_dx[_qp][i].push_back(sgnx * _fluid_state.dDensity_dX(pressure[n], temperature, n));
+      _dgravity_flux_dx[_qp][i].push_back(sgnx * _fluid_state.dDensity_dX(pressure[n], temperature, n) * _gravity[_qp]);
   }
 
 
