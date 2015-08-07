@@ -1,0 +1,55 @@
+/****************************************************************/
+/*               DO NOT MODIFY THIS HEADER                      */
+/* MOOSE - Multiphysics Object Oriented Simulation Environment  */
+/*                                                              */
+/*           (c) 2010 Battelle Energy Alliance, LLC             */
+/*                   ALL RIGHTS RESERVED                        */
+/*                                                              */
+/*          Prepared by Battelle Energy Alliance, LLC           */
+/*            Under Contract No. DE-AC07-05ID14517              */
+/*            With the U. S. Department of Energy               */
+/*                                                              */
+/*            See COPYRIGHT for full restrictions               */
+/****************************************************************/
+
+#include <math.h>
+
+#include "LaserSource.h"
+
+/**
+ * This function defines the valid parameters for
+ * this Kernel and their default values
+ */
+template<>
+InputParameters validParams<LaserSource>()
+{
+  InputParameters params = validParams<Kernel>();
+  params.addParam<FunctionName>("power","0","Laser power (W/m^3).");
+  params.addParam<FunctionName>("x0","0","X coordinate of the laser source (center).");
+  params.addParam<FunctionName>("y0","0","Y coordinate of the laser source (center).");
+  params.addParam<FunctionName>("sigma","1","Range parameter of the laser.");
+  return params;
+}
+
+LaserSource::LaserSource(const std::string & name,
+                                     InputParameters parameters) :
+  // You must call the constructor of the base class first
+  Kernel(name,parameters),
+  _power(getFunction("power")),
+  _x0(getFunction("x0")),
+  _y0(getFunction("y0")),
+  _sigma(getFunction("sigma"))
+{}
+
+Real LaserSource::computeQpResidual()
+{
+  const MaterialProperty<Real> & thickness(getMaterialProperty<Real>("thickness"));
+  const MaterialProperty<Real> & specific_heat(getMaterialProperty<Real>("specific_heat"));
+  const MaterialProperty<Real> & density(getMaterialProperty<Real>("density"));
+  Real l = thickness[_qp];
+  Real p_c = specific_heat[_qp];
+  Real rho = density[_qp];
+  Real s_dist = pow(_q_point[_qp](0)-_x0.value(_t,_q_point[_qp]),2) + pow(_q_point[_qp](1)-_x0.value(_t,_q_point[_qp]),2);
+  Real f = _power.value(_t,_q_point[_qp])*exp(-s_dist/(2.0*pow(_sigma.value(_t,_q_point[_qp]),2)))/(_sigma.value(_t,_q_point[_qp])*sqrt(2.0*3.1416));
+  return -f/(l*p_c*rho);
+}

@@ -1,0 +1,53 @@
+/****************************************************************/
+/*               DO NOT MODIFY THIS HEADER                      */
+/* MOOSE - Multiphysics Object Oriented Simulation Environment  */
+/*                                                              */
+/*           (c) 2010 Battelle Energy Alliance, LLC             */
+/*                   ALL RIGHTS RESERVED                        */
+/*                                                              */
+/*          Prepared by Battelle Energy Alliance, LLC           */
+/*            Under Contract No. DE-AC07-05ID14517              */
+/*            With the U. S. Department of Energy               */
+/*                                                              */
+/*            See COPYRIGHT for full restrictions               */
+/****************************************************************/
+
+#include "Function.h"
+
+#include "ConvectBC.h"
+
+template<>
+InputParameters validParams<ConvectBC>()
+{
+  InputParameters params = validParams<IntegratedBC>();
+
+  // Here we are adding a parameter that will be extracted from the input file by the Parser
+  params.addParam<Real>("mu",0,"Heat transfer coefficient (m/s).");
+  params.addParam<FunctionName>("u_e","0","Function of external temperature (K).");
+  return params;
+}
+
+ConvectBC::ConvectBC(const std::string & name, InputParameters parameters) :
+    IntegratedBC(name,parameters),
+    _mu(getParam<Real>("mu")),
+    _u_e(getFunction("u_e"))
+{}
+
+Real
+ConvectBC::computeQpResidual()
+{
+  const MaterialProperty<Real> & thickness(getMaterialProperty<Real>("thickness"));
+  const MaterialProperty<Real> & diffusivity(getMaterialProperty<Real>("diffusivity"));
+  Real l = thickness[_qp];
+  Real alpha = diffusivity[_qp];
+  return _mu*l/alpha*(_u[_qp] - _u_e.value(_t,_q_point[_qp]))*_test[_i][_qp];
+}
+
+Real ConvectBC::Jacobian()
+{
+  const MaterialProperty<Real> & thickness(getMaterialProperty<Real>("thickness"));
+  const MaterialProperty<Real> & diffusivity(getMaterialProperty<Real>("diffusivity"));
+  Real l = thickness[_qp];
+  Real alpha = diffusivity[_qp];
+  return _mu*l/alpha*_phi[_j][_qp]*_test[_i][_qp];
+}
