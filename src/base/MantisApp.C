@@ -3,6 +3,12 @@
 #include "AppFactory.h"
 #include "ModulesApp.h"
 
+#include "ConvectBC.h"
+#include "HeatDiff.h"
+#include "Conv2D.h"
+#include "LaserSource.h"
+#include "Plate.h"
+
 template<>
 InputParameters validParams<MantisApp>()
 {
@@ -44,6 +50,11 @@ extern "C" void MantisApp__registerObjects(Factory & factory) { MantisApp::regis
 void
 MantisApp::registerObjects(Factory & factory)
 {
+  registerBoundaryCondition(ConvectBC);
+  registerKernel(HeatDiff);
+  registerKernel(Conv2D);
+  registerKernel(LaserSource);
+  registerMaterial(Plate);
 }
 
 // External entry point for dynamic syntax association
