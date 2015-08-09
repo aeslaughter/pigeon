@@ -11,7 +11,7 @@
 #include "FluidProperties.h"
 #include "FluidPropertiesWater.h"
 #include "FluidPropertiesCO2.h"
-#include "FluidState.h"
+#include "FluidStateTwoPhase.h"
 #include "RelativePermeability.h"
 #include "CapillaryPressure.h"
 
@@ -25,26 +25,13 @@ class FluidStateWaterCO2;
  * In matrices, the first row is for H2O, the second for CO2.
  */
 
-
 template<>
-InputParameters validParams<FluidState>();
+InputParameters validParams<FluidStateTwoPhase>();
 
-class FluidStateWaterCO2 : public FluidState
+class FluidStateWaterCO2 : public FluidStateTwoPhase
 {
  public:
   FluidStateWaterCO2(const InputParameters & parameters);
-
-  /**
-   * Number of fluid phases
-   *
-   * @return number of fluid phases
-   */
-  virtual unsigned int numPhases() const;
-
-  /**
-   * List of phase index for each variable
-   */
-  virtual unsigned int variablePhase(unsigned int moose_var) const;
 
   /**
    * Fluid density for each phase
@@ -74,90 +61,13 @@ class FluidStateWaterCO2 : public FluidState
   virtual std::vector<std::vector<Real> > massFractions(Real pressure, Real temperature) const;
 
   /**
-   * Relative permeabilities of each phase
+   * Derivative of fluid  density with respect to fluid pressure.
    *
-   * @param saturation liquid saturation
-   * @return relative permeabilities for each phase (-)
+   * @param pressure fluid pressure (Pa)
+   * @param temperature fluid temperature (C)
+   * @param phase_index index of phase
+   * @return fluid density vector (element for each phase) (kg/m^3)
    */
-  virtual std::vector<Real> relativePermeability(Real liquid_saturation) const;
-
-  /**
-   * Derivative of relative permeabilities of each phase wrt liquid saturation
-   *
-   * @param saturation liquid saturation
-   * @return derivative of relative permeabilities for each phase (-/m)
-   */
-  virtual std::vector<Real> dRelativePermeability(Real liquid_saturation) const;
-
-  /**
-   * Pressure of each phase
-   *
-   * @param pressure gas pressure (Pa)
-   * @param saturation liquid saturation (-)
-   * @return pressure liquid phase pressure (Pa)
-   */
-  virtual std::vector<Real> pressure(Real gas_pressure, Real liquid_saturation) const;
-
-  /**
-   * Derivative of capillary pressure for each phase with respect to the
-   * liquid saturation
-   *
-   * @param saturation liquid saturation (-)
-   * @return derivative of capillary pressure (Pa)
-   */
-  virtual std::vector<Real> dCapillaryPressure(Real liquid_saturation) const;
-
-  /**
-   * Second derivative of capillary pressure for each phase with respect to the
-   * liquid saturation
-   *
-   * @param saturation liquid saturation (-)
-   * @return second derivative of capillary pressure (Pa)
-   */
-  virtual std::vector<Real> d2CapillaryPressure(Real liquid_saturation) const;
-
-  /**
-   * Saturation of each phase
-   *
-   * @param saturation liquid saturation (-)
-   * @return saturation gas phase saturation (-)
-   */
-  virtual std::vector<Real> saturation(Real saturation) const;
-
-  /**
-   * Sign of the derivative of primary saturation variable with respect to
-   * liquid saturation. Used in calculating the pressure gradient of non-primary
-   * pressure variables
-   *
-   * @return sign of derivative
-   */
-  virtual Real dSaturation_dSl(unsigned int phase_index = 0) const;
-
-   /**
-    * Sign of the derivative of a saturation variable with respect to
-    * the primary saturation variable. Used in Jacobian calculations
-    *
-    * @return sign of derivative
-    */
-  virtual Real dSaturation_dS(unsigned int var) const;
-
-  /**
-   * Sign of the derivative of a mass fraction variable with respect to
-   * the primary mass fraction variable. Used in Jacobian calculations
-   *
-   * @return sign of derivative
-   */
-  virtual Real dMassFraction_dX(unsigned int var) const;
-
-    /**
-     * Derivative of fluid  density with respect to fluid pressure.
-     *
-     * @param pressure fluid pressure (Pa)
-     * @param temperature fluid temperature (C)
-     * @param phase_index index of phase
-     * @return fluid density vector (element for each phase) (kg/m^3)
-     */
-
   virtual Real dDensity_dP(Real pressure, Real temperature, unsigned int phase_index = 0) const;
 
   /**
@@ -209,13 +119,6 @@ class FluidStateWaterCO2 : public FluidState
    */
   virtual void thermophysicalProperties(std::vector<Real> primary_vars, FluidStateProperties & fsp);
 
-  /**
-   * Retrieve the primary saturation variable
-   *
-   * @return primary saturation variable number
-   */
-  virtual unsigned int getPrimarySaturationVar() const;
-
  protected:
 
   /**
@@ -229,18 +132,6 @@ class FluidStateWaterCO2 : public FluidState
    * value for CO2 properties.
    */
   const FluidPropertiesCO2 & _co2_property;
-
-  /**
-   * This is the member reference that will hold the User Object
-   * value for relative permeabilities.
-   */
-  const RelativePermeability & _relative_permeability;
-
-  /**
-   * This is the member reference that will hold the User Object
-   * value for capillary pressure.
-   */
-  const CapillaryPressure & _capillary_pressure;
 
   /// Number of phases (can be 1 or 2 in this FluidState UserObject)
   unsigned int _num_phases;

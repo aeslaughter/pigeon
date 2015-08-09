@@ -10,51 +10,27 @@
 template<>
 InputParameters validParams<FluidStateWaterCO2>()
 {
-  InputParameters params = validParams<FluidState>();
+  InputParameters params = validParams<FluidStateTwoPhase>();
   params.addClassDescription("Thermophysical fluid state of water (H2O) and CO2.");
+  /// Suppress fluid property UserObjects from FluidStateTwoPhase and use water and CO2 specialisations
+  params.suppressParameter<UserObjectName>("liquid_property_uo");
+  params.suppressParameter<UserObjectName>("gas_property_uo");
   params.addRequiredParam<UserObjectName>("water_property_uo", "Name of the User Object defining the water properties");
   params.addRequiredParam<UserObjectName>("co2_property_uo", "Name of the User Object defining the CO2 properties");
-  params.addRequiredParam<UserObjectName>("relative_permeability_uo", "Name of the User Object defining the relative permeabilities");
-  params.addRequiredParam<UserObjectName>("capillary_pressure_uo", "Name of the User Object defining the capillary pressure");
   return params;
 }
 
 FluidStateWaterCO2::FluidStateWaterCO2(const InputParameters & parameters) :
-  FluidState(parameters),
+  FluidStateTwoPhase(parameters),
 
   _water_property(getUserObject<FluidPropertiesWater>("water_property_uo")),
-  _co2_property(getUserObject<FluidPropertiesCO2>("co2_property_uo")),
-  _relative_permeability(getUserObject<RelativePermeability>("relative_permeability_uo")),
-  _capillary_pressure(getUserObject<CapillaryPressure>("capillary_pressure_uo"))
-
+  _co2_property(getUserObject<FluidPropertiesCO2>("co2_property_uo"))
 {
   _Mh2o = _water_property.molarMass();
   _Mco2 = _co2_property.molarMass();
 
   _num_components = 2;
   _num_phases = 2;
-
-}
-
-unsigned int
-FluidStateWaterCO2::numPhases() const
-{
-  return _num_phases;
-}
-
-unsigned int
-FluidStateWaterCO2::variablePhase(unsigned int moose_var) const
-{
-  unsigned int varphase = 0;
-
-  if (moose_var == _pvar)
-    varphase = _p_phase;
-  else if (moose_var == _svar)
-    varphase = _s_phase;
-  else
-    mooseError("Variable number " << moose_var << " is not a pressure or saturation variable in the FluidStateWaterCO2 UserObject");
-
-  return varphase;
 }
 
 void
@@ -65,7 +41,6 @@ FluidStateWaterCO2::thermophysicalProperties(std::vector<Real> primary_vars, Flu
   Real node_temperature = primary_vars[1];
   Real node_saturation = primary_vars[2];
   Real node_xmass = primary_vars[3];
-
 
   /// Assign the fluid properties
   /// Saturation
@@ -160,147 +135,6 @@ FluidStateWaterCO2::thermophysicalProperties(std::vector<Real> primary_vars, Flu
   fsp.mobility = mobilities;
 }
 
-std::vector<Real>
-FluidStateWaterCO2::relativePermeability(Real liquid_saturation) const
-{
-  std::vector<Real> relperm;
-
-  relperm.push_back(_relative_permeability.relativePermLiquid(liquid_saturation));
-  relperm.push_back(_relative_permeability.relativePermGas(liquid_saturation));
-
-  return relperm;
-}
-
-std::vector<Real>
-FluidStateWaterCO2::dRelativePermeability(Real liquid_saturation) const
-{
-  std::vector<Real> drelperm;
-
-  drelperm.push_back(_relative_permeability.dRelativePermLiquid(liquid_saturation));
-  drelperm.push_back(_relative_permeability.dRelativePermGas(liquid_saturation));
-
-  return drelperm;
-}
-
-std::vector<Real>
-FluidStateWaterCO2::pressure(Real pressure, Real liquid_saturation) const
-{
-  std::vector<Real> pressures;
-  Real capillary_pressure = _capillary_pressure.capillaryPressure(liquid_saturation);
-
-  /// Primary pressure is liquid: Pg = Pl - Pc
-  if (_p_phase == 0)
-  {
-    pressures.push_back(pressure);
-    pressures.push_back(pressure - capillary_pressure);
-  }
-  /// Primary pressure is gas: Pl = Pg + Pc
-  else if (_p_phase == 1)
-  {
-    pressures.push_back(pressure + capillary_pressure);
-    pressures.push_back(pressure);
-  }
-  else
-    mooseError("Shouldn't get here! Error in pressure phase in FluidStateTwoPhase::pressure");
-
-  return pressures;
-}
-
-std::vector<Real>
-FluidStateWaterCO2::dCapillaryPressure(Real liquid_saturation) const
-{
-  std::vector<Real> dpc;
-
-  /// Primary pressure is liquid: Pg = Pl - Pc
-  if (_p_phase == 0)
-  {
-  dpc.push_back(0.);
-  dpc.push_back(- _capillary_pressure.dCapillaryPressure(liquid_saturation));
-  }
-  /// Primary pressure is gas: Pl = Pg + Pc
-  else if (_p_phase == 1)
-  {
-  dpc.push_back(_capillary_pressure.dCapillaryPressure(liquid_saturation));
-  dpc.push_back(0.);
-  }
-  else
-    mooseError("Shouldn't get here! Error in pressure phase in FluidStateWaterCO2::dCapillaryPressure.");
-
-  return dpc;
-}
-
-std::vector<Real>
-FluidStateWaterCO2::d2CapillaryPressure(Real liquid_saturation) const
-{
-  std::vector<Real> d2pc;
-
-  /// Primary pressure is liquid: Pg = Pl - Pc
-  if (_p_phase == 0)
-  {
-  d2pc.push_back(0.);
-  d2pc.push_back(- _capillary_pressure.d2CapillaryPressure(liquid_saturation));
-  }
-  /// Primary pressure is gas: Pl = Pg + Pc
-  else if (_p_phase == 1)
-  {
-  d2pc.push_back(_capillary_pressure.d2CapillaryPressure(liquid_saturation));
-  d2pc.push_back(0.);
-  }
-  else
-    mooseError("Shouldn't get here! Error in pressure phase in FluidStateWaterCO2::dCapillaryPressure.");
-
-  return d2pc;
-}
-
-std::vector<Real>
-FluidStateWaterCO2::saturation(Real saturation) const
-{
-  std::vector<Real> saturations;
-
-  /// Primary saturation is liquid
-  if (_s_phase == 0)
-  {
-    saturations.push_back(saturation);
-    saturations.push_back(1.0 - saturation);
-  }
-  /// Else the primary saturation is gas
-  else if (_s_phase == 1)
-  {
-    saturations.push_back(1.0 - saturation);
-    saturations.push_back(saturation);
-  }
-  else
-    mooseError("Shouldn't get here! Error in saturation phase in FluidStateWaterCO2::saturation");
-
-  return saturations;
-}
-
-Real
-FluidStateWaterCO2::dSaturation_dS(unsigned int phase_index) const
-{
-  /// Return 1 if liquid phase, -1 if gas phase
-  return (phase_index == 0 ? 1.0 : -1.0);
-}
-
-Real
-FluidStateWaterCO2::dMassFraction_dX(unsigned int var) const
-{
-  /// Return 1 if primary mass fraction, -1 otherwise
-  return (isFluidStateVariable(var) ? 1.0 : -1.0);
-}
-
-Real
-FluidStateWaterCO2::dSaturation_dSl(unsigned int var) const
-{
-  Real sgn = 1.0;
-
-  /// If saturation is not the primary saturation variable
-  if (var != _svar || variablePhase(var) != 0)
-    sgn *= -1.0;
-
-  return sgn;
-}
-
 Real
 FluidStateWaterCO2::dDensity_dP(Real pressure, Real temperature, unsigned int phase_index) const
 {
@@ -312,7 +146,6 @@ FluidStateWaterCO2::dDensity_dP(Real pressure, Real temperature, unsigned int ph
     dfluid_density = _co2_property.dDensity_dP(pressure, temperature);
   else
     mooseError("phase_index " << phase_index << " is out of range in FluidStateWaterCO2::dDensity_dP");
-
 
   return dfluid_density;
 }
@@ -355,7 +188,6 @@ FluidStateWaterCO2::dissolved(Real pressure, Real temperature) const
   return xco2l;
 }
 
-// TODO: These aren't used so should remove them in base class
 Real
 FluidStateWaterCO2::density(Real pressure, Real temperature, unsigned int phase_index) const
 {
@@ -450,10 +282,4 @@ FluidStateWaterCO2::dViscosity_dDensity(Real pressure, Real temperature, Real de
     mooseError("phase_index " << phase_index << " is out of range in FluidStateWaterCO2::dViscosity_dDensity");
 
   return dviscosity_ddensity;
-}
-
-unsigned int
-FluidStateWaterCO2::getPrimarySaturationVar() const
-{
-  return _svar;
 }

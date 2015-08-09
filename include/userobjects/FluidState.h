@@ -211,8 +211,8 @@ public Coupleable
    * liquid saturation
    *
    * @param saturation liquid saturation (-)
-  * @return derivative of capillary pressure (Pa)
-  */
+   * @return derivative of capillary pressure (Pa)
+   */
   virtual std::vector<Real> dCapillaryPressure(Real liquid_saturation) const = 0;
 
   /**
@@ -220,8 +220,8 @@ public Coupleable
    * liquid saturation
    *
    * @param saturation liquid saturation (-)
-  * @return second derivative of capillary pressure (Pa)
-  */
+   * @return second derivative of capillary pressure (Pa)
+   */
   virtual std::vector<Real> d2CapillaryPressure(Real liquid_saturation) const = 0;
 
   /**
@@ -239,7 +239,6 @@ public Coupleable
    *
    * @return sign of derivative
    */
-
   virtual Real dSaturation_dSl(unsigned int phase_index = 0) const = 0;
 
   /**
@@ -248,7 +247,6 @@ public Coupleable
    *
    * @return sign of derivative
    */
-
   virtual Real dSaturation_dS(unsigned int var) const = 0;
 
   /**
