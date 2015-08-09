@@ -18,7 +18,7 @@
   [./linear1]
     type = 'CSVDiff'
     input = 'RelativePermeabilityLinear.i'
-    csvdiff = 'RelativePermeabilityLineaer_vpp_0001.csv'
+    csvdiff = 'RelativePermeabilityLinear_vpp_0001.csv'
     abs_zero = 1.0E-6
   [../]
   [./van_genuchten1]

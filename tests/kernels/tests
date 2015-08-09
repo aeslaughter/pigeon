@@ -1,8 +1,26 @@
-#[Tests]
-#  [./component_flux]
-#    type = 'CSVDiff'
-#    input = 'ComponentFlux.i'
-#    csvdiff = 'ComponentFlux_out.csv'
-#    abs_zero = 1.0E-6
-#  [../]
-#[]
+[Tests]
+  [./singlephase1]
+    type = 'AnalyzeJacobian'
+    input = 'singlephase1.i'
+  [../]
+  [./singlephase1g]
+    type = 'AnalyzeJacobian'
+    input = 'singlephase1g.i'
+  [../]
+  [./singlephase2]
+    type = 'AnalyzeJacobian'
+    input = 'singlephase2.i'
+  [../]
+  [./singlephase2g]
+    type = 'AnalyzeJacobian'
+    input = 'singlephase2g.i'
+  [../]
+  [./singlephase3]
+    type = 'AnalyzeJacobian'
+    input = 'singlephase3.i'
+  [../]
+  [./singlephase3g]
+    type = 'AnalyzeJacobian'
+    input = 'singlephase3g.i'
+  [../]
+[]

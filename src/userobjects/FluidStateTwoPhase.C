@@ -81,7 +81,8 @@ FluidStateTwoPhase::thermophysicalProperties(std::vector<Real> primary_vars, Flu
   std::vector<Real> viscosities(_num_phases);
 
   /// Water viscosity uses water density in calculation.
-  viscosities[0] = _liquid_property.viscosity(node_temperature, fsp.density[0]);
+  /// FIXME: check this for correctness!
+  viscosities[0] = _liquid_property.viscosity(fsp.pressure[0], node_temperature, fsp.density[0]);
   viscosities[1] = _gas_property.viscosity(fsp.pressure[1], node_temperature);
 
   fsp.viscosity = viscosities;
@@ -215,14 +216,12 @@ FluidStateTwoPhase::viscosity(Real pressure, Real temperature, Real density, uns
 {
   Real fluid_viscosity;
 
-  // TODO: Fix this so that density isn't calculated twice.
   if (phase_index == 0)
-  {
-    Real liquid_density = _liquid_property.density(pressure, temperature);
-    fluid_viscosity = _liquid_property.viscosity(pressure, temperature, liquid_density);
-  }
+    fluid_viscosity = _liquid_property.viscosity(pressure, temperature, density);
+
   else if (phase_index == 1)
     fluid_viscosity = _gas_property.viscosity(pressure, temperature, density);
+
   else
     mooseError("phase_index " << phase_index << " is out of range in FluidStateTwoPhase::viscosity");
 
@@ -290,7 +289,6 @@ FluidStateTwoPhase::pressure(Real pressure, Real liquid_saturation) const
   }
   else
     mooseError("Shouldn't get here! Error in pressure phase in FluidStateTwoPhase::pressure");
-
 
   return pressures;
 }

@@ -65,7 +65,7 @@ class FluidPropertiesWater : public FluidProperties
    * @param temperature water temperature (C)
    * @return saturation pressure (Pa)
    */
-  Real pSat(Real temperature) const;
+  virtual Real pSat(Real temperature) const;
 
   /** Saturation temperature as a function of pressure.
    *

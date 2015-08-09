@@ -49,7 +49,7 @@
 // Fluid states
 #include "FluidStateSinglePhase.h"
 //#include "FluidStateBrineCO2.h"
-//#include "FluidStateWaterCO2.h"
+#include "FluidStateWaterCO2.h"
 #include "FluidStateTwoPhase.h"
 
 // Postprocessors
@@ -153,7 +153,7 @@ QuollApp::registerObjects(Factory & factory)
    // Register user objects for fluid states
    registerUserObject(FluidStateSinglePhase);
   // registerUserObject(FluidStateBrineCO2);
-  // registerUserObject(FluidStateWaterCO2);
+   registerUserObject(FluidStateWaterCO2);
    registerUserObject(FluidStateTwoPhase);
 
    // Register postprocessors

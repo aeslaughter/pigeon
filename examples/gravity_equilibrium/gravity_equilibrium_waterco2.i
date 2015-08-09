@@ -1,14 +1,13 @@
 [Mesh]
   type = GeneratedMesh
-  dim = 2
-  ny = 20
+  dim = 1
+  ny = 7
   xmax = 100
   ymax = 100
 []
 
 [Variables]
   [./liquid_saturation]
-    scaling = 10
   [../]
   [./gas_pressure]
   [../]
@@ -69,7 +68,7 @@
     component_mass_fraction_variable = xh2oliquid
   [../]
   [./H2OLiquidFlux]
-    type = ComponentFlux
+    type = ComponentAdvectiveFlux
     variable = gas_pressure
     phase_index = 0
     primary_variable_type = pressure
@@ -93,7 +92,7 @@
     component_mass_fraction_variable = xco2gas
   [../]
   [./CO2MassFlux]
-    type = ComponentFlux
+    type = ComponentAdvectiveFlux
     variable = liquid_saturation
     fluid_state_uo = FluidState
     primary_variable_type = saturation
@@ -214,7 +213,7 @@
     rel_perm_uo = RelativePermeabilityVanGenuchten
     density = 2600.
     cap_pres_uo = CapillaryPressure
-    gravity = '0 -9.8 0'
+    gravity = '-9.8 0 0'
     liquid_saturation_variable = liquid_saturation
     diffusivity = 0.
     permeability = '1e-12 0 0 0 1e-12 0 0 0 1e-12'
@@ -227,7 +226,7 @@
     phase_index = 1
     primary_pressure_variable = gas_pressure
     primary_saturation_variable = liquid_saturation
-    temperature_variable = 100
+    temperature_variable = 50
     fluid_density_variables = 'liquid_density gas_density'
   [../]
 []
@@ -290,7 +289,7 @@
 []
 
 [Preconditioning]
-  active = 'fdp'
+  active = 'smp'
   [./fdp]
     type = FDP
     full = true
@@ -299,13 +298,16 @@
   [../]
   [./smp]
     type = SMP
+    full = true
+    petsc_options_iname = '-ksp_type -pc_type -sub_pc_type'
+    petsc_options_value = 'gmres asm lu'
   [../]
 []
 
 [Executioner]
   type = Transient
   solve_type = NEWTON
-  end_time = 1e6
+  end_time = 1e3
   nl_abs_tol = 1e-10
   nl_rel_tol = 1e-8
   l_tol = 1e-12

@@ -243,7 +243,7 @@ class FluidStateTwoPhase : public FluidState
    */
   const CapillaryPressure & _capillary_pressure;
 
-    /// Number of phases (can be 1 or 2 in this FluidState UserObject)
+  /// Number of phases (can be 1 or 2 in this FluidState UserObject)
   unsigned int _num_phases;
 
 };

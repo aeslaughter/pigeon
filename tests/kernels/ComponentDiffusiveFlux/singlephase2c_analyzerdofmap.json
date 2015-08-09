@@ -1,2 +1,0 @@
-{"ndof": 16, "demangled": true, "vars": [{"name": "x2", "subdomains": [{"id": 0, "kernels": [{"name": "Component2DiffusiveFlux", "type": "ComponentDiffusiveFlux"}], "dofs": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]}]}]}
-

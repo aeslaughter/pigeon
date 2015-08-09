@@ -45,7 +45,7 @@
     fluid_pressure_variable = liquid_pressure
   [../]
   [./H2OLiquidFlux]
-    type = ComponentFlux
+    type = ComponentAdvectiveFlux
     variable = liquid_pressure
     primary_variable_type = pressure
     fluid_viscosity_variable = liquid_viscosity
@@ -85,7 +85,7 @@
     gravity = '0 -9.8 0'
     liquid_saturation_variable = 1
     diffusivity = 0.
-    permeability = '1e-12 0 0 0 1e-12 0 0 0 1e-12'
+    permeability = '1e-8 0 0 0 1e-8 0 0 0 1e-8'
     porosity = 0.25
   [../]
   [./FluidStateMaterial]
@@ -95,6 +95,7 @@
     primary_saturation_variable = liquid_saturation
     fluid_state_uo = FluidState
     fluid_density_variables = liquid_density
+    temperature_variable = 50
   [../]
 []
 
@@ -132,11 +133,6 @@
 []
 
 [Preconditioning]
-  active = 'fdp'
-  [./fdp]
-    type = FDP
-    full = true
-  [../]
   [./smp]
     type = SMP
     full = true
@@ -145,7 +141,7 @@
 
 [Executioner]
   type = Transient
-  solve_type = PJFNK
+  solve_type = NEWTON
   end_time = 1e6
   nl_abs_tol = 1e-10
   nl_rel_tol = 1e-12
