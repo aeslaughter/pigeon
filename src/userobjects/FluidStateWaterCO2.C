@@ -13,18 +13,18 @@ InputParameters validParams<FluidStateWaterCO2>()
   InputParameters params = validParams<FluidStateTwoPhase>();
   params.addClassDescription("Thermophysical fluid state of water (H2O) and CO2.");
   /// Suppress fluid property UserObjects from FluidStateTwoPhase and use water and CO2 specialisations
-  params.suppressParameter<UserObjectName>("liquid_property_uo");
-  params.suppressParameter<UserObjectName>("gas_property_uo");
-  params.addRequiredParam<UserObjectName>("water_property_uo", "Name of the User Object defining the water properties");
-  params.addRequiredParam<UserObjectName>("co2_property_uo", "Name of the User Object defining the CO2 properties");
+  //params.suppressParameter<UserObjectName>("liquid_property_uo");
+  //params.suppressParameter<UserObjectName>("gas_property_uo");
+//  params.addRequiredParam<UserObjectName>("water_property_uo", "Name of the User Object defining the water properties");
+//  params.addRequiredParam<UserObjectName>("co2_property_uo", "Name of the User Object defining the CO2 properties");
   return params;
 }
 
 FluidStateWaterCO2::FluidStateWaterCO2(const InputParameters & parameters) :
   FluidStateTwoPhase(parameters),
 
-  _water_property(getUserObject<FluidPropertiesWater>("water_property_uo")),
-  _co2_property(getUserObject<FluidPropertiesCO2>("co2_property_uo"))
+  _water_property(getUserObject<FluidPropertiesWater>("liquid_property_uo")),
+  _co2_property(getUserObject<FluidPropertiesCO2>("gas_property_uo"))
 {
   _Mh2o = _water_property.molarMass();
   _Mco2 = _co2_property.molarMass();
@@ -69,7 +69,7 @@ FluidStateWaterCO2::thermophysicalProperties(std::vector<Real> primary_vars, Flu
     water_viscosity = 1.; // Not used but set to a non-zero value
   }
   else
-  { ///FIXME: check viscosity for correctness
+  {
     Real water_density = _water_property.density(fsp.pressure[0], node_temperature);
     water_viscosity = _water_property.viscosity(fsp.pressure[0], node_temperature, water_density);
 
@@ -90,7 +90,7 @@ FluidStateWaterCO2::thermophysicalProperties(std::vector<Real> primary_vars, Flu
     vapour_viscosity = 1.;  // Not used
   }
   else
-  { //FIXME: Check viscosity
+  {
     Real co2_density = _co2_property.density(co2_partial_pressure, node_temperature);
     Real vapour_density = _water_property.density(pv, node_temperature);
     gas_density = co2_density + vapour_density;
@@ -133,6 +133,84 @@ FluidStateWaterCO2::thermophysicalProperties(std::vector<Real> primary_vars, Flu
     mobilities[i] = fsp.relperm[i] * fsp.density[i]  / fsp.viscosity[i];
 
   fsp.mobility = mobilities;
+
+  /// For derivatives wrt saturation, the sign of the derivative depends on whether the primary
+  /// saturation variable is liquid or not. This can be accounted for by multiplying all derivatives
+  /// wrt S by dS/dSl
+  Real sgn = dSaturation_dSl(_svar);
+
+  /// Derivative of relative permeability wrt liquid_saturation
+  std::vector<Real> drelperm(_num_phases);
+
+  for (unsigned int i = 0; i < _num_phases; ++i)
+    drelperm[i] = sgn * dRelativePermeability(fsp.saturation[0])[i];
+
+  fsp.drelperm = drelperm;
+
+  /// Derivative of density wrt pressure
+  std::vector<Real> ddensities_dp(_num_phases);
+
+  for (unsigned int i = 0; i < _num_phases; ++i)
+    ddensities_dp[i] = dDensity_dP(fsp.pressure[i], node_temperature, i);
+
+  fsp.ddensity_dp = ddensities_dp;
+
+  /// Derivative of density wrt saturation
+  std::vector<Real> ddensities_ds(_num_phases);
+
+  for (unsigned int i = 0; i < _num_phases; ++i)
+    ddensities_ds[i] = sgn * dCapillaryPressure(fsp.saturation[0])[i] * fsp.ddensity_dp[i];
+
+  fsp.ddensity_ds = ddensities_ds;
+
+  /// Derivative of density wrt mass fraction
+  std::vector<std::vector<Real> > ddensities_dx;
+  ddensities_dx.resize(numComponents());
+
+  ddensities_dx[0].push_back(0.);
+  ddensities_dx[0].push_back(0.);
+  ddensities_dx[1].push_back(0.);
+  ddensities_dx[1].push_back(0.);
+
+  fsp.ddensity_dx = ddensities_dx;
+
+  /// Derivative of mobility wrt pressure
+  std::vector<Real> dmobilities_dp(_num_phases);
+  Real dmdp;
+
+  for (unsigned int n = 0; n < _num_phases; ++n)
+  {
+    dmdp = (fsp.relperm[n] * fsp.ddensity_dp[n] / fsp.viscosity[n]) * (1.0 - (fsp.density[n] / fsp.viscosity[n]) *
+      dViscosity_dDensity(fsp.pressure[n], node_temperature, fsp.density[n], n));
+    dmobilities_dp[n] = dmdp;
+  }
+  fsp.dmobility_dp = dmobilities_dp;
+
+  /// Derivative of mobility wrt saturation
+  /// Note: drelperm and ddensity_ds are already the correct sign, so don't multiply by sgn
+  std::vector<Real> dmobilities_ds(_num_phases);
+  Real dmds;
+  for (unsigned int n = 0; n < _num_phases; ++n)
+  {
+    dmds = fsp.drelperm[n] * fsp.density[n] / fsp.viscosity[n] + (fsp.relperm[n] * fsp.ddensity_ds[n] / fsp.viscosity[n]) * (1.0 - (fsp.density[n] / fsp.viscosity[n]) *
+      dViscosity_dDensity(fsp.pressure[n], node_temperature, fsp.density[n], n));
+    dmobilities_ds[n] = dmds;
+  }
+
+  fsp.dmobility_ds = dmobilities_ds;
+
+  /// Derivative of mobility wrt mass fraction
+  /// Note: ddensity_dx is already the correct sign, so don't multiply by sgn
+  std::vector<std::vector<Real> > dmobilities_dx(_num_components);
+  Real dmdx;
+  for (unsigned int i = 0; i < _num_components; ++i)
+    for (unsigned int n = 0; n < _num_phases; ++n)
+    {
+      dmdx = (fsp.relperm[n] * fsp.ddensity_dx[i][n] / fsp.viscosity[n]) * (1.0 - (fsp.density[n] / fsp.viscosity[n]) *
+        dViscosity_dDensity(fsp.pressure[n], node_temperature, fsp.density[n], n));
+      dmobilities_dx[i].push_back(dmdx);
+    }
+  fsp.dmobility_dx = dmobilities_dx;
 }
 
 Real
@@ -244,29 +322,6 @@ FluidStateWaterCO2::viscosity(Real pressure, Real temperature, Real density, uns
   // TODO: effect of co2 in water on viscosity
 
   return fluid_viscosity;
-}
-
-std::vector<std::vector<Real> >
-FluidStateWaterCO2::massFractions(Real pressure, Real temperature) const
-{
-  std::vector<std::vector<Real> > xmass;
-  unsigned int numcomp = numComponents();
-  unsigned int numphase = numPhases();
-
-  xmass.resize(numcomp);
-
-  // Calculate the dissolved mole fraction of CO2 in water
-  Real xco2lm = pressure / FluidStateWaterCO2::henry(temperature);
-  // The mass fraction is then
-  Real xco2l = xco2lm * _Mco2 / (xco2lm * _Mco2 + (1.0 - xco2lm) * _Mh2o);
-
-/// FIXME
-  xmass[0].push_back(1.0 - xco2l); // H2O in liquid
-  xmass[0].push_back(0.0); // H2O in gas
-  xmass[1].push_back(xco2l); // CO2 in liquid
-  xmass[1].push_back(1.0); // CO2 in gas
-
-  return xmass;
 }
 
 Real

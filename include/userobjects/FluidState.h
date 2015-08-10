@@ -172,15 +172,6 @@ public Coupleable
    */
   virtual Real viscosity(Real pressure, Real temperature, Real density, unsigned int phase_index) const = 0;
 
- /**
-   * Mass fractions for each component in each phase.
-   * 2D vector - one row for each component, one column
-   * for each phsae.
-   *
-   * @return mass fracions (-)
-   */
-  virtual std::vector<std::vector<Real> > massFractions(Real pressure, Real temperature) const = 0;
-
   /**
    * Relative permeabilities of each phase
    *

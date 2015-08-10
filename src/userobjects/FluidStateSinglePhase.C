@@ -193,21 +193,6 @@ FluidStateSinglePhase::viscosity(Real pressure, Real temperature, Real density, 
   return fluid_viscosity;
 }
 
-std::vector<std::vector<Real> >
-FluidStateSinglePhase::massFractions(Real pressure, Real temperature) const
-{
-  std::vector<std::vector<Real> > xmass;
-  unsigned int numcomp = numComponents();
-  // unsigned int numphase = numPhases();
-
-  xmass.resize(numcomp);
-
-  xmass[0].push_back(1.0); // Component in phase
-  xmass[0].push_back(0.0); // No other phase
-
-  return xmass;
-}
-
 std::vector<Real>
 FluidStateSinglePhase::relativePermeability(Real liquid_saturation) const
 {

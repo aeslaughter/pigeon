@@ -52,15 +52,6 @@ class FluidStateWaterCO2 : public FluidStateTwoPhase
   virtual Real viscosity(Real pressure, Real temperature, Real density, unsigned int phase_index) const;
 
   /**
-   * Mass fractions for each component in each phase.
-   * 2D vector - one row for each component, one column
-   * for each phsae.
-   *
-   * @return mass fracions (-)
-   */
-  virtual std::vector<std::vector<Real> > massFractions(Real pressure, Real temperature) const;
-
-  /**
    * Derivative of fluid  density with respect to fluid pressure.
    *
    * @param pressure fluid pressure (Pa)

@@ -48,7 +48,7 @@ FluidStateTwoPhase::variablePhase(unsigned int moose_var) const
   else if (moose_var == _svar)
     varphase = _s_phase;
   else
-    mooseError("Variable number " << moose_var << " is not a pressure or saturation variable in the FluidStateTwoPhase UserObject");
+    mooseError("Variable number " << moose_var << " is not a pressure or saturation variable in the " << _short_name << " UserObject");
 
   return varphase;
 }
@@ -80,8 +80,6 @@ FluidStateTwoPhase::thermophysicalProperties(std::vector<Real> primary_vars, Flu
   /// Viscosity of each phase
   std::vector<Real> viscosities(_num_phases);
 
-  /// Water viscosity uses water density in calculation.
-  /// FIXME: check this for correctness!
   viscosities[0] = _liquid_property.viscosity(fsp.pressure[0], node_temperature, fsp.density[0]);
   viscosities[1] = _gas_property.viscosity(fsp.pressure[1], node_temperature);
 
@@ -206,7 +204,7 @@ FluidStateTwoPhase::density(Real pressure, Real temperature, unsigned int phase_
     fluid_density = _gas_property.density(pressure, temperature);
 
   else
-    mooseError("phase_index " << phase_index << " is out of range in FluidStateTwoPhase::density");
+    mooseError("phase_index " << phase_index << " is out of range in " << _short_name <<"::density");
 
   return fluid_density;
 }
@@ -223,28 +221,11 @@ FluidStateTwoPhase::viscosity(Real pressure, Real temperature, Real density, uns
     fluid_viscosity = _gas_property.viscosity(pressure, temperature, density);
 
   else
-    mooseError("phase_index " << phase_index << " is out of range in FluidStateTwoPhase::viscosity");
+    mooseError("phase_index " << phase_index << " is out of range in " << _short_name << "::viscosity");
 
   // TODO: effect of co2 in water on viscosity
 
   return fluid_viscosity;
-}
-
-std::vector<std::vector<Real> >
-FluidStateTwoPhase::massFractions(Real pressure, Real temperature) const
-{
-  std::vector<std::vector<Real> > xmass;
-  unsigned int numcomp = numComponents();
-//  unsigned int numphase = numPhases();
-
-  xmass.resize(numcomp);
-
-  xmass[0].push_back(1.0); // Only liquid component in liquid
-  xmass[0].push_back(0.0); // No liquid component in gas
-  xmass[1].push_back(0.0); // No gas component in liquid
-  xmass[1].push_back(1.0); // Only gas component in gas
-
-  return xmass;
 }
 
 std::vector<Real>
@@ -288,7 +269,7 @@ FluidStateTwoPhase::pressure(Real pressure, Real liquid_saturation) const
     pressures.push_back(pressure);
   }
   else
-    mooseError("Shouldn't get here! Error in pressure phase in FluidStateTwoPhase::pressure");
+    mooseError("Shouldn't get here! Error in pressure phase in " << _short_name <<"::pressure");
 
   return pressures;
 }
@@ -311,7 +292,7 @@ FluidStateTwoPhase::dCapillaryPressure(Real liquid_saturation) const
   dpc.push_back(0.);
   }
   else
-    mooseError("Shouldn't get here! Error in pressure phase in FluidStateTwoPhase::dCapillaryPressure.");
+    mooseError("Shouldn't get here! Error in pressure phase in " << _short_name <<"::dCapillaryPressure.");
 
   return dpc;
 }
@@ -335,7 +316,7 @@ FluidStateTwoPhase::d2CapillaryPressure(Real liquid_saturation) const
   d2pc.push_back(0.);
   }
   else
-    mooseError("Shouldn't get here! Error in pressure phase in FluidStateTwoPhase::dCapillaryPressure.");
+    mooseError("Shouldn't get here! Error in pressure phase in " << _short_name <<"::dCapillaryPressure.");
 
   return d2pc;
 }
@@ -358,7 +339,7 @@ FluidStateTwoPhase::saturation(Real saturation) const
     saturations.push_back(saturation);
   }
   else
-    mooseError("Shouldn't get here! Error in saturation phase in FluidStateTwoPhase::saturation");
+    mooseError("Shouldn't get here! Error in saturation phase in " << _short_name << "::saturation");
 
   return saturations;
 }
@@ -399,7 +380,7 @@ FluidStateTwoPhase::dDensity_dP(Real pressure, Real temperature, unsigned int ph
   else if (phase_index == 1) /// gas phase
     dfluid_density = _gas_property.dDensity_dP(pressure, temperature);
   else
-    mooseError("phase_index " << phase_index << " is out of range in FluidStateTwoPhase::dDensity_dP");
+    mooseError("phase_index " << phase_index << " is out of range in " << _short_name << "::dDensity_dP");
 
 
   return dfluid_density;
@@ -436,7 +417,7 @@ FluidStateTwoPhase::dViscosity_dDensity(Real pressure, Real temperature, Real de
   else if (phase_index == 1) /// gas phase
     dviscosity_ddensity = _gas_property.dViscosity_dDensity(pressure, temperature, density);
   else
-    mooseError("phase_index " << phase_index << " is out of range in FluidStateTwoPhase::dViscosity_dDensity");
+    mooseError("phase_index " << phase_index << " is out of range in " << _short_name <<"::dViscosity_dDensity");
 
   return dviscosity_ddensity;
 }

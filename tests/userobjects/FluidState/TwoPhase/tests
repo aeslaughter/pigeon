@@ -1,14 +1,8 @@
 [Tests]
- [./singlephase1]
+ [./twophase1]
    type = 'CSVDiff'
-   input = 'singlephase1.i'
-   csvdiff = 'singlephase1_nodalproperties_0001.csv'
-   abs_zero = 1.0E-6
- [../]
- [./singlephase2]
-   type = 'CSVDiff'
-   input = 'singlephase2.i'
-   csvdiff = 'singlephase2_nodalproperties_0001.csv'
+   input = 'twophase1.i'
+   csvdiff = 'twophase1_nodalproperties_0001.csv'
    abs_zero = 1.0E-6
  [../]
 []
