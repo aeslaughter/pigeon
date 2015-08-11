@@ -1,0 +1,23 @@
+[Tests]
+ [./firstorder]
+   type = 'Exodiff'
+   input = 'firstorder.i'
+   exodiff = 'firstorder.e'
+ [../]
+ [./firstorder2]
+   type = 'Exodiff'
+   input = 'firstorder.i'
+   exodiff = 'firstorder.e'
+   min_parallel = 2
+ [../]
+ [./secondorder]
+   type = 'Exodiff'
+   input = 'secondorder.i'
+   exodiff = 'secondorder.e'
+ [../]
+ [./secondorder2]
+   type = 'Exodiff'
+   input = 'secondorder.i'
+   exodiff = 'secondorder.e'
+   min_parallel = 2
+[]
