@@ -11,7 +11,7 @@ InputParameters validParams<AntApp>();
 class AntApp : public MooseApp
 {
 public:
-  AntApp(const std::string & name, InputParameters parameters);
+  AntApp(InputParameters parameters);
   virtual ~AntApp();
 
   static void registerApps();
