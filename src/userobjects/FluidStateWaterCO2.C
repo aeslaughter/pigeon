@@ -147,7 +147,7 @@ FluidStateWaterCO2::thermophysicalProperties(std::vector<Real> primary_vars, Flu
 
   fsp.drelperm = drelperm;
 
-  /// Derivative of density wrt pressure
+  /// Derivative of density wrt pressure FIXME!
   std::vector<Real> ddensities_dp(_num_phases);
 
   for (unsigned int i = 0; i < _num_phases; ++i)
@@ -264,64 +264,6 @@ FluidStateWaterCO2::dissolved(Real pressure, Real temperature) const
   Real xco2l = xco2lm * _Mco2 / (xco2lm * _Mco2 + (1.0 - xco2lm) * _Mh2o);
 
   return xco2l;
-}
-
-Real
-FluidStateWaterCO2::density(Real pressure, Real temperature, unsigned int phase_index) const
-{
-  Real fluid_density;
-  // The vapour pressure of H2O
-  Real pv = _water_property.pSat(temperature);
-  // The partial pressure of the CO2 in the gas phase
-  Real co2_partial_pressure = pressure - pv;
-
-  if (phase_index == 0) // Liquid phase
-  {
-    fluid_density = _water_property.density(pressure, temperature);
-
-    // The mass fraction of CO2 in the liquid phase
-    Real xco2l = dissolved(co2_partial_pressure, temperature);
-
-    // The liquid density increase due to dissolved co2
-    fluid_density = 1.0 / (xco2l / _co2_property.partialDensity(temperature) +
-      (1.0 - xco2l) / fluid_density);
-  }
-
-  else if (phase_index == 1) // Gas phase
-  {
-    // The density and viscosity of the gas phase water
-    Real vapour_density = _water_property.density(pv, temperature);
-
-    // The density and viscosity of the gas phase CO2
-    Real co2_density = _co2_property.density(co2_partial_pressure, temperature);
-
-    // The density of the gas is found from the sum of densities for each component
-    fluid_density = co2_density + vapour_density;
-  }
-
-  else
-    mooseError("phase_index is out of range in FluidStateWaterCO2::density");
-
-  return fluid_density;
-}
-
-Real
-FluidStateWaterCO2::viscosity(Real pressure, Real temperature, Real density, unsigned int phase_index) const
-{
-  Real fluid_viscosity;
-
-  if (phase_index == 0)
-    fluid_viscosity = _water_property.viscosity(pressure, temperature, density);
-
-  else if (phase_index == 1)
-    fluid_viscosity = _co2_property.viscosity(pressure, temperature, density);
-
-  else
-    mooseError("phase_index is out of range in FluidStateWaterCO2::viscosity");
-
-  // TODO: effect of co2 in water on viscosity
-
-  return fluid_viscosity;
 }
 
 Real

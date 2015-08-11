@@ -34,7 +34,6 @@ private:
   std::vector<Real> _material_diffusivity;
 
   MaterialProperty<std::vector<RealGradient> > & _phase_flux_no_mobility;
-  MaterialProperty<std::vector<Real> > & _phase_mass;
   MaterialProperty<std::vector<Real> > & _dpressure_flux_dp;
   MaterialProperty<std::vector<Real> > & _dpressure_flux_ds;
   MaterialProperty<std::vector<RealVectorValue> > & _dgravity_flux_dp;
@@ -49,7 +48,6 @@ private:
   VariableGradient & _grad_primary_pressure;
   VariableValue & _temperature;
   VariableValue & _primary_mass_fraction;
-  std::vector<VariableValue *> _density;
   unsigned int _num_phases;
   unsigned int _num_components;
   unsigned int _phase_index;
@@ -67,6 +65,8 @@ private:
   unsigned int _p_phase;
   unsigned int _s_phase;
 
+  const VariablePhiValue  & _phi;
+
 };
 
-#endif //FLUIDSTATEMATERAIL_H
+#endif //FLUIDSTATEMATERIAL_H

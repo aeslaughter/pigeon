@@ -153,26 +153,6 @@ public Coupleable
   virtual unsigned int primaryComponentIndex() const;
 
   /**
-   * Fluid density must be over-written in all derived classes.
-   *
-   * @param pressure pressure (Pa)
-   * @param temperature  temperature (C)
-   * @param phase_index index of phase
-   * @return fluid density of phase (kg/m^3)
-   */
-  virtual Real density(Real pressure, Real temperature, unsigned int phase_index) const = 0;
-
-  /**
-   * Liquid viscosity must be over-written in all derived classes.
-   *
-   * @param pressure liquid pressure (Pa)
-   * @param temperature liquid temperature (C)
-   * @param xmass vector of component mass fractions (kg/kg)
-   * @return liquid viscosity (Pa.s)
-   */
-  virtual Real viscosity(Real pressure, Real temperature, Real density, unsigned int phase_index) const = 0;
-
-  /**
    * Relative permeabilities of each phase
    *
    * @param saturation liquid saturation
@@ -247,16 +227,6 @@ public Coupleable
    * @return sign of derivative
    */
   virtual Real dMassFraction_dX(unsigned int var) const = 0;
-
-  /**
-   * Derivative of fluid  density with respect to fluid pressure.
-   *
-   * @param pressure fluid pressure (Pa)
-   * @param temperature fluid temperature (C)
-   * @param phase_index index of phase
-   * @return fluid density vector (element for each phase) (kg/m^3)
-   */
-  virtual Real dDensity_dP(Real pressure, Real temperature, unsigned int phase_index = 0) const = 0;
 
   /**
    * Derivative of fluid  density with respect to mass fraction.

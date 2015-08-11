@@ -17,7 +17,6 @@ InputParameters validParams<FluidStateMaterial>()
   params.addRequiredCoupledVar("primary_pressure_variable", "The primary pressure variable");
   params.addCoupledVar("primary_mass_fraction_variable", 1.0, "The primary mass fraction variable");
   params.addRequiredCoupledVar("temperature_variable", "The temperature variable");
-  params.addRequiredCoupledVar("fluid_density_variables", "The density of each fluid phase");
   params.addParam<std::vector<Real> >("diffusivity", "Vector of diffusivity for each component in each phase. Order is i) component 1 in phase 1; ii) component 1 in phase 2 ...; component 2 in phase 1; ... component n in phase m (m^2/s");
   params.addParam<bool>("has_diffusion", false, "Is diffusion being modelled?");
   return params;
@@ -32,7 +31,6 @@ FluidStateMaterial::FluidStateMaterial(const InputParameters & parameters) :
 
     // Declare vector of phase fluxes (without mobility)
     _phase_flux_no_mobility(declareProperty<std::vector<RealGradient> >("phase_flux_no_mobility")),
-    _phase_mass(declareProperty<std::vector<Real> >("phase_mass")),
     _dpressure_flux_dp(declareProperty<std::vector<Real> >("dpressure_flux_dp")),
     _dpressure_flux_ds(declareProperty<std::vector<Real> >("dpressure_flux_ds")),
     _dgravity_flux_dp(declareProperty<std::vector<RealVectorValue> >("dgravity_flux_dp")),
@@ -50,7 +48,8 @@ FluidStateMaterial::FluidStateMaterial(const InputParameters & parameters) :
     _svar(coupled("primary_saturation_variable")),
     _xvar(coupled("primary_mass_fraction_variable")),
     _has_diffusion(getParam<bool>("has_diffusion")),
-    _fluid_state(getUserObject<FluidState>("fluid_state_uo"))
+    _fluid_state(getUserObject<FluidState>("fluid_state_uo")),
+    _phi(_assembly.phi())
 
 {
   /// The number of phases in the given FluidState model
@@ -58,10 +57,6 @@ FluidStateMaterial::FluidStateMaterial(const InputParameters & parameters) :
 
   /// The number of components in the given FluidState model
   _num_components = _fluid_state.numComponents();
-
-  /// Check that the required number (_num_phases) of auxillary variables have been provided
-  if (coupledComponents("fluid_density_variables") != _num_phases)
-    mooseError("The number of phase densities provided in FluidStateMaterial is not equal to the number of phases in the FluidState UserObject");
 
   /**
    * Check that the required number (_num_phases * _num_components) of diffusivities have been provided if the
@@ -90,7 +85,6 @@ FluidStateMaterial::computeQpProperties()
   else
     temperature = _temperature[_qp];
 
-
   std::vector<Real> pressure, saturation;
 
   /// Compute pressure, saturation and density at the qp's
@@ -98,13 +92,37 @@ FluidStateMaterial::computeQpProperties()
   Real liquid_saturation = saturation[0];
   pressure = _fluid_state.pressure(_primary_pressure[_qp], liquid_saturation);
 
-  _phase_mass[_qp].resize(_num_phases);
-  _density.resize(_num_phases);
+  /**
+   * As density and its derivatives are calculated at the nodes in the FluidStateMaterial
+   * UserObject, we will project their values onto the quadrature points using the shape
+   * function _phi. This cuts down on code duplication in the FluidState UserObject, particularly
+   * where density is a function of mass fraction of multiple components
+   */
 
-  for (unsigned int n = 0; n < _num_phases; ++n)
+  Real qp_density = 0.;
+  Real qp_ddensity_dp = 0.;
+  Real node_density = 0.;
+  Real node_ddensity_dp = 0.;
+
+  /// Loop over all nodes on this element for each phase
+  const Node * current_node;
+  unsigned int nodeid;
+
+  for (unsigned int j = 0; j < _num_phases; ++j)
   {
-    _density[n] = &coupledValue("fluid_density_variables", n);
-    _phase_mass[_qp][n] = (*_density[n])[_qp] * saturation[n];
+    for (unsigned int i = 0; i < _phi.size(); ++i)
+    {
+      current_node = _current_elem->get_node(i);
+      nodeid = current_node->id();
+
+      /// Density and required derivatives at the node
+      node_density = _fluid_state.getNodalProperty("density", nodeid, j);
+      node_ddensity_dp = _fluid_state.getNodalProperty("ddensity_dp", nodeid, j);
+
+      //  Density and required derivatives at the qps
+      qp_density += _phi[i][_qp] * node_density;
+      qp_ddensity_dp += _phi[i][_qp] * node_ddensity_dp;
+    }
   }
 
   /// Initialise the size of the material property vectors
@@ -119,6 +137,10 @@ FluidStateMaterial::computeQpProperties()
 
   /// Depending on the primary saturation, the sign of the gradient in saturation is + or -
   Real sgns;
+  /// Derivative of capillary pressure wrt liquid saturation
+  std::vector<Real> dcapillary_pressure = _fluid_state.dCapillaryPressure(liquid_saturation);
+  /// Second derivative of capillary pressure wrt liquid saturation
+  std::vector<Real> d2capillary_pressure = _fluid_state.d2CapillaryPressure(liquid_saturation);
 
   /// Loop over all phases and calculate the phase flux and derivatives
   for (unsigned int n = 0; n < _num_phases; ++n)
@@ -127,25 +149,24 @@ FluidStateMaterial::computeQpProperties()
     sgns = _fluid_state.dSaturation_dS(n);
 
     /// The pressure gradient of phase n
-    grad_pressure = _grad_primary_pressure[_qp] + sgns * _fluid_state.dCapillaryPressure(liquid_saturation)[n] *
+    grad_pressure = _grad_primary_pressure[_qp] + sgns * dcapillary_pressure[n] *
       _grad_primary_saturation[_qp];
 
     /// Advective flux (without mobility) of phase n
-    _phase_flux_no_mobility[_qp][n] = (grad_pressure - (*_density[n])[_qp] * _gravity[_qp]);
-
+    _phase_flux_no_mobility[_qp][n] = (grad_pressure - qp_density * _gravity[_qp]);
     /// Derivative of gravity flux (density * gravity) of phase n wrt pressure
-    _dgravity_flux_dp[_qp][n] = - _fluid_state.dDensity_dP(pressure[n], temperature, n) * _gravity[_qp];
+    _dgravity_flux_dp[_qp][n] = - qp_ddensity_dp * _gravity[_qp];
 
     /// Derivative of gravity flux (density * gravity) of phase n wrt saturation
     /// Note: add d2(Pc)/dS2 term here, and note that the sign is correct (sgns * sgns = 1 always)
-    _dgravity_flux_ds[_qp][n] = sgns * _fluid_state.dCapillaryPressure(liquid_saturation)[n] * _dgravity_flux_dp[_qp][n] +
-      _fluid_state.d2CapillaryPressure(liquid_saturation)[n] * _grad_primary_saturation[_qp];
+    _dgravity_flux_ds[_qp][n] = sgns * dcapillary_pressure[n] * _dgravity_flux_dp[_qp][n] +
+      d2capillary_pressure[n] * _grad_primary_saturation[_qp];
 
     /// Derivative of pressure flux (GradP) of phase n wrt pressure
     _dpressure_flux_dp[_qp][n] = 1.0;
 
     /// Derivative of pressure flux (GradP) of phase n wrt saturation
-    _dpressure_flux_ds[_qp][n] = sgns * _fluid_state.dCapillaryPressure(liquid_saturation)[n];
+    _dpressure_flux_ds[_qp][n] = sgns * dcapillary_pressure[n];
   }
 
   /// The sign of the derivative of flux wrt mass fraction
@@ -154,13 +175,11 @@ FluidStateMaterial::computeQpProperties()
   /// Loop over all components and phases and calculate derivative of the flux wrt mass fraction
   for (unsigned int i = 0; i < _num_components; ++i)
   {
+    // FIXME
     // Check if the compnent index is the primary component index and set the sign of the derivative appropriately
     sgnx = (i == _fluid_state.primaryComponentIndex() ? 1.0 : -1.0);
 
     for (unsigned int n = 0; n < _num_phases; ++n)
       _dgravity_flux_dx[_qp][i].push_back(sgnx * _fluid_state.dDensity_dX(pressure[n], temperature, n) * _gravity[_qp]);
   }
-
-
-
 }

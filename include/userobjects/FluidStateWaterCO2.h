@@ -34,24 +34,6 @@ class FluidStateWaterCO2 : public FluidStateTwoPhase
   FluidStateWaterCO2(const InputParameters & parameters);
 
   /**
-   * Fluid density for each phase
-   *
-   * @param pressure phase pressure (Pa)
-   * @param temperature temperature (C)
-   * @return fluid density (kg/m^3)
-   */
-  virtual Real density(Real pressure, Real temperature, unsigned int phase_index) const;
-
-  /**
-   * Fluid viscosity for each phase
-   *
-   * @param pressure liquid pressure (Pa)
-   * @param temperature liquid temperature (C)
-   * @return fluid viscosity (liquid and gas) (Pa.s)
-   */
-  virtual Real viscosity(Real pressure, Real temperature, Real density, unsigned int phase_index) const;
-
-  /**
    * Derivative of fluid  density with respect to fluid pressure.
    *
    * @param pressure fluid pressure (Pa)

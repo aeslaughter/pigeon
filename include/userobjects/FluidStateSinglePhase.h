@@ -43,27 +43,6 @@ class FluidStateSinglePhase : public FluidState
   virtual unsigned int variablePhase(unsigned int moose_var) const;
 
   /**
-   * Fluid density
-   *
-   * @param pressure phase pressure (Pa)
-   * @param temperature temperature (C)
-   * @param phase_index phase index (not used)
-   * @return fluid density (kg/m^3)
-   */
-  virtual Real density(Real pressure, Real temperature, unsigned int phase_index) const;
-
-  /**
-   * Fluid viscosity
-   *
-   * @param pressure phase pressure (Pa)
-   * @param temperature temperature (C)
-   * @param density phase density (kg/m^3)
-   * @param phase_index phase index (not used)
-   * @return fluid viscosity (Pa.s)
-   */
-  virtual Real viscosity(Real pressure, Real temperature, Real density, unsigned int phase_index) const;
-
-  /**
    * Relative permeabilities of each phase
    *
    * @param saturation liquid saturation
@@ -139,17 +118,6 @@ class FluidStateSinglePhase : public FluidState
    * @return sign of derivative
    */
   virtual Real dMassFraction_dX(unsigned int component_index) const;
-
-  /**
-   * Derivative of fluid density with respect to fluid pressure.
-   *
-   * @param pressure fluid pressure (Pa)
-   * @param temperature fluid temperature (C)
-   * @param phase_index index of phase
-   * @return derivative of density wrt pressure
-   */
-
-  virtual Real dDensity_dP(Real pressure, Real temperature, unsigned int phase_index = 0) const;
 
   /**
    * Derivative of fluid density with respect to mass fraction.

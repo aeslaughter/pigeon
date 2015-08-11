@@ -123,8 +123,8 @@ FluidStateTwoPhase::thermophysicalProperties(std::vector<Real> primary_vars, Flu
   /// Derivative of density wrt pressure
   std::vector<Real> ddensities_dp(_num_phases);
 
-  for (unsigned int i = 0; i < _num_phases; ++i)
-    ddensities_dp[i] = dDensity_dP(fsp.pressure[i], node_temperature, i);
+  ddensities_dp[0] = _liquid_property.dDensity_dP(fsp.pressure[0],  node_temperature);
+  ddensities_dp[1] = _gas_property.dDensity_dP(fsp.pressure[1],  node_temperature);
 
   fsp.ddensity_dp = ddensities_dp;
 
@@ -190,42 +190,6 @@ unsigned int
 FluidStateTwoPhase::getPrimarySaturationVar() const
 {
   return _svar;
-}
-
-Real
-FluidStateTwoPhase::density(Real pressure, Real temperature, unsigned int phase_index) const
-{
-  Real fluid_density;
-
-  if (phase_index == 0) // Liquid phase
-  fluid_density = _liquid_property.density(pressure, temperature);
-
-  else if (phase_index == 1) // Gas phase
-    fluid_density = _gas_property.density(pressure, temperature);
-
-  else
-    mooseError("phase_index " << phase_index << " is out of range in " << _short_name <<"::density");
-
-  return fluid_density;
-}
-
-Real
-FluidStateTwoPhase::viscosity(Real pressure, Real temperature, Real density, unsigned int phase_index) const
-{
-  Real fluid_viscosity;
-
-  if (phase_index == 0)
-    fluid_viscosity = _liquid_property.viscosity(pressure, temperature, density);
-
-  else if (phase_index == 1)
-    fluid_viscosity = _gas_property.viscosity(pressure, temperature, density);
-
-  else
-    mooseError("phase_index " << phase_index << " is out of range in " << _short_name << "::viscosity");
-
-  // TODO: effect of co2 in water on viscosity
-
-  return fluid_viscosity;
 }
 
 std::vector<Real>
@@ -368,22 +332,6 @@ FluidStateTwoPhase::dSaturation_dSl(unsigned int var) const
     sgn *= -1.0;
 
   return sgn;
-}
-
-Real
-FluidStateTwoPhase::dDensity_dP(Real pressure, Real temperature, unsigned int phase_index) const
-{
-  Real dfluid_density;
-
-  if (phase_index == 0) /// liquid phase
-    dfluid_density = _liquid_property.dDensity_dP(pressure, temperature);
-  else if (phase_index == 1) /// gas phase
-    dfluid_density = _gas_property.dDensity_dP(pressure, temperature);
-  else
-    mooseError("phase_index " << phase_index << " is out of range in " << _short_name << "::dDensity_dP");
-
-
-  return dfluid_density;
 }
 
 Real

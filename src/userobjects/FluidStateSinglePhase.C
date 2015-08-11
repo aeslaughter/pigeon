@@ -110,8 +110,7 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
   /// Derivative of density wrt pressure
   std::vector<Real> ddensities_dp(_num_phases);
 
-  for (unsigned int n = 0; n < _num_phases; ++n)
-    ddensities_dp[n] = dDensity_dP(fsp.pressure[n], node_temperature, n);
+  ddensities_dp[0] = _fluid_property.dDensity_dP(fsp.pressure[0], node_temperature);
 
   fsp.ddensity_dp = ddensities_dp;
 
@@ -175,22 +174,6 @@ FluidStateSinglePhase::thermophysicalProperties(std::vector<Real> primary_vars, 
       dmobilities_dx[i].push_back(dmdx);
     }
   fsp.dmobility_dx = dmobilities_dx;
-}
-
-Real
-FluidStateSinglePhase::density(Real pressure, Real temperature, unsigned int phase_index) const
-{
-  Real fluid_density = _fluid_property.density(pressure, temperature);
-
-  return fluid_density;
-}
-
-Real
-FluidStateSinglePhase::viscosity(Real pressure, Real temperature, Real density, unsigned int phase_index) const
-{
-  Real fluid_viscosity = _fluid_property.viscosity(pressure, temperature, density);
-
-  return fluid_viscosity;
 }
 
 std::vector<Real>
@@ -269,14 +252,6 @@ Real
 FluidStateSinglePhase::dMassFraction_dX(unsigned int component_index) const
 {
   return (component_index == _component_index ? 1.0 : -1.0);
-}
-
-Real
-FluidStateSinglePhase::dDensity_dP(Real pressure, Real temperature, unsigned int phase_index) const
-{
-  Real dfluid_density = _fluid_property.dDensity_dP(pressure, temperature);
-
-  return dfluid_density;
 }
 
 Real

@@ -11,17 +11,21 @@
   dim = 1
   nx = 7
   xmax = 100
+  elem_type = EDGE3
 []
 
 [Variables]
   [./pressure]
+    order = second
   [../]
 []
 
 [AuxVariables]
   [./density]
+    order = second
   [../]
   [./residual]
+    order = second
   [../]
 []
 
