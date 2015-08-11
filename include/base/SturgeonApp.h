@@ -11,7 +11,7 @@ InputParameters validParams<SturgeonApp>();
 class SturgeonApp : public MooseApp
 {
 public:
-  SturgeonApp(const std::string & name, InputParameters parameters);
+  SturgeonApp(InputParameters parameters);
   virtual ~SturgeonApp();
 
   static void registerApps();
