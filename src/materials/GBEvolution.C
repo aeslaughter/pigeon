@@ -19,9 +19,8 @@ InputParameters validParams<GBEvolution>()
 }
 
 
-GBEvolution::GBEvolution(const std::string & name,
-                         InputParameters parameters) :
-    Material(name, parameters),
+GBEvolution::GBEvolution(const InputParameters & parameters) :
+    Material(parameters),
     _f0s(getParam<Real>("f0s")),
     _wGB(getParam<Real>("wGB")),
     _length_scale(getParam<Real>("length_scale")),

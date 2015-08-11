@@ -19,7 +19,7 @@ InputParameters validParams<ACParsed>();
 class ACParsed : public DerivativeKernelInterface<JvarMapInterface<ACBulk> >
 {
 public:
-  ACParsed(const std::string & name, InputParameters parameters);
+  ACParsed(const InputParameters & parameters);
 
 protected:
   virtual Real computeDFDOP(PFFunctionType type);

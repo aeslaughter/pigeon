@@ -13,7 +13,7 @@ InputParameters validParams<SplitCHWRes>();
 class SplitCHWRes : public Kernel
 {
 public:
-  SplitCHWRes(const std::string & name, InputParameters parameters);
+  SplitCHWRes(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpResidual();

@@ -16,7 +16,7 @@ InputParameters validParams<Porosity>();
 class Porosity : public ElementAverageValue
 {
 public:
-  Porosity(const std::string & name, InputParameters parameters);
+  Porosity(const InputParameters & parameters);
 
   virtual Real computeQpIntegral();
 };

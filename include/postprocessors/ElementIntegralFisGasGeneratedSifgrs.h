@@ -15,7 +15,7 @@ InputParameters validParams<ElementIntegralFisGasGeneratedSifgrs>();
 class ElementIntegralFisGasGeneratedSifgrs : public ElementIntegralVariablePostprocessor
 {
 public:
-  ElementIntegralFisGasGeneratedSifgrs(const std::string & name, InputParameters parameters);
+  ElementIntegralFisGasGeneratedSifgrs(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpIntegral();

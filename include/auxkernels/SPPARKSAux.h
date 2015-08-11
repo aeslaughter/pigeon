@@ -12,7 +12,7 @@ class SPPARKSAux : public AuxKernel
 {
 public:
 
-  SPPARKSAux(const std::string & name, InputParameters params);
+  SPPARKSAux(const InputParameters & params);
   virtual ~SPPARKSAux() {}
 
   virtual Real computeValue();

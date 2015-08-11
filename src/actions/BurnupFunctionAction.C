@@ -20,8 +20,7 @@ InputParameters validParams<BurnupFunctionAction>()
   return params;
 }
 
-BurnupFunctionAction::BurnupFunctionAction(const std::string & name,
-                                           InputParameters params) :
-  AddFunctionAction(name, params)
+BurnupFunctionAction::BurnupFunctionAction(InputParameters params) :
+  AddFunctionAction(params)
 {
 }

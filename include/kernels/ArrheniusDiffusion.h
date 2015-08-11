@@ -14,7 +14,7 @@ class ArrheniusDiffusion : public Diffusion
 {
 public:
 
-  ArrheniusDiffusion(const std::string & name, InputParameters parameters);
+  ArrheniusDiffusion(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpResidual();

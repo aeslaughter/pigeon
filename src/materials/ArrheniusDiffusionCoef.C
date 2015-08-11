@@ -25,9 +25,8 @@ InputParameters validParams<ArrheniusDiffusionCoef>()
   return params;
 }
 
-ArrheniusDiffusionCoef::ArrheniusDiffusionCoef(const std::string & name,
-                             InputParameters parameters)
-  :Material(name, parameters),
+ArrheniusDiffusionCoef::ArrheniusDiffusionCoef(const InputParameters & parameters)
+  :Material(parameters),
 
    _d1(getParam<Real>("d1")),
    _d1_function(isParamValid("d1_function") ? &getFunction("d1_function") : NULL),

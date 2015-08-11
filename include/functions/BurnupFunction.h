@@ -356,7 +356,7 @@ private:
 
 public:
 
-  BurnupFunction(const std::string & name, InputParameters parameters);
+  BurnupFunction(const InputParameters & parameters);
 
   void setup(const Real delta_t, const Real time);
 

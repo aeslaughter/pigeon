@@ -13,7 +13,7 @@ class BndsCalcAux : public AuxKernel
 {
 public:
 
-  BndsCalcAux(const std::string & name, InputParameters parameters);
+  BndsCalcAux(const InputParameters & parameters);
 
 protected:
   virtual Real computeValue();

@@ -12,8 +12,7 @@ InputParameters validParams<GBEvolution>();
 class GBEvolution : public Material
 {
 public:
-  GBEvolution(const std::string & name,
-              InputParameters parameters);
+  GBEvolution(const InputParameters & parameters);
 
 protected:
   virtual void computeQpProperties();

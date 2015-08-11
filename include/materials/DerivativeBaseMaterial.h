@@ -37,7 +37,7 @@ InputParameters validParams<DerivativeBaseMaterial>();
 class DerivativeBaseMaterial : public DerivativeMaterialInterface<Material>
 {
 public:
-  DerivativeBaseMaterial(const std::string & name, InputParameters parameters);
+  DerivativeBaseMaterial(const InputParameters & parameters);
 
 protected:
   virtual void computeProperties();

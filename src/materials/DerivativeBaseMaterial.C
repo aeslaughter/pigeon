@@ -10,9 +10,8 @@ InputParameters validParams<DerivativeBaseMaterial>()
   return params;
 }
 
-DerivativeBaseMaterial::DerivativeBaseMaterial(const std::string & name,
-                                               InputParameters parameters) :
-    DerivativeMaterialInterface<Material>(name, parameters),
+DerivativeBaseMaterial::DerivativeBaseMaterial(const InputParameters & parameters) :
+    DerivativeMaterialInterface<Material>(parameters),
     _F_name(getParam<std::string>("f_name")),
     _third_derivatives(getParam<bool>("third_derivatives")),
     _prop_F(&declareProperty<Real>(_F_name)),

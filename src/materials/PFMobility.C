@@ -9,9 +9,8 @@ InputParameters validParams<PFMobility>()
   return params;
 }
 
-PFMobility::PFMobility(const std::string & name,
-                       InputParameters parameters) :
-    Material(name, parameters),
+PFMobility::PFMobility(const InputParameters & parameters) :
+    Material(parameters),
     _M(declareProperty<Real>("M")),
     _grad_M(declareProperty<RealGradient>("grad_M")),
     _kappa_c(declareProperty<Real>("kappa_c")),

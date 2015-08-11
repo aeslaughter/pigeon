@@ -12,7 +12,7 @@ class PelletBrittleZone : public ElementUserObject
 {
 
   public:
-    PelletBrittleZone(const std::string & name, InputParameters parameters);
+    PelletBrittleZone(const InputParameters & parameters);
 
     virtual void initialize();
     virtual void execute();

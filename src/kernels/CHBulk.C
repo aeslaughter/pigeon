@@ -11,8 +11,8 @@ InputParameters validParams<CHBulk>()
   return params;
 }
 
-CHBulk::CHBulk(const std::string & name, InputParameters parameters) :
-    KernelGrad(name, parameters),
+CHBulk::CHBulk(const InputParameters & parameters) :
+    KernelGrad(parameters),
     _mob_name(getParam<std::string>("mob_name")),
     _Dmob_name(getParam<std::string>("Dmob_name")),
     _M(getMaterialProperty<Real>(_mob_name)),

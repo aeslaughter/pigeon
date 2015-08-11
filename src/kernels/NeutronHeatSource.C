@@ -27,8 +27,8 @@ InputParameters validParams<NeutronHeatSource>()
   return params;
 }
 
-NeutronHeatSource::NeutronHeatSource(const std::string & name, InputParameters parameters)
-  :Kernel(name, parameters),
+NeutronHeatSource::NeutronHeatSource(const InputParameters & parameters)
+  :Kernel(parameters),
    _energy_per_fission(getParam<Real>("energy_per_fission")),
    _units(getParam<std::string>("units")),
    _has_fission_rate(isCoupled("fission_rate")),

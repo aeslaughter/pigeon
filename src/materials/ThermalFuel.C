@@ -62,9 +62,8 @@ InputParameters validParams<ThermalFuel>()
   return params;
 }
 
-ThermalFuel::ThermalFuel(const std::string & name,
-                       InputParameters parameters) :
-  Material(name, parameters),
+ThermalFuel::ThermalFuel(const InputParameters & parameters) :
+  Material(parameters),
 
   _has_temp(isCoupled("temp")),
   _temp(_has_temp ? coupledValue("temp") : _zero),

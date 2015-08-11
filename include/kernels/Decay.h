@@ -13,7 +13,7 @@ class Decay : public Kernel
 {
 public:
 
-  Decay(const std::string & name, InputParameters parameters);
+  Decay(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpResidual();

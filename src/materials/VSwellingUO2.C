@@ -29,8 +29,8 @@ InputParameters validParams<VSwellingUO2>()
   return params;
 }
 
-VSwellingUO2::VSwellingUO2( const std::string & name, InputParameters parameters)
-  :VolumetricModel( name, parameters ),
+VSwellingUO2::VSwellingUO2(const InputParameters & parameters)
+  :VolumetricModel(parameters),
    _has_burnup(isCoupled("burnup")),
 
    _burnup(_has_burnup ? coupledValue("burnup") : _zero),

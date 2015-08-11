@@ -6,7 +6,7 @@
 class BurnupAuxKernelsAction : public Action
 {
 public:
-  BurnupAuxKernelsAction(const std::string & name, InputParameters params);
+  BurnupAuxKernelsAction(InputParameters params);
 
   virtual void act();
 

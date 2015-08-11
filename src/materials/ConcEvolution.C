@@ -17,9 +17,8 @@ InputParameters validParams<ConcEvolution>()
   return params;
 }
 
-ConcEvolution::ConcEvolution(const std::string & name,
-                             InputParameters parameters) :
-    Material(name, parameters),
+ConcEvolution::ConcEvolution(const InputParameters & parameters) :
+    Material(parameters),
     _c(coupledValue("c")),
     _grad_c(coupledGradient("c") ),
     _T(coupledValue("T")),

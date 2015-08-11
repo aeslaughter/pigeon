@@ -28,8 +28,8 @@ InputParameters validParams<BurnupAux>()
   return params;
 }
 
-BurnupAux::BurnupAux(const std::string & name, InputParameters parameters)
-  :AuxKernel(name, parameters),
+BurnupAux::BurnupAux(const InputParameters & parameters)
+  :AuxKernel(parameters),
    _molecular_weight(getParam<Real>("molecular_weight")),
    _density(getParam<Real>("density")),
    _fission_rate(coupledValue("fission_rate"))

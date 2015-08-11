@@ -9,8 +9,8 @@ InputParameters validParams<ACInterface>()
   return params;
 }
 
-ACInterface::ACInterface(const std::string & name, InputParameters parameters) :
-    KernelGrad(name, parameters),
+ACInterface::ACInterface(const InputParameters & parameters) :
+    KernelGrad(parameters),
     _mob_name(getParam<std::string>("mob_name")),
     _kappa_name(getParam<std::string>("kappa_name")),
     _kappa(getMaterialProperty<Real>(_kappa_name)),

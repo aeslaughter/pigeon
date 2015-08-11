@@ -6,7 +6,7 @@
 class BurnupAuxVarsAction : public Action
 {
 public:
-  BurnupAuxVarsAction(const std::string & name, InputParameters params);
+  BurnupAuxVarsAction(InputParameters params);
   virtual ~BurnupAuxVarsAction(){}
   virtual void act();
 

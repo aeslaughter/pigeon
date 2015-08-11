@@ -15,7 +15,7 @@ InputParameters validParams<ElementIntegralFisGasGrainSifgrs>();
 class ElementIntegralFisGasGrainSifgrs : public ElementIntegralVariablePostprocessor
 {
 public:
-  ElementIntegralFisGasGrainSifgrs(const std::string & name, InputParameters parameters);
+  ElementIntegralFisGasGrainSifgrs(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpIntegral();

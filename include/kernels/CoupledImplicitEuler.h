@@ -15,7 +15,7 @@ InputParameters validParams<CoupledImplicitEuler>();
 class CoupledImplicitEuler : public Kernel
 {
 public:
-  CoupledImplicitEuler(const std::string & name, InputParameters parameters);
+  CoupledImplicitEuler(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpResidual();

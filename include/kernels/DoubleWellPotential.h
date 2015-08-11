@@ -15,7 +15,7 @@ InputParameters validParams<DoubleWellPotential>();
 class DoubleWellPotential : public ACBulk
 {
 public:
-  DoubleWellPotential(const std::string & name, InputParameters parameters);
+  DoubleWellPotential(const InputParameters & parameters);
 
 protected:
   virtual Real computeDFDOP(PFFunctionType type);

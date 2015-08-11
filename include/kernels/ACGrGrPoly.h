@@ -17,7 +17,7 @@ InputParameters validParams<ACGrGrPoly>();
 class ACGrGrPoly : public ACBulk
 {
 public:
-  ACGrGrPoly(const std::string & name, InputParameters parameters);
+  ACGrGrPoly(const InputParameters & parameters);
 
 protected:
   virtual Real computeDFDOP(PFFunctionType type);

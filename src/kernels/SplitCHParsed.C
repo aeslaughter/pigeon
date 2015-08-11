@@ -8,8 +8,8 @@ InputParameters validParams<SplitCHParsed>()
   return params;
 }
 
-SplitCHParsed::SplitCHParsed(const std::string & name, InputParameters parameters) :
-    DerivativeKernelInterface<JvarMapInterface<SplitCHCRes> >(name, parameters),
+SplitCHParsed::SplitCHParsed(const InputParameters & parameters) :
+    DerivativeKernelInterface<JvarMapInterface<SplitCHCRes> >(parameters),
     _dFdc(getMaterialPropertyDerivative<Real>(_F_name, _var.name())),
     _d2Fdc2(getMaterialPropertyDerivative<Real>(_F_name, _var.name(), _var.name()))
 {

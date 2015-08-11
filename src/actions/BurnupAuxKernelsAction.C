@@ -22,9 +22,8 @@ InputParameters validParams<BurnupAuxKernelsAction>()
   return params;
 }
 
-BurnupAuxKernelsAction::BurnupAuxKernelsAction(const std::string & name,
-                                               InputParameters params) :
-  Action(name, params),
+BurnupAuxKernelsAction::BurnupAuxKernelsAction(InputParameters params) :
+  Action(params),
   _blocks(getParam<std::vector<SubdomainName> >("block")),
   _energy_per_fission(getParam<Real>("energy_per_fission")),
   _N235(getParam<std::string>("N235")),

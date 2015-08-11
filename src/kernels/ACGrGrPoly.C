@@ -11,8 +11,8 @@ InputParameters validParams<ACGrGrPoly>()
   return params;
 }
 
-ACGrGrPoly::ACGrGrPoly(const std::string & name, InputParameters parameters) :
-    ACBulk(name,parameters),
+ACGrGrPoly::ACGrGrPoly(const InputParameters & parameters) :
+    ACBulk(parameters),
     _mu(getMaterialProperty<Real>("mu")),
     _gamma(getMaterialProperty<Real>("gamma_asymm")),
     _tgrad_corr_mult(getMaterialProperty<Real>("tgrad_corr_mult")),

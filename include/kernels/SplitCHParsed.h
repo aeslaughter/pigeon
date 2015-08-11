@@ -20,7 +20,7 @@ InputParameters validParams<SplitCHParsed>();
 class SplitCHParsed : public DerivativeKernelInterface<JvarMapInterface<SplitCHCRes> >
 {
 public:
-  SplitCHParsed(const std::string & name, InputParameters parameters);
+  SplitCHParsed(const InputParameters & parameters);
 
 protected:
   virtual Real computeDFDC(PFFunctionType type);

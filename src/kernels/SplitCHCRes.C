@@ -11,8 +11,8 @@ InputParameters validParams<SplitCHCRes>()
   return params;
 }
 
-SplitCHCRes::SplitCHCRes(const std::string & name, InputParameters parameters) :
-    SplitCHBase(name, parameters),
+SplitCHCRes::SplitCHCRes(const InputParameters & parameters) :
+    SplitCHBase(parameters),
     _kappa_name(getParam<std::string>("kappa_name")),
     _kappa(getMaterialProperty<Real>(_kappa_name)),
     _w_var(coupled("w")),

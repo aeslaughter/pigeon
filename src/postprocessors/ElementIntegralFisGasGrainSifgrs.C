@@ -7,8 +7,8 @@ InputParameters validParams<ElementIntegralFisGasGrainSifgrs>()
   return params;
 }
 
-ElementIntegralFisGasGrainSifgrs::ElementIntegralFisGasGrainSifgrs(const std::string & name, InputParameters parameters) :
-    ElementIntegralVariablePostprocessor(name, parameters),
+ElementIntegralFisGasGrainSifgrs::ElementIntegralFisGasGrainSifgrs(const InputParameters & parameters) :
+    ElementIntegralVariablePostprocessor(parameters),
     _gas_grn_3(getMaterialProperty<Real>("gas_grn_3"))
 {}
 

@@ -14,7 +14,7 @@ InputParameters validParams<CalcDiffusion>();
 class CalcDiffusion : public Diffusion
 {
 public:
- CalcDiffusion (const std::string & name, InputParameters parameters);
+ CalcDiffusion(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpResidual();

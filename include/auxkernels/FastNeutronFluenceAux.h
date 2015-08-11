@@ -20,7 +20,7 @@ public:
    * Factory constructor, takes parameters so that all derived classes can be built using the same
    * constructor.
    */
-  FastNeutronFluenceAux(const std::string & name, InputParameters parameters);
+  FastNeutronFluenceAux(const InputParameters & parameters);
 
   virtual ~FastNeutronFluenceAux() {}
 

@@ -17,8 +17,7 @@ InputParameters validParams<ConcEvolution>();
 class ConcEvolution : public Material
 {
 public:
-  ConcEvolution(const std::string & name,
-          InputParameters parameters);
+  ConcEvolution(const InputParameters & parameters);
 
 protected:
   virtual void computeProperties();

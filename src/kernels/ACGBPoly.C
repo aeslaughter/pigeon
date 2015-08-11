@@ -11,8 +11,8 @@ InputParameters validParams<ACGBPoly>()
   return params;
 }
 
-ACGBPoly::ACGBPoly(const std::string & name, InputParameters parameters) :
-    ACBulk(name,parameters),
+ACGBPoly::ACGBPoly(const InputParameters & parameters) :
+    ACBulk(parameters),
     _c(coupledValue("c")),
     _c_var(coupled("c")),
     _mu(getMaterialProperty<Real>("mu")),

@@ -13,7 +13,7 @@ InputParameters validParams<SplitCHCRes>();
 class SplitCHCRes : public SplitCHBase
 {
 public:
-  SplitCHCRes(const std::string & name, InputParameters parameters);
+  SplitCHCRes(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpResidual();

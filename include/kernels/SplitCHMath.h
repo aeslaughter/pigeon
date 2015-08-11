@@ -12,7 +12,7 @@ InputParameters validParams<SplitCHMath>();
 class SplitCHMath : public SplitCHCRes
 {
 public:
-  SplitCHMath(const std::string & name, InputParameters parameters);
+  SplitCHMath(const InputParameters & parameters);
 
 protected:
   virtual Real computeDFDC(PFFunctionType type);

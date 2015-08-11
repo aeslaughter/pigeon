@@ -12,8 +12,7 @@ InputParameters validParams<ArrheniusDiffusionCoef>();
 class ArrheniusDiffusionCoef : public Material
 {
 public:
-  ArrheniusDiffusionCoef (const std::string & name,
-                InputParameters parameters);
+  ArrheniusDiffusionCoef(const InputParameters & parameters);
 
 protected:
   virtual void computeQpProperties();

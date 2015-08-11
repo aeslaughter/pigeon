@@ -36,7 +36,7 @@ public:
    * Factory constructor, takes parameters so that all derived classes can be built using the same
    * constructor.
    */
-  FissionRateAux(const std::string & name, InputParameters parameters);
+  FissionRateAux(const InputParameters & parameters);
 
   virtual ~FissionRateAux() {}
 

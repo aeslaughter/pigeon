@@ -9,8 +9,8 @@ InputParameters validParams<MatDiffusion>()
   return params;
 }
 
-MatDiffusion::MatDiffusion(const std::string & name, InputParameters parameters) :
-    Diffusion(name, parameters),
+MatDiffusion::MatDiffusion(const InputParameters & parameters) :
+    Diffusion(parameters),
     _D_name(getParam<std::string>("D_name")),
     _D(getMaterialProperty<Real>(_D_name))
 {}

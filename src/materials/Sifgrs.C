@@ -69,8 +69,8 @@ InputParameters validParams<Sifgrs>()
 
 bool Sifgrs::_write_msg = true;
 
-Sifgrs::Sifgrs(const std::string & name, InputParameters parameters) :
-  Material(name, parameters),
+Sifgrs::Sifgrs(const InputParameters & parameters) :
+  Material(parameters),
   _initial_grain_radius(getParam<Real>("initial_grain_radius")),
   _hydrostatic_stress_const(getParam<Real>("hydrostatic_stress_const")),
   _initial_sat_coverage(getParam<Real>("saturation_coverage")),

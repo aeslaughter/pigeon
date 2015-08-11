@@ -58,10 +58,9 @@ InputParameters validParams<TrexApp>()
   return params;
 }
 
-TrexApp::TrexApp(const std::string & name, InputParameters parameters) :
-    MooseApp(name, parameters)
+TrexApp::TrexApp(InputParameters parameters) :
+    MooseApp(parameters)
 {
-  srand(processor_id());
 
   Moose::registerObjects(_factory);
   ModulesApp::registerObjects(_factory);

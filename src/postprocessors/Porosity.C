@@ -7,8 +7,8 @@ InputParameters validParams<Porosity>()
   return params;
 }
 
-Porosity::Porosity(const std::string & name, InputParameters parameters) :
-    ElementAverageValue(name, parameters)
+Porosity::Porosity(const InputParameters & parameters) :
+    ElementAverageValue(parameters)
 {
 }
 

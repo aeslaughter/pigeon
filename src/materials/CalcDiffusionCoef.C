@@ -14,8 +14,8 @@ InputParameters validParams<CalcDiffusionCoef>()
   return params;
 }
 
-CalcDiffusionCoef::CalcDiffusionCoef(const std::string & name, InputParameters parameters)
-    : Material(name, parameters),
+CalcDiffusionCoef::CalcDiffusionCoef(const InputParameters & parameters)
+    : Material(parameters),
       _D0(getParam<Real>("D0")),
       _Q(getParam<Real>("Q")),
       _R(getParam<Real>("R")),

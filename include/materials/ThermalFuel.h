@@ -13,8 +13,7 @@ class BurnupFunction;
 class ThermalFuel : public Material
 {
 public:
-  ThermalFuel(const std::string & name,
-      InputParameters parameters);
+  ThermalFuel(const InputParameters & parameters);
 
 protected:
   virtual void computeProperties();

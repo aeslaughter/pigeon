@@ -8,8 +8,8 @@ InputParameters validParams<ACParsed>()
   return params;
 }
 
-ACParsed::ACParsed(const std::string & name, InputParameters parameters) :
-    DerivativeKernelInterface<JvarMapInterface<ACBulk> >(name, parameters),
+ACParsed::ACParsed(const InputParameters & parameters) :
+    DerivativeKernelInterface<JvarMapInterface<ACBulk> >(parameters),
     _dFdEta(getMaterialPropertyDerivative<Real>(_F_name, _var.name())),
     _d2FdEta2(getMaterialPropertyDerivative<Real>(_F_name, _var.name(), _var.name()))
 {

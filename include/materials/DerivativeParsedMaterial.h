@@ -18,8 +18,7 @@ InputParameters validParams<DerivativeParsedMaterial>();
 class DerivativeParsedMaterial : public DerivativeParsedMaterialHelper
 {
 public:
-  DerivativeParsedMaterial(const std::string & name,
-                           InputParameters parameters);
+  DerivativeParsedMaterial(const InputParameters & parameters);
 };
 
 #endif // DERIVATIVEPARSEDMATERIAL_H

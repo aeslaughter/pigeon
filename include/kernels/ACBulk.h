@@ -12,7 +12,7 @@ InputParameters validParams<ACBulk>();
 class ACBulk : public KernelValue
 {
 public:
-  ACBulk(const std::string & name, InputParameters parameters);
+  ACBulk(const InputParameters & parameters);
 
 protected:
   enum PFFunctionType

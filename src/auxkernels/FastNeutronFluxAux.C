@@ -18,8 +18,8 @@ InputParameters validParams<FastNeutronFluxAux>()
   return params;
 }
 
-FastNeutronFluxAux::FastNeutronFluxAux(const std::string & name, InputParameters parameters) :
-  AuxKernel(name, parameters),
+FastNeutronFluxAux::FastNeutronFluxAux(const InputParameters & parameters) :
+  AuxKernel(parameters),
   _factor(isParamValid("factor") ?
           getParam<Real>("factor") : 1),
   _function(isParamValid("function") ?

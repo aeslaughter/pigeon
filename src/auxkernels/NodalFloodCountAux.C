@@ -28,8 +28,8 @@ InputParameters validParams<NodalFloodCountAux>()
   return params;
 }
 
-NodalFloodCountAux::NodalFloodCountAux(const std::string & name, InputParameters parameters) :
-    AuxKernel(name, parameters),
+NodalFloodCountAux::NodalFloodCountAux(const InputParameters & parameters) :
+    AuxKernel(parameters),
     _flood_counter(getUserObject<NodalFloodCount>("bubble_object")),
     _var_idx(getParam<unsigned int>("map_index")),
     _field_display(getParam<MooseEnum>("field_display")),

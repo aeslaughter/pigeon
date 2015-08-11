@@ -6,8 +6,7 @@
 class CreepPyC : public SolidModel
 {
 public:
-  CreepPyC( const std::string & name,
-            InputParameters params );
+  CreepPyC(const InputParameters & params);
 
 protected:
 

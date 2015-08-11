@@ -9,7 +9,7 @@ class BurnupFunction;
 class VSwellingUO2 : public VolumetricModel
 {
 public:
-  VSwellingUO2( const std::string & name, InputParameters parameters);
+  VSwellingUO2(const InputParameters & parameters);
 
   void initStatefulProperties(unsigned n_points);
 

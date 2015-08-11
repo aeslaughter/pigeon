@@ -19,7 +19,7 @@ InputParameters validParams<SplitCHPoly>();
 class SplitCHPoly : public SplitCHCRes
 {
 public:
-  SplitCHPoly(const std::string & name, InputParameters parameters);
+  SplitCHPoly(const InputParameters & parameters);
 
 protected:
   virtual Real computeDFDC(PFFunctionType type);

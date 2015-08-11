@@ -13,8 +13,8 @@ InputParameters validParams<CHInterface>()
   return params;
 }
 
-CHInterface::CHInterface(const std::string & name, InputParameters parameters) :
-    Kernel(name, parameters),
+CHInterface::CHInterface(const InputParameters & parameters) :
+    Kernel(parameters),
     _kappa_name(getParam<std::string>("kappa_name")),
     _mob_name(getParam<std::string>("mob_name")),
     _Dmob_name(getParam<std::string>("Dmob_name")),

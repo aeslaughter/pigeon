@@ -8,9 +8,8 @@ InputParameters validParams<ArrheniusDiffusion>()
   return params;
 }
 
-ArrheniusDiffusion::ArrheniusDiffusion(const std::string & name,
-                                       InputParameters parameters) :
-  Diffusion(name, parameters),
+ArrheniusDiffusion::ArrheniusDiffusion(const InputParameters & parameters) :
+  Diffusion(parameters),
   _arrhenius_diffusion_coef(getMaterialProperty<Real>("arrhenius_diffusion_coef"))
 {}
 

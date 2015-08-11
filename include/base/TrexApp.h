@@ -11,7 +11,7 @@ InputParameters validParams<TrexApp>();
 class TrexApp : public MooseApp
 {
 public:
-  TrexApp(const std::string & name, InputParameters parameters);
+  TrexApp(InputParameters parameters);
   virtual ~TrexApp();
 
   static void registerApps();

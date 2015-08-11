@@ -12,7 +12,7 @@ class Sifgrs : public Material
 {
 
 public:
-  Sifgrs(const std::string & name, InputParameters parameters);
+  Sifgrs(const InputParameters & parameters);
 
 protected:
   virtual void initStatefulProperties(unsigned n_points);

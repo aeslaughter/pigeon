@@ -7,8 +7,8 @@ InputParameters validParams<ElementIntegralFisGasReleasedSifgrs>()
   return params;
 }
 
-ElementIntegralFisGasReleasedSifgrs::ElementIntegralFisGasReleasedSifgrs(const std::string & name, InputParameters parameters) :
-    ElementIntegralVariablePostprocessor(name, parameters),
+ElementIntegralFisGasReleasedSifgrs::ElementIntegralFisGasReleasedSifgrs(const InputParameters & parameters) :
+    ElementIntegralVariablePostprocessor(parameters),
     _gas_rel_3(getMaterialProperty<Real>("gas_rel_3"))
 {}
 

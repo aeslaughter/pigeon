@@ -20,8 +20,8 @@ InputParameters validParams<PelletBrittleZone>()
   return params;
 }
 
-PelletBrittleZone :: PelletBrittleZone(const std::string & name, InputParameters parameters) :
-  ElementUserObject(name, parameters),
+PelletBrittleZone::PelletBrittleZone(const InputParameters & parameters) :
+  ElementUserObject(parameters),
 
   _pellet_id(coupledValue("pellet_id")),
   _temp(coupledValue("temp")),

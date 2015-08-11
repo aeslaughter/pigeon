@@ -8,8 +8,8 @@ InputParameters validParams<Decay>()
   return params;
 }
 
-Decay::Decay(const std::string & name, InputParameters parameters)
-  :Kernel(name, parameters),
+Decay::Decay(const InputParameters & parameters)
+  :Kernel(parameters),
    _lambda(getMaterialProperty<Real>("lambda"))
 {}
 

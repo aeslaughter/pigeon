@@ -9,9 +9,8 @@ InputParameters validParams<RadioActiveDecayConstant>()
 return params;
 }
 
-RadioActiveDecayConstant::RadioActiveDecayConstant(const std::string & name,
-                   InputParameters parameters)
-  :Material(name, parameters),
+RadioActiveDecayConstant::RadioActiveDecayConstant(const InputParameters & parameters)
+  :Material(parameters),
    _my_lambda(getParam<Real>("lambda")),
    _lambda(declareProperty<Real>("lambda"))
   {}

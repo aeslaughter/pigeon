@@ -8,8 +8,8 @@ InputParameters validParams<CalcDiffusion>()
   return params;
 }
 
-CalcDiffusion::CalcDiffusion(const std::string & name, InputParameters parameters)
-    : Diffusion(name, parameters),
+CalcDiffusion::CalcDiffusion(const InputParameters & parameters)
+    : Diffusion(parameters),
       _diffusion_coef(getMaterialProperty<Real>("diffusion_coef"))
 {
 

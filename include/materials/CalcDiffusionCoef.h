@@ -14,7 +14,7 @@ class CalcDiffusionCoef : public Material
 
 {
 public:
-  CalcDiffusionCoef (const std::string & name, InputParameters parameters);
+  CalcDiffusionCoef(const InputParameters & parameters);
 
 protected:
   virtual void computeProperties();

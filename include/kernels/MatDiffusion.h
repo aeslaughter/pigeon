@@ -13,7 +13,7 @@ InputParameters validParams<MatDiffusion>();
 class MatDiffusion : public Diffusion
 {
 public:
-  MatDiffusion(const std::string & name, InputParameters parameters);
+  MatDiffusion(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpResidual();

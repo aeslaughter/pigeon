@@ -9,8 +9,8 @@ InputParameters validParams<ACBulk>()
   return params;
 }
 
-ACBulk::ACBulk(const std::string & name, InputParameters parameters) :
-    KernelValue(name, parameters),
+ACBulk::ACBulk(const InputParameters & parameters) :
+    KernelValue(parameters),
     _mob_name(getParam<std::string>("mob_name")),
     _L(getMaterialProperty<Real>(_mob_name))
 {

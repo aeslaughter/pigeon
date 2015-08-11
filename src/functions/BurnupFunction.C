@@ -58,8 +58,8 @@ InputParameters validParams<BurnupFunction>()
 // The ideas are coded in TUBRNP by Lassmann.
 //
 
-BurnupFunction::BurnupFunction(const std::string & name, InputParameters params) :
-  Function( name, params ),
+BurnupFunction::BurnupFunction(const InputParameters & params) :
+  Function(params),
   FunctionInterface( params ),
   _ralp(getParam<FunctionName>("rod_ave_lin_pow") != "" ?
         &getFunction("rod_ave_lin_pow") :

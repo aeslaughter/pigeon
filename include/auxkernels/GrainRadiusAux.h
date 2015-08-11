@@ -8,7 +8,7 @@ class GrainRadiusAux : public AuxKernel
 
 public:
 
-  GrainRadiusAux(const std::string & name, InputParameters parameters);
+  GrainRadiusAux(const InputParameters & parameters);
 
   virtual ~GrainRadiusAux() {}
 

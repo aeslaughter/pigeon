@@ -25,9 +25,8 @@ InputParameters validParams<BurnupAuxVarsAction>()
   return params;
 }
 
-BurnupAuxVarsAction::BurnupAuxVarsAction(const std::string & name,
-                                                   InputParameters params) :
-  Action(name, params),
+BurnupAuxVarsAction::BurnupAuxVarsAction(InputParameters params) :
+  Action(params),
   _order(getParam<std::string>("order")),
   _family(getParam<std::string>("family")),
   _N235(getParam<std::string>("N235")),

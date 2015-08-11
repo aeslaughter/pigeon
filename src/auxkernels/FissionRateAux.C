@@ -26,8 +26,8 @@ InputParameters validParams<FissionRateAux>()
   return params;
 }
 
-FissionRateAux::FissionRateAux(const std::string & name, InputParameters parameters)
-  :AuxKernel(name, parameters),
+FissionRateAux::FissionRateAux(const InputParameters & parameters)
+  :AuxKernel(parameters),
    _value(getParam<Real>("value")),
    _has_function(getParam<FunctionName>("function") != ""),
    _function( _has_function ? &getFunction("function") : NULL )

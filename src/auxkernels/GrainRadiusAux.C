@@ -10,7 +10,7 @@ InputParameters validParams<GrainRadiusAux>()
   return params;
 }
 
-GrainRadiusAux::GrainRadiusAux(const std::string & name, InputParameters parameters) : AuxKernel(name, parameters),
+GrainRadiusAux::GrainRadiusAux(const InputParameters & parameters) : AuxKernel(parameters),
 
   conversion_factor(1.56/2.),  // grain radius to linear intercept ratio acc. to M.I. Mendelson (J. Am. Ceram. Soc. 52, p.8, 1969)
   gas_constant(8.314),         // perfect gas constant [J/K]

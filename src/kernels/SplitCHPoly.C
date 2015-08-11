@@ -9,8 +9,8 @@ InputParameters validParams<SplitCHPoly>()
   return params;
 }
 
-SplitCHPoly::SplitCHPoly(const std::string & name, InputParameters parameters) :
-    SplitCHCRes(name, parameters),
+SplitCHPoly::SplitCHPoly(const InputParameters & parameters) :
+    SplitCHCRes(parameters),
     _c_eq_name(getParam<std::string>("c_eq_name")),
     _cv_eq(getMaterialProperty<Real>(_c_eq_name)),
     _W(getMaterialProperty<Real>("barr_height")),

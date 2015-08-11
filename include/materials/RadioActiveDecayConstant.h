@@ -16,8 +16,7 @@ InputParameters validParams<RadioActiveDecayConstant>();
 class RadioActiveDecayConstant : public Material
 {
 public:
-  RadioActiveDecayConstant(const std::string & name,
-           InputParameters parameters);
+  RadioActiveDecayConstant(const InputParameters & parameters);
 
 protected:
   virtual void computeProperties();

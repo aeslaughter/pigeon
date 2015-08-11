@@ -6,7 +6,7 @@
 class BurnupFunctionAction : public AddFunctionAction
 {
 public:
-  BurnupFunctionAction(const std::string & name, InputParameters params);
+  BurnupFunctionAction(InputParameters params);
 };
 
 template<>

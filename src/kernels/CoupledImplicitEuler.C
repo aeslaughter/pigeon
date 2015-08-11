@@ -8,8 +8,8 @@ InputParameters validParams<CoupledImplicitEuler>()
   return params;
 }
 
-CoupledImplicitEuler::CoupledImplicitEuler(const std::string & name, InputParameters parameters) :
-    Kernel(name, parameters),
+CoupledImplicitEuler::CoupledImplicitEuler(const InputParameters & parameters) :
+    Kernel(parameters),
     _v_dot(coupledDot("v")),
     _dv_dot(coupledDotDu("v")),
     _v_var(coupled("v"))

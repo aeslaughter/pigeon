@@ -12,7 +12,7 @@ InputParameters validParams<ACInterface>();
 class ACInterface : public KernelGrad
 {
 public:
-  ACInterface(const std::string & name, InputParameters parameters);
+  ACInterface(const InputParameters & parameters);
 
 protected:
   enum PFFunctionType

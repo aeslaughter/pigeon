@@ -17,9 +17,8 @@ InputParameters validParams<CreepPyC>()
 }
 
 
-CreepPyC::CreepPyC( const std::string & name,
-                    InputParameters parameters )
-  :SolidModel( name, parameters ),
+CreepPyC::CreepPyC(const InputParameters & parameters)
+  :SolidModel(parameters),
    _densitygcc(getParam<Real>("density") * 0.001), // kg/m3 -> g/cc
    _fast_neutron_flux(coupledValue("flux")),
    _nu( 0.5 ),

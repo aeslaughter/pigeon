@@ -11,8 +11,8 @@ InputParameters validParams<DoubleWellPotential>()
   return params;
 }
 
-DoubleWellPotential::DoubleWellPotential(const std::string & name, InputParameters parameters) :
-    ACBulk( name, parameters )
+DoubleWellPotential::DoubleWellPotential(const InputParameters & parameters) :
+    ACBulk(parameters)
 {
 }
 

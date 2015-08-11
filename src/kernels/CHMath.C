@@ -8,8 +8,8 @@ InputParameters validParams<CHMath>()
   return params;
 }
 
-CHMath::CHMath(const std::string & name, InputParameters parameters) :
-    CHBulk(name, parameters)
+CHMath::CHMath(const InputParameters & parameters) :
+    CHBulk(parameters)
 {
 }
 

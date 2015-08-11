@@ -11,7 +11,7 @@ class NeutronHeatSource : public Kernel
 {
 public:
 
-  NeutronHeatSource(const std::string & name, InputParameters parameters);
+  NeutronHeatSource(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpResidual();

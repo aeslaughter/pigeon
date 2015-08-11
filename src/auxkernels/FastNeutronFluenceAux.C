@@ -11,8 +11,8 @@ InputParameters validParams<FastNeutronFluenceAux>()
   return params;
 }
 
-FastNeutronFluenceAux::FastNeutronFluenceAux(const std::string & name, InputParameters parameters)
-  :AuxKernel(name, parameters),
+FastNeutronFluenceAux::FastNeutronFluenceAux(const InputParameters & parameters)
+  :AuxKernel(parameters),
    _fast_neutron_flux(coupledValue("fast_neutron_flux")),
    _fast_neutron_flux_old(coupledValueOld("fast_neutron_flux"))
 {}
