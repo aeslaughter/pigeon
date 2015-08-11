@@ -11,7 +11,7 @@ InputParameters validParams<BananaApp>();
 class BananaApp : public MooseApp
 {
 public:
-  BananaApp(const std::string & name, InputParameters parameters);
+  BananaApp(InputParameters parameters);
   virtual ~BananaApp();
 
   static void registerApps();
