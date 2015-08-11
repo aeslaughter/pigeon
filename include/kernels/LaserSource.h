@@ -48,8 +48,7 @@ public:
    * string and a InputParameters object, just like other
    * Kernel-derived classes.
    */
-  LaserSource(const std::string & name,
-                    InputParameters parameters);
+  LaserSource(const InputParameters & parameters);
 
 protected:
   /**

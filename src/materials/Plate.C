@@ -29,8 +29,8 @@ InputParameters validParams<Plate>()
   return params;
 }
 
-Plate::Plate(const std::string & name, InputParameters parameters) :
-    Material(name, parameters),
+Plate::Plate(const InputParameters & parameters) :
+    Material(parameters),
     _l(getParam<Real>("l")),
     _thickness(declareProperty<Real>("thickness")),
     _rho(getParam<Real>("rho")),

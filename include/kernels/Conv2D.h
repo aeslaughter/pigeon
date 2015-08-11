@@ -48,8 +48,7 @@ public:
    * string and a InputParameters object, just like other
    * Kernel-derived classes.
    */
-  Conv2D(const std::string & name,
-                    InputParameters parameters);
+  Conv2D(const InputParameters & parameters);
 
 protected:
   /**

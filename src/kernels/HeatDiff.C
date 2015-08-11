@@ -25,10 +25,9 @@ InputParameters validParams<HeatDiff>()
   return params;
 }
 
-HeatDiff::HeatDiff(const std::string & name,
-                                     InputParameters parameters) :
+HeatDiff::HeatDiff(const InputParameters & parameters) :
   // You must call the constructor of the base class first
-  Kernel(name,parameters)
+  Kernel(parameters)
 {}
 
 Real HeatDiff::computeQpResidual()

@@ -31,10 +31,9 @@ InputParameters validParams<LaserSource>()
   return params;
 }
 
-LaserSource::LaserSource(const std::string & name,
-                                     InputParameters parameters) :
+LaserSource::LaserSource(const InputParameters & parameters) :
   // You must call the constructor of the base class first
-  Kernel(name,parameters),
+  Kernel(parameters),
   _power(getFunction("power")),
   _x0(getFunction("x0")),
   _y0(getFunction("y0")),

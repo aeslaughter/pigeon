@@ -27,8 +27,8 @@ InputParameters validParams<ConvectBC>()
   return params;
 }
 
-ConvectBC::ConvectBC(const std::string & name, InputParameters parameters) :
-    IntegratedBC(name,parameters),
+ConvectBC::ConvectBC(const InputParameters & parameters) :
+    IntegratedBC(parameters),
     _mu(getParam<Real>("mu")),
     _u_e(getFunction("u_e"))
 {}

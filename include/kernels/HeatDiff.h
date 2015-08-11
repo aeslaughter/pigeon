@@ -47,8 +47,7 @@ public:
    * string and a InputParameters object, just like other
    * Kernel-derived classes.
    */
-  HeatDiff(const std::string & name,
-                    InputParameters parameters);
+  HeatDiff(const InputParameters & parameters);
 
 protected:
 

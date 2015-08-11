@@ -27,10 +27,9 @@ InputParameters validParams<Conv2D>()
   return params;
 }
 
-Conv2D::Conv2D(const std::string & name,
-                                     InputParameters parameters) :
+Conv2D::Conv2D(const InputParameters & parameters) :
   // You must call the constructor of the base class first
-  Kernel(name,parameters),
+  Kernel(parameters),
   _mu(getParam<Real>("mu")),
   _u_e(getFunction("u_e"))
 {}

@@ -28,8 +28,7 @@ class Plate : public Material
 {
 
 public:
-  Plate(const std::string & name,
-                  InputParameters parameters);
+  Plate(const InputParameters & parameters);
 
 protected:
   virtual void computeQpProperties();
