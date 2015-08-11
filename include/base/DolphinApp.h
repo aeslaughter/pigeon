@@ -11,7 +11,7 @@ InputParameters validParams<DolphinApp>();
 class DolphinApp : public MooseApp
 {
 public:
-  DolphinApp(const std::string & name, InputParameters parameters);
+  DolphinApp(InputParameters parameters);
   virtual ~DolphinApp();
 
   static void registerApps();

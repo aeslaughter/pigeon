@@ -13,10 +13,9 @@ InputParameters validParams<DolphinApp>()
   return params;
 }
 
-DolphinApp::DolphinApp(const std::string & name, InputParameters parameters) :
-    MooseApp(name, parameters)
+DolphinApp::DolphinApp(InputParameters parameters) :
+    MooseApp(parameters)
 {
-  srand(processor_id());
 
   Moose::registerObjects(_factory);
   ModulesApp::registerObjects(_factory);
