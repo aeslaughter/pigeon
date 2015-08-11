@@ -198,7 +198,7 @@ FluidState::execute()
     const Elem * current_elem = *el;
 
     /// Loop over all nodes on each element
-    for (unsigned int i = 0; i < current_elem->n_vertices(); ++i)
+    for (unsigned int i = 0; i < current_elem->n_nodes(); ++i)
     {
       const Node * current_node = current_elem->get_node(i);
       unsigned int nodeid = current_node->id();
