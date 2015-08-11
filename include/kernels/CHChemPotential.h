@@ -14,7 +14,7 @@ InputParameters validParams<CHChemPotential>();
 class CHChemPotential : public CHBulk
 {
 public:
-  CHChemPotential(const std::string & name, InputParameters parameters);
+  CHChemPotential(const InputParameters & parameters);
 
 protected:
   virtual RealGradient computeGradDFDCons(PFFunctionType type);

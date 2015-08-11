@@ -8,8 +8,8 @@ InputParameters validParams<CHChemPotential>()
   return params;
 }
 
-CHChemPotential::CHChemPotential(const std::string & name, InputParameters parameters) :
-    CHBulk(name, parameters)
+CHChemPotential::CHChemPotential(const InputParameters & parameters) :
+    CHBulk(parameters)
 {
 }
 

@@ -17,9 +17,8 @@ InputParameters validParams<PFDiffusion>()
   return params;
 }
 
-PFDiffusion::PFDiffusion(const std::string & name,
-                       InputParameters parameters) :
-    Material(name, parameters),
+PFDiffusion::PFDiffusion(const InputParameters & parameters) :
+    Material(parameters),
     _Dvol(getParam<Real>("Dvol")),
     _Dvap(getParam<Real>("Dvap")),
     _Dsurf(getParam<Real>("Dsurf")),

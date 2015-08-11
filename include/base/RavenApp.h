@@ -11,7 +11,7 @@ InputParameters validParams<RavenApp>();
 class RavenApp : public MooseApp
 {
 public:
-  RavenApp(const std::string & name, InputParameters parameters);
+  RavenApp(InputParameters parameters);
   virtual ~RavenApp();
 
   static void registerApps();

@@ -17,10 +17,9 @@ InputParameters validParams<RavenApp>()
   return params;
 }
 
-RavenApp::RavenApp(const std::string & name, InputParameters parameters) :
-    MooseApp(name, parameters)
+RavenApp::RavenApp(InputParameters parameters) :
+    MooseApp(parameters)
 {
-  srand(processor_id());
 
   Moose::registerObjects(_factory);
   ModulesApp::registerObjects(_factory);

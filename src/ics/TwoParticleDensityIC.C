@@ -14,9 +14,8 @@ InputParameters validParams<TwoParticleDensityIC>()
   return params;
 }
 
-TwoParticleDensityIC::TwoParticleDensityIC(const std::string & name,
-                                                     InputParameters parameters) :
-    InitialCondition(name, parameters),
+TwoParticleDensityIC::TwoParticleDensityIC(const InputParameters & parameters) :
+    InitialCondition(parameters),
     _mesh(_fe_problem.mesh()),
     _nl(_fe_problem.getNonlinearSystem()),
     _minvalue(getParam<Real>("min")),
