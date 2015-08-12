@@ -11,7 +11,7 @@ InputParameters validParams<TurkeyApp>();
 class TurkeyApp : public MooseApp
 {
 public:
-  TurkeyApp(const std::string & name, InputParameters parameters);
+  TurkeyApp(InputParameters parameters);
   virtual ~TurkeyApp();
 
   static void registerApps();

@@ -13,10 +13,9 @@ InputParameters validParams<TurkeyApp>()
   return params;
 }
 
-TurkeyApp::TurkeyApp(const std::string & name, InputParameters parameters) :
-    MooseApp(name, parameters)
+TurkeyApp::TurkeyApp(InputParameters parameters) :
+    MooseApp(parameters)
 {
-  srand(processor_id());
 
   Moose::registerObjects(_factory);
   ModulesApp::registerObjects(_factory);
