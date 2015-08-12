@@ -11,7 +11,7 @@ InputParameters validParams<SquirrelApp>();
 class SquirrelApp : public MooseApp
 {
 public:
-  SquirrelApp(const std::string & name, InputParameters parameters);
+  SquirrelApp(InputParameters parameters);
   virtual ~SquirrelApp();
 
   static void registerApps();
