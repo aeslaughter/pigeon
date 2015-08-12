@@ -13,10 +13,9 @@ InputParameters validParams<MinhocaApp>()
   return params;
 }
 
-MinhocaApp::MinhocaApp(const std::string & name, InputParameters parameters) :
-    MooseApp(name, parameters)
+MinhocaApp::MinhocaApp(InputParameters parameters) :
+    MooseApp(parameters)
 {
-  srand(processor_id());
 
   Moose::registerObjects(_factory);
   ModulesApp::registerObjects(_factory);

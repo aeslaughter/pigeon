@@ -11,7 +11,7 @@ InputParameters validParams<MinhocaApp>();
 class MinhocaApp : public MooseApp
 {
 public:
-  MinhocaApp(const std::string & name, InputParameters parameters);
+  MinhocaApp(InputParameters parameters);
   virtual ~MinhocaApp();
 
   static void registerApps();
