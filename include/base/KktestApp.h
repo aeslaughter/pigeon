@@ -11,7 +11,7 @@ InputParameters validParams<KktestApp>();
 class KktestApp : public MooseApp
 {
 public:
-  KktestApp(const std::string & name, InputParameters parameters);
+  KktestApp(InputParameters parameters);
   virtual ~KktestApp();
 
   static void registerApps();

@@ -13,10 +13,9 @@ InputParameters validParams<KktestApp>()
   return params;
 }
 
-KktestApp::KktestApp(const std::string & name, InputParameters parameters) :
-    MooseApp(name, parameters)
+KktestApp::KktestApp(InputParameters parameters) :
+    MooseApp(parameters)
 {
-  srand(processor_id());
 
   Moose::registerObjects(_factory);
   ModulesApp::registerObjects(_factory);
