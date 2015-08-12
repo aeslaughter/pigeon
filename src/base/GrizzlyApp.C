@@ -10,10 +10,9 @@ InputParameters validParams<GrizzlyApp>()
   return params;
 }
 
-GrizzlyApp::GrizzlyApp(const std::string & name, InputParameters parameters) :
-    MooseApp(name, parameters)
+GrizzlyApp::GrizzlyApp(InputParameters parameters) :
+    MooseApp(parameters)
 {
-  srand(processor_id());
 
   Moose::registerObjects(_factory);
   ModulesApp::registerObjects(_factory);

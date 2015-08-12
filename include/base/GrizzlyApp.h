@@ -11,7 +11,7 @@ InputParameters validParams<GrizzlyApp>();
 class GrizzlyApp : public MooseApp
 {
 public:
-  GrizzlyApp(const std::string & name, InputParameters parameters);
+  GrizzlyApp(InputParameters parameters);
   virtual ~GrizzlyApp();
 
   static void registerApps();
