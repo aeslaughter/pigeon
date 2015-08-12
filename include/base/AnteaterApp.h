@@ -11,7 +11,7 @@ InputParameters validParams<AnteaterApp>();
 class AnteaterApp : public MooseApp
 {
 public:
-  AnteaterApp(const std::string & name, InputParameters parameters);
+  AnteaterApp(InputParameters parameters);
   virtual ~AnteaterApp();
 
   static void registerApps();
