@@ -11,7 +11,7 @@ InputParameters validParams<TardigradeApp>();
 class TardigradeApp : public MooseApp
 {
 public:
-  TardigradeApp(const std::string & name, InputParameters parameters);
+  TardigradeApp(InputParameters parameters);
   virtual ~TardigradeApp();
 
   static void registerApps();
