@@ -13,7 +13,7 @@ class NeutronicRemoval : public Reaction
 {
 public:
 
-  NeutronicRemoval(const std::string & name, InputParameters parameters);
+  NeutronicRemoval(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpResidual(); 

@@ -12,7 +12,7 @@ InputParameters validParams<NeutronicSource>();
 class NeutronicSource : public EigenKernel 
 {
 public:
-  NeutronicSource(const std::string & name, InputParameters parameters);
+  NeutronicSource(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpResidual(); 

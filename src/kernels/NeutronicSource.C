@@ -7,9 +7,9 @@ InputParameters validParams<NeutronicSource>()
   return params;
 }
 
-NeutronicSource::NeutronicSource(const std::string & name, InputParameters parameters) :
+NeutronicSource::NeutronicSource(const InputParameters & parameters) :
 
-  EigenKernel(name,parameters),
+  EigenKernel(parameters),
   _nu_sigma_f_xs(getMaterialProperty<Real>("nu_sigma_f_xs_g0")) 
 {}
 

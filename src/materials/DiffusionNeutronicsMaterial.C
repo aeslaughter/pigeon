@@ -10,8 +10,8 @@ InputParameters validParams<DiffusionNeutronicsMaterial>()
   return params;
 }
 
-DiffusionNeutronicsMaterial::DiffusionNeutronicsMaterial(const std::string & name, InputParameters parameters) : 
-  Material(name, parameters),
+DiffusionNeutronicsMaterial::DiffusionNeutronicsMaterial(const InputParameters & parameters) : 
+  Material(parameters),
   _diffusion_coef_value(getParam<Real>("diffusion_coef")),
   _absorption_value(getParam<Real>("sigma_abs")),
   _nu_sigma_f_value(getParam<Real>("nusigma_f")), 

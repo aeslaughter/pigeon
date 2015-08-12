@@ -13,7 +13,7 @@ class NeutronicDiffusion : public Diffusion
 {
 public:
 
-  NeutronicDiffusion(const std::string & name, InputParameters parameters);
+  NeutronicDiffusion(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpResidual(); 

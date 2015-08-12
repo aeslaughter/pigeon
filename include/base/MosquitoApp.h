@@ -11,7 +11,7 @@ InputParameters validParams<MosquitoApp>();
 class MosquitoApp : public MooseApp
 {
 public:
-  MosquitoApp(const std::string & name, InputParameters parameters);
+  MosquitoApp(InputParameters parameters);
   virtual ~MosquitoApp();
 
   static void registerApps();
