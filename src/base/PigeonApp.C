@@ -4,6 +4,8 @@
 #include "ModulesApp.h"
 #include "MooseSyntax.h"
 
+#include "LaplaceYoung.h"
+
 template<>
 InputParameters validParams<PigeonApp>()
 {
@@ -45,6 +47,8 @@ extern "C" void PigeonApp__registerObjects(Factory & factory) { PigeonApp::regis
 void
 PigeonApp::registerObjects(Factory & factory)
 {
+  registerKernel(LaplaceYoung);
+
 }
 
 // External entry point for dynamic syntax association
