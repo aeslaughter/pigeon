@@ -45,13 +45,13 @@ protected:
   Real _maximum;
 
   /// Denote x = porepressure - centre.  Then Flux out = (max/cutoff^3)*(2x + cutoff)(x - cutoff)^2 for cutoff < x < 0.  Flux out = max for x >= 0.  Flux out = 0 for x <= cutoff.
-  Function & _cutoff;
+  const Function & _cutoff;
 
   /// Denote x = porepressure - centre.  Then Flux out = (max/cutoff^3)*(2x + cutoff)(x - cutoff)^2 for cutoff < x < 0.  Flux out = max for x >= 0.  Flux out = 0 for x <= cutoff.
   Real _centre;
 
   /// multiplying function: all fluxes will be multiplied by this
-  Function & _m_func;
+  const Function & _m_func;
 
   /**
    * holds info regarding the names of the Richards variables
