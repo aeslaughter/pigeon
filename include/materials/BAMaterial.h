@@ -72,8 +72,8 @@ private:
 
   bool _use_transverse_direction;
 
-  std::vector<Function *> _change_kh;
-  std::vector<Function *> _change_kv;
+  std::vector<const Function *> _change_kh;
+  std::vector<const Function *> _change_kv;
 
   std::vector<const VariableValue *> _trans_dir;
 };

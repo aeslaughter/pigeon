@@ -57,7 +57,11 @@ BAPolyLineSink::computeQpResidual()
   Real test_fcn = _test[_i][_qp];
   Real flow = 0;
   if ((_t >= _start_time) && (_t <= _end_time))
-    flow = test_fcn*_sink_func.sample(_pp[_qp][_pvar] - _p0.value(_t, _q_point[_qp]));
+  {
+    const Real pz = _p0.value(_t, _q_point[_qp]);
+    const Real fl = _sink_func.sample(_pp[_qp][_pvar] - pz);
+    flow = test_fcn*fl;
+  }
   _total_outflow_mass.add(flow*_dt);
   _point_pp.record(_pp[_qp][_pvar]);
   return flow;
@@ -66,9 +70,13 @@ BAPolyLineSink::computeQpResidual()
 Real
 BAPolyLineSink::computeQpJacobian()
 {
-  Real test_fcn = _test[_i][_qp];
+  const Real test_fcn = _test[_i][_qp];
   if ((_t >= _start_time) && (_t <= _end_time))
-    return test_fcn*_sink_func.sampleDerivative(_pp[_qp][_pvar] - _p0.value(_t, _q_point[_qp]))*_dpp_dv[_qp][_pvar][_pvar]*_phi[_j][_qp];
+  {
+    const Real pz = _p0.value(_t, _q_point[_qp]);
+    const Real sf = _sink_func.sampleDerivative(_pp[_qp][_pvar] - pz);
+    return test_fcn*sf*_dpp_dv[_qp][_pvar][_pvar]*_phi[_j][_qp];
+  }
   else
     return 0.0;
 }
@@ -81,7 +89,11 @@ BAPolyLineSink::computeQpOffDiagJacobian(unsigned int jvar)
   unsigned int dvar = _richards_name_UO.richards_var_num(jvar);
   Real test_fcn = _test[_i][_qp];
   if ((_t >= _start_time) && (_t <= _end_time))
-    return test_fcn*_sink_func.sampleDerivative(_pp[_qp][_pvar] - _p0.value(_t, _q_point[_qp]))*_dpp_dv[_qp][_pvar][dvar]*_phi[_j][_qp];
+  {
+    const Real pz = _p0.value(_t, _q_point[_qp]);
+    const Real sf = _sink_func.sampleDerivative(_pp[_qp][_pvar] - pz);
+    return test_fcn*sf*_dpp_dv[_qp][_pvar][dvar]*_phi[_j][_qp];
+  }
   else
     return 0.0;
 }

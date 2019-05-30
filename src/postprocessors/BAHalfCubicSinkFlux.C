@@ -42,12 +42,12 @@ Real
 BAHalfCubicSinkFlux::computeQpIntegral()
 {
   Real x = _pp[_qp][_pvar] - _centre;
-  Real full_value = _maximum*_dt*_m_func.value(_t, _q_point[_qp]);
+  const Real full_value = _maximum*_dt*_m_func.value(_t, _q_point[_qp]);
 
   if (x >= 0)
     return full_value;
 
-  Real cutoff = _cutoff.value(_t, _q_point[_qp]);
+  const Real cutoff = _cutoff.value(_t, _q_point[_qp]);
   if (x <= cutoff)
     return 0;
 

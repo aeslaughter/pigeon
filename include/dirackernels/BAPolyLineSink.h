@@ -33,7 +33,7 @@ public:
 
 protected:
 
-  Function & _p0;
+  const Function & _p0;
 
 private:
 

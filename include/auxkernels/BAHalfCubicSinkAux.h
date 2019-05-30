@@ -35,7 +35,7 @@ private:
   Real _maximum;
 
   /// Denote x = porepressure - centre.  Then Flux out = (max/cutoff^3)*(2x + cutoff)(x - cutoff)^2 for cutoff < x < 0.  Flux out = max for x >= 0.  Flux out = 0 for x <= cutoff.
-  Function & _cutoff;
+  const Function & _cutoff;
 
   /// Denote x = porepressure - centre.  Then Flux out = (max/cutoff^3)*(2x + cutoff)(x - cutoff)^2 for cutoff < x < 0.  Flux out = max for x >= 0.  Flux out = 0 for x <= cutoff.
   Real _centre;
@@ -44,7 +44,7 @@ private:
   const VariableValue & _pressure_var;
 
   /// the multiplier function: the flux out will be multiplied by this function
-  Function & _m_func;
+  const Function & _m_func;
 };
 
 #endif //BAHALFCUBICSINKAUX_H

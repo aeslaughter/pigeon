@@ -139,10 +139,8 @@ BAMaterial::computeProperties()
   // all of the following are assumed to be constant throughout the material
   // This is a requirement in other parts of Richards
   Real depth = _depth[0];
-  Real change_kh = _change_kh[ch_zone]->value(_t, _q_point[0]);
-  change_kh = std::min(change_kh, _max_kh_change);
-  Real change_kv = _change_kv[ch_zone]->value(_t, _q_point[0]);
-  change_kv = std::min(change_kv, _max_kv_change);
+  const Real change_kh = std::min(_change_kh[ch_zone]->value(_t, _q_point[0]), _max_kh_change);
+  const Real change_kv = std::min(_change_kv[ch_zone]->value(_t, _q_point[0]), _max_kv_change);
   Real porosity = _por[ipor_zone]*std::exp(-_decayp*depth);
   Real permh = _kh[i_zone]*std::exp(-_decayh*depth)*std::pow(10, change_kh);
   Real permv = _kv[i_zone]*std::exp(-_decayv*depth)*std::pow(10, change_kv);
