@@ -45,7 +45,7 @@ protected:
   Real _maximum;
 
   /// Denote x = porepressure - centre.  Then Flux out = (max/cutoff^3)*(2x + cutoff)(x - cutoff)^2 for cutoff < x < 0.  Flux out = max for x >= 0.  Flux out = 0 for x <= cutoff.
-  Function & _cutoff;
+  const Function & _cutoff;
 
   /// Denote x = porepressure - centre.  Then Flux out = (max/cutoff^3)*(2x + cutoff)(x - cutoff)^2 for cutoff < x < 0.  Flux out = max for x >= 0.  Flux out = 0 for x <= cutoff.
   Real _centre;
@@ -66,7 +66,7 @@ protected:
   unsigned int _pvar;
 
   /// the multiplier function: the flux out will be multiplied by this function
-  Function & _m_func;
+  const Function & _m_func;
 
   /// porepressure (or porepressure vector for multiphase problems)
   const MaterialProperty<std::vector<Real> > & _pp;

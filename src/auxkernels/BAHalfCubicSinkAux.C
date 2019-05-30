@@ -34,16 +34,16 @@ Real
 BAHalfCubicSinkAux::computeValue()
 {
   Real x = _pressure_var[_qp] - _centre;
-  Real full_value = _maximum*_m_func.value(_t, _q_point[_qp]);
+  const Real full_value = _maximum*_m_func.value(_t, _q_point[_qp]);
 
   if (x >= 0)
     return full_value;
 
-  Real cutoff = _cutoff.value(_t, _q_point[_qp]);
+  const Real cutoff = _cutoff.value(_t, _q_point[_qp]);
   if (x <= cutoff)
     return 0;
 
-  Real cutoff3 = cutoff*cutoff*cutoff;
+  const Real cutoff3 = cutoff*cutoff*cutoff;
   return full_value*(2*x + cutoff)*(x - cutoff)*(x - cutoff)/cutoff3;
 }
 

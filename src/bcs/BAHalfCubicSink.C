@@ -43,13 +43,13 @@ BAHalfCubicSink::BAHalfCubicSink(const InputParameters & parameters) :
 Real
 BAHalfCubicSink::computeQpResidual()
 {
-  Real x = _pp[_qp][_pvar] - _centre;
-  Real full_value = _maximum*_test[_i][_qp]*_m_func.value(_t, _q_point[_qp]);
+  const Real x = _pp[_qp][_pvar] - _centre;
+  const Real full_value = _maximum*_test[_i][_qp]*_m_func.value(_t, _q_point[_qp]);
 
   if (x >= 0)
     return full_value;
 
-  Real cutoff = _cutoff.value(_t, _q_point[_qp]);
+  const Real cutoff = _cutoff.value(_t, _q_point[_qp]);
   if (x <= cutoff)
     return 0;
 
@@ -60,13 +60,13 @@ BAHalfCubicSink::computeQpResidual()
 Real
 BAHalfCubicSink::computeQpJacobian()
 {
-  Real x = _pp[_qp][_pvar] - _centre;
-  Real full_value = _maximum*_test[_i][_qp]*_m_func.value(_t, _q_point[_qp]);
+  const Real x = _pp[_qp][_pvar] - _centre;
+  const Real full_value = _maximum*_test[_i][_qp]*_m_func.value(_t, _q_point[_qp]);
 
   if (x >= 0)
     return 0.0;
 
-  Real cutoff = _cutoff.value(_t, _q_point[_qp]);
+  const Real cutoff = _cutoff.value(_t, _q_point[_qp]);
   if (x <= cutoff)
     return 0;
 
@@ -81,16 +81,16 @@ BAHalfCubicSink::computeQpOffDiagJacobian(unsigned int jvar)
     return 0.0;
   unsigned int dvar = _richards_name_UO.richards_var_num(jvar);
 
-  Real x = _pp[_qp][_pvar] - _centre;
-  Real full_value = _maximum*_test[_i][_qp]*_m_func.value(_t, _q_point[_qp]);
+  const Real x = _pp[_qp][_pvar] - _centre;
+  const Real full_value = _maximum*_test[_i][_qp]*_m_func.value(_t, _q_point[_qp]);
 
   if (x >= 0)
     return 0.0;
 
-  Real cutoff = _cutoff.value(_t, _q_point[_qp]);
+  const Real cutoff = _cutoff.value(_t, _q_point[_qp]);
   if (x <= cutoff)
     return 0;
 
-  Real cutoff3 = cutoff*cutoff*cutoff;
+  const Real cutoff3 = cutoff*cutoff*cutoff;
   return full_value*6*x*(x - cutoff)/cutoff3*_phi[_j][_qp]*_dpp_dv[_qp][_pvar][dvar];
 }
